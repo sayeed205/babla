@@ -28,6 +28,7 @@
     "#policies/*": "./app/policies/*.js",
     "#abilities/*": "./app/abilities/*.js",
     "#types/*": "./app/types/*.js",
+    "#utils/*": "./app/utils/*.js",
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
     "#tests/*": "./tests/*.js",
@@ -59,10 +60,13 @@
     "@adonisjs/core": "^6.18.0",
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^21.6.1",
+    "@mtcute/dispatcher": "^0.24.3",
+    "@mtcute/node": "^0.24.3",
     "@vinejs/vine": "^3.0.1",
     "luxon": "^3.6.1",
     "pg": "^8.16.2",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "tmdb-ts": "^2.0.1"
   },
   "hotHook": {
     "boundaries": [
@@ -73,7 +77,6 @@
   "prettier": "@adonisjs/prettier-config",
   "lint-staged": {
     "*.{js,ts}": [
-      "eslint --fix",
       "prettier --write ."
     ],
     "*.{json,md,yml,yaml}": [

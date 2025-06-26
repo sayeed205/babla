@@ -47,6 +47,14 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/lucid/database_provider'),
     () => import('@adonisjs/auth/auth_provider'),
+    {
+      file: () => import('#providers/tg_provider'),
+      environment: ['web'],
+    },
+    {
+      file: () => import('#providers/tg_logger_provider'),
+      environment: ['web'],
+    },
   ],
 
   /*

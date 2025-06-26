@@ -2,5 +2,7 @@ words = [
     "adonisjs",
     "cuid",
     "luxon",
+    "mtcute",
+    "tmdb",
     "tokenable",
 ]
