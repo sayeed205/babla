@@ -1,9 +1,10 @@
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
 
 import withID from '#models/utils/with_id'
 import { withTimestamps } from '#models/utils/with_timestamps'
 import type { ExtraVideos, MediaLinks, MediaMeta } from '#types/media'
+import app from '@adonisjs/core/services/app'
 
 export default class Movie extends compose(BaseModel, withID(), withTimestamps()) {
   @column()
@@ -71,4 +72,28 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
 
   @column()
   declare productionCountries: string[]
+
+  @beforeCreate()
+  public static async embedMovie(movie: Movie) {
+    const meilisearch = await app.container.make('meilisearch')
+    const movieIndex = await meilisearch.getIndex('movies')
+    await movieIndex.addDocuments([
+      {
+        id: movie.id,
+        title: movie.title,
+        tagline: movie.tagline,
+        poster: movie.poster,
+        backdrop: movie.backdrop,
+        logo: movie.logo,
+        runtime: movie.runtime,
+        popularity: movie.popularity,
+        voteAverage: movie.voteAverage,
+        voteCount: movie.voteCount,
+        adult: movie.adult,
+        releaseDate: movie.releaseDate,
+        genres: movie.genres,
+        overview: movie.overview,
+      },
+    ])
+  }
 }

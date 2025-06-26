@@ -24,6 +24,5 @@ yarn-error.log
 # Platform specific
 .DS_Store
 
-
 # TG client sessions
 client.*

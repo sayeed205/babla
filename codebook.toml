@@ -2,7 +2,9 @@ words = [
     "adonisjs",
     "cuid",
     "luxon",
+    "meilisearch",
     "mtcute",
+    "openai",
     "tmdb",
     "tokenable",
 ]

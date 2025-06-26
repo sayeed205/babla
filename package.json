@@ -64,6 +64,7 @@
     "@mtcute/node": "^0.24.3",
     "@vinejs/vine": "^3.0.1",
     "luxon": "^3.6.1",
+    "meilisearch": "^0.51.0",
     "pg": "^8.16.2",
     "reflect-metadata": "^0.2.2",
     "tmdb-ts": "^2.0.1"
