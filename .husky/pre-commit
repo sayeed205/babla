@@ -1,0 +1,2 @@
+export PATH="/home/hitarashi/.local/share/nvm/v22.17.0/bin:$PATH"
+npx lint-staged
