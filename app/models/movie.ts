@@ -1,6 +1,5 @@
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
-import db from '@adonisjs/lucid/services/db'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 import withID from '#models/utils/with_id'
 import { withTimestamps } from '#models/utils/with_timestamps'
