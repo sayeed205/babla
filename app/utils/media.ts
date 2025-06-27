@@ -1,4 +1,8 @@
+import mediaInfoFactory from 'mediainfo.js'
 import { Image } from 'tmdb-ts'
+
+import type { MediaMeta } from '#types/media'
+import app from '@adonisjs/core/services/app'
 
 export type TGMovieCaption = {
   title: string
@@ -62,4 +66,36 @@ export function getImage(images: Image[]): string {
       return true
     })?.file_path || ''
   )
+}
+
+export async function getVideoMetadata(
+  fileId: string
+): Promise<Omit<MediaMeta, 'type' | 'size' | 'ext'>> {
+  const { tg } = await app.container.make('tg')
+
+  const mediainfo = await mediaInfoFactory({
+    locateFile: () =>
+      new URL('node_modules/mediainfo.js/dist/MediaInfoModule.wasm', app.appRoot).pathname,
+  })
+  const size = 1024 * 1024
+  const result = await mediainfo.analyzeData(
+    () => size,
+    async () =>
+      await tg.downloadAsBuffer(fileId, {
+        offset: 0,
+        limit: size,
+      })
+  )
+
+  const general = result.media?.track.find((t) => t['@type'] === 'General') || {}
+  const video = result.media?.track.find((t) => t['@type'] === 'Video') || {}
+
+  mediainfo.close()
+
+  return {
+    bitRate: parseInt(general.OverallBitRate || '0', 10),
+    bitDepth: parseInt(video.BitDepth || '0', 10),
+    videoCodec: video.Format || video.CodecID || video.CodecIDHint || '',
+    frameRate: parseFloat(video.FrameRate || '0'),
+  }
 }

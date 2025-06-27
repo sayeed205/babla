@@ -1,6 +1,7 @@
 import logger from '@adonisjs/core/services/logger'
-import { Dispatcher, filters } from '@mtcute/dispatcher'
+import { Dispatcher, filters, MessageContext } from '@mtcute/dispatcher'
 import { TelegramClient } from '@mtcute/node'
+import mime from 'mime'
 import { TMDB } from 'tmdb-ts'
 
 import type { ApplicationService } from '@adonisjs/core/types'
@@ -8,7 +9,13 @@ import type { Document, Video } from '@mtcute/node'
 
 import Movie from '#models/movie'
 import env from '#start/env'
-import { getImage, parseMediaInfo, TGMovieCaption, TGShowsCaption } from '#utils/media'
+import {
+  getImage,
+  getVideoMetadata,
+  parseMediaInfo,
+  TGMovieCaption,
+  TGShowsCaption,
+} from '#utils/media'
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
@@ -59,17 +66,8 @@ export default class TGProvider {
    */
   async ready() {
     const { dp } = await this.app.container.make('tg')
-    dp.onNewMessage(filters.media, async ({ media, text }) => {
-      if (media.type === 'document' || media.type === 'video') {
-        logger.info(`Processing: ${media.fileName}, ${text}`)
-
-        const meta = parseMediaInfo(text)
-        if (!meta) return logger.error(`Failed to parse media info: ${text}`)
-        if (meta.type === 'movie') return handleMovie(meta, text, media)
-        if (meta.type === 'tv') return handleTV(meta, text)
-      }
-      // await TGJob.enqueue({ text: ctx.text, media: ctx.media })
-    })
+    dp.onNewMessage(filters.document, handleTGMessage)
+    dp.onNewMessage(filters.video, handleTGMessage)
   }
 
   /**
@@ -83,7 +81,53 @@ export default class TGProvider {
   }
 }
 
-const handleMovie = async (meta: TGMovieCaption, text: string, media: Document | Video) => {
+const handleTGMessage = async (
+  ctx:
+    | filters.Modify<
+        MessageContext,
+        {
+          media: Document
+        }
+      >
+    | filters.Modify<
+        MessageContext,
+        {
+          media: filters.Modify<
+            Video,
+            {
+              isRound: false
+              isAnimation: false
+            }
+          >
+        }
+      >
+) => {
+  const { text, media } = ctx
+  logger.info(`Processing: ${media.fileName}, ${text}`)
+  const meta = parseMediaInfo(text)
+  if (!meta) return logger.error(`Failed to parse media info: ${text}`)
+  if (meta.type === 'movie') return handleMovie(meta, ctx)
+  if (meta.type === 'tv') return handleTV(meta, ctx)
+}
+
+const handleMovie = async (
+  meta: TGMovieCaption,
+  ctx: filters.Modify<
+    MessageContext,
+    {
+      media:
+        | Document
+        | filters.Modify<
+            Video,
+            {
+              isRound: false
+              isAnimation: false
+            }
+          >
+    }
+  >
+) => {
+  const { media, link, text } = ctx
   const movieSearch = await tmdb.search.movies({
     query: meta.title,
     year: meta.year,
@@ -108,7 +152,13 @@ const handleMovie = async (meta: TGMovieCaption, text: string, media: Document |
     popularity: tmdbMovie.popularity,
     homepage: tmdbMovie.homepage,
     logo: getImage(tmdbMovie.images.logos),
-    meta: { fileId: media.fileId, type: media.mimeType, size: media.fileSize! },
+    tgMeta: { fileId: media.fileId, fileLink: link },
+    meta: {
+      ...(await getVideoMetadata(media.fileId)),
+      type: media.mimeType,
+      size: media.fileSize!,
+      ext: mime.getExtension(media.mimeType)!,
+    },
     overview: tmdbMovie.overview,
     poster: tmdbMovie.poster_path,
     productionCountries: tmdbMovie.production_countries.map((c) => c.name),
@@ -132,4 +182,20 @@ const handleMovie = async (meta: TGMovieCaption, text: string, media: Document |
   return logger.info(text, 'Movie added')
 }
 
-const handleTV = async (meta: TGShowsCaption, text: string) => {}
+const handleTV = async (
+  meta: TGShowsCaption,
+  ctx: filters.Modify<
+    MessageContext,
+    {
+      media:
+        | Document
+        | filters.Modify<
+            Video,
+            {
+              isRound: false
+              isAnimation: false
+            }
+          >
+    }
+  >
+) => {}

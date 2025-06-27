@@ -21,8 +21,17 @@ export type MediaCast = {
   character: string
 }
 
+export type TGMeta = {
+  fileId: string
+  fileLink: string
+}
+
 export type MediaMeta = {
   type: string
   size: number
-  fileId: string
+  bitRate: number
+  bitDepth: number
+  videoCodec: string
+  ext: string
+  frameRate: number
 }

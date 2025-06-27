@@ -22,6 +22,7 @@ export default class extends BaseSchema {
       table.integer('vote_count').notNullable()
       table.boolean('adult').notNullable()
       table.specificType('genres', 'text[]').notNullable()
+      table.jsonb('tg_meta').notNullable()
       table.jsonb('videos').notNullable()
       table.jsonb('links').nullable()
       table.text('homepage').notNullable()

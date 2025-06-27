@@ -1,9 +1,8 @@
-import { DateTime } from 'luxon'
-import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import { compose } from '@adonisjs/core/helpers'
+import hash from '@adonisjs/core/services/hash'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 import withID from '#models/utils/with_id'
 import { withTimestamps } from '#models/utils/with_timestamps'

@@ -40,7 +40,7 @@ export default class MoviesController {
     const movie = await Movie.find(params.id)
     if (!movie) return response.notFound({ message: 'Movie not found' })
 
-    const { fileId, size, type } = movie.meta
+    const { size, type } = movie.meta
     const range = request.header('range')
 
     let start = 0
@@ -71,7 +71,7 @@ export default class MoviesController {
     response.header('Content-Length', contentLength.toString())
     response.header('Content-Type', type)
     response.header('Accept-Ranges', 'bytes')
-    response.header('Content-Disposition', `inline; filename="${movie.title}.mp4"`)
+    response.header('Content-Disposition', `inline; filename="${movie.title}.${movie.meta.ext}"`)
     response.header('Access-Control-Allow-Origin', '*')
     response.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
     response.header('Access-Control-Allow-Headers', 'Range, Content-Type')
@@ -81,7 +81,7 @@ export default class MoviesController {
     const tgLimit = contentLength
 
     const { tg } = await app.container.make('tg')
-    const tgStream = tg.downloadAsNodeStream(fileId, {
+    const tgStream = tg.downloadAsNodeStream(movie.tgMeta.fileId, {
       offset: tgOffset,
       limit: tgLimit,
     })

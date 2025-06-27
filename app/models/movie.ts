@@ -3,7 +3,7 @@ import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
 
 import withID from '#models/utils/with_id'
 import { withTimestamps } from '#models/utils/with_timestamps'
-import type { ExtraVideos, MediaLinks, MediaMeta } from '#types/media'
+import type { ExtraVideos, MediaLinks, MediaMeta, TGMeta } from '#types/media'
 import app from '@adonisjs/core/services/app'
 
 export default class Movie extends compose(BaseModel, withID(), withTimestamps()) {
@@ -52,6 +52,13 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
   @column({
     consume: (value) => value,
     prepare: (value) => JSON.stringify(value),
+    serializeAs: null,
+  })
+  declare tgMeta: TGMeta
+
+  @column({
+    consume: (value) => value,
+    prepare: (value) => JSON.stringify(value),
   })
   declare videos: ExtraVideos[]
 
@@ -64,7 +71,6 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
   @column({
     consume: (value) => value,
     prepare: (value) => JSON.stringify(value),
-    serializeAs: null,
   })
   declare meta: MediaMeta
 
