@@ -64,6 +64,7 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
   @column({
     consume: (value) => value,
     prepare: (value) => JSON.stringify(value),
+    serializeAs: null,
   })
   declare meta: MediaMeta
 

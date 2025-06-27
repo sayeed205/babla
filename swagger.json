@@ -5,14 +5,18 @@
     "description": "",
     "version": "1.0.0"
   },
-  "tags": [],
+  "tags": [
+    {
+      "name": "Movies"
+    }
+  ],
   "paths": {
     "/movies": {
       "get": {
         "summary": "All paginated Movies",
         "deprecated": false,
         "description": "Get all the movies in a paginated format",
-        "tags": [],
+        "tags": ["Movies"],
         "parameters": [
           {
             "name": "page",
@@ -229,6 +233,213 @@
                       }
                     }
                   ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/movies/{id}": {
+      "get": {
+        "summary": "Get a movie by ID",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "1195506",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "originalTitle": {
+                      "type": "string"
+                    },
+                    "releaseDate": {
+                      "type": "string"
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "tagline": {
+                      "type": "string"
+                    },
+                    "poster": {
+                      "type": "string"
+                    },
+                    "backdrop": {
+                      "type": "string"
+                    },
+                    "logo": {
+                      "type": "string"
+                    },
+                    "runtime": {
+                      "type": "integer"
+                    },
+                    "popularity": {
+                      "type": "number"
+                    },
+                    "voteAverage": {
+                      "type": "number"
+                    },
+                    "voteCount": {
+                      "type": "integer"
+                    },
+                    "adult": {
+                      "type": "boolean"
+                    },
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "videos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["key", "name", "type"]
+                      }
+                    },
+                    "links": {
+                      "type": "null"
+                    },
+                    "homepage": {
+                      "type": "string"
+                    },
+                    "productionCountries": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "originalTitle",
+                    "releaseDate",
+                    "overview",
+                    "tagline",
+                    "poster",
+                    "backdrop",
+                    "logo",
+                    "runtime",
+                    "popularity",
+                    "voteAverage",
+                    "voteCount",
+                    "adult",
+                    "genres",
+                    "videos",
+                    "links",
+                    "homepage",
+                    "productionCountries",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "example": {
+                  "id": "1195506",
+                  "title": "Novocaine",
+                  "originalTitle": "Novocaine",
+                  "releaseDate": "2025-03-12T00:00:00.000Z",
+                  "overview": "When the girl of his dreams is kidnapped, everyman Nate turns his inability to feel pain into an unexpected strength in his fight to get her back.",
+                  "tagline": "Nathan Caine can't feel pain.",
+                  "poster": "/xmMHGz9dVRaMY6rRAlEX4W0Wdhm.jpg",
+                  "backdrop": "/lyBH2mFFU6qrHwD5QKotL2JnEb6.jpg",
+                  "logo": "/458Ty20JuTIzJ7X9wNAaHyOORrq.png",
+                  "runtime": 110,
+                  "popularity": 35.1764,
+                  "voteAverage": 6.923,
+                  "voteCount": 909,
+                  "adult": false,
+                  "genres": ["Action", "Comedy", "Thriller"],
+                  "videos": [
+                    {
+                      "key": "5jpGbDFViM8",
+                      "name": "Adrenaline Rush",
+                      "type": "Teaser"
+                    },
+                    {
+                      "key": "_9hBEzh1aGk",
+                      "name": "A Genre-Bending Dark Comedy (Behind the Scenes)",
+                      "type": "Behind the Scenes"
+                    },
+                    {
+                      "key": "rdzk8L_LMg4",
+                      "name": "Extended Clip - Nate Reveals He Can’t Feel Pain",
+                      "type": "Clip"
+                    },
+                    {
+                      "key": "99BLnkAlC1M",
+                      "name": "Final Trailer",
+                      "type": "Trailer"
+                    }
+                  ],
+                  "links": null,
+                  "homepage": "https://www.novocainemovie.com",
+                  "productionCountries": ["United States of America"],
+                  "createdAt": "2025-06-26T16:16:14.856+00:00",
+                  "updatedAt": "2025-06-26T16:16:14.856+00:00"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Movie not found"
                 }
               }
             },

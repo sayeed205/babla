@@ -108,7 +108,7 @@ const handleMovie = async (meta: TGMovieCaption, text: string, media: Document |
     popularity: tmdbMovie.popularity,
     homepage: tmdbMovie.homepage,
     logo: getImage(tmdbMovie.images.logos),
-    meta: { fileId: media.fileId, type: media.type, size: media.fileSize! },
+    meta: { fileId: media.fileId, type: media.mimeType, size: media.fileSize! },
     overview: tmdbMovie.overview,
     poster: tmdbMovie.poster_path,
     productionCountries: tmdbMovie.production_countries.map((c) => c.name),
