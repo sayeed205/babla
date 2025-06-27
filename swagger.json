@@ -1,0 +1,247 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Babla",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/movies": {
+      "get": {
+        "summary": "All paginated Movies",
+        "deprecated": false,
+        "description": "Get all the movies in a paginated format",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 1,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 10,
+            "schema": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "title",
+            "schema": {
+              "type": "string",
+              "enum": ["title", "releaseDate", "popularity", "voteAverage", "voteCount"],
+              "examples": ["title", "voteCount"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "desc",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer"
+                        },
+                        "perPage": {
+                          "type": "integer"
+                        },
+                        "currentPage": {
+                          "type": "integer"
+                        },
+                        "lastPage": {
+                          "type": "integer"
+                        },
+                        "firstPage": {
+                          "type": "integer"
+                        },
+                        "firstPageUrl": {
+                          "type": "string"
+                        },
+                        "lastPageUrl": {
+                          "type": "string"
+                        },
+                        "nextPageUrl": {
+                          "type": ["string", "null"]
+                        },
+                        "previousPageUrl": {
+                          "type": ["string", "null"]
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "perPage",
+                        "currentPage",
+                        "lastPage",
+                        "firstPage",
+                        "firstPageUrl",
+                        "lastPageUrl",
+                        "nextPageUrl",
+                        "previousPageUrl"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "releaseDate": {
+                            "type": "string"
+                          },
+                          "poster": {
+                            "type": "string"
+                          },
+                          "runtime": {
+                            "type": "integer"
+                          },
+                          "popularity": {
+                            "type": "number"
+                          },
+                          "voteAverage": {
+                            "type": "number"
+                          },
+                          "voteCount": {
+                            "type": "integer"
+                          },
+                          "adult": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["meta", "data"]
+                },
+                "example": {
+                  "meta": {
+                    "total": 1,
+                    "perPage": 10,
+                    "currentPage": 1,
+                    "lastPage": 1,
+                    "firstPage": 1,
+                    "firstPageUrl": "/movies?page=1",
+                    "lastPageUrl": "/movies?page=1",
+                    "nextPageUrl": null,
+                    "previousPageUrl": null
+                  },
+                  "data": [
+                    {
+                      "id": "1195506",
+                      "title": "Novocaine",
+                      "releaseDate": "2025-03-12T00:00:00.000Z",
+                      "poster": "/xmMHGz9dVRaMY6rRAlEX4W0Wdhm.jpg",
+                      "runtime": 110,
+                      "popularity": 35.1764,
+                      "voteAverage": 6.923,
+                      "voteCount": 909,
+                      "adult": false
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          },
+                          "rule": {
+                            "type": "string"
+                          },
+                          "field": {
+                            "type": "string"
+                          },
+                          "meta": {
+                            "type": "object",
+                            "properties": {
+                              "choices": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": ["choices"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["errors"]
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "The selected order is invalid",
+                      "rule": "enum",
+                      "field": "order",
+                      "meta": {
+                        "choices": ["asc", "desc"]
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {}
+  },
+  "servers": []
+}

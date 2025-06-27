@@ -19,7 +19,7 @@ export default class MoviesController {
         'vote_count',
         'adult',
       ])
-      .if(sort, (q) => q.orderBy(sort!, order ? order : 'asc'))
+      .orderBy(sort ? sort : 'title', order ? order : 'asc')
       .paginate(page ? page : 1, limit ? limit : 10)
 
     movies.baseUrl(router.makeUrl('movies.index'))
