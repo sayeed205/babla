@@ -8,15 +8,11 @@ import type { ApplicationService } from '@adonisjs/core/types'
 import type { Document, Video } from '@mtcute/node'
 
 import Collection from '#models/collection'
+import Image from '#models/image'
 import Movie from '#models/movie'
 import env from '#start/env'
-import {
-  getImage,
-  getVideoMetadata,
-  parseMediaInfo,
-  TGMovieCaption,
-  TGShowsCaption,
-} from '#utils/media'
+import { ImageTypeEnum } from '#types/media'
+import { getVideoMetadata, parseMediaInfo, TGMovieCaption, TGShowsCaption } from '#utils/media'
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
@@ -162,12 +158,10 @@ const handleMovie = async (
     id: tmdbMovie.id.toString(),
     title: tmdbMovie.title,
     adult: tmdbMovie.adult,
-    backdrop: tmdbMovie.backdrop_path,
     genres: tmdbMovie.genres.map((g) => g.name),
     originalTitle: tmdbMovie.original_title,
     popularity: tmdbMovie.popularity,
     homepage: tmdbMovie.homepage,
-    logo: getImage(tmdbMovie.images.logos),
     tgMeta: { fileId: media.fileId, fileLink: link },
     meta: {
       ...(await getVideoMetadata(media.fileId)),
@@ -177,7 +171,6 @@ const handleMovie = async (
     },
     collectionId: tmdbMovie.belongs_to_collection?.id.toString() || null,
     overview: tmdbMovie.overview,
-    poster: tmdbMovie.poster_path,
     productionCountries: tmdbMovie.production_countries.map((c) => c.name),
     releaseDate: tmdbMovie.release_date,
     runtime: tmdbMovie.runtime,
@@ -194,6 +187,31 @@ const handleMovie = async (
     voteAverage: tmdbMovie.vote_average,
     voteCount: tmdbMovie.vote_count,
   })
+
+  // save images
+  const imageEntries: {
+    type: ImageTypeEnum
+    path: string
+    collectionId: string
+    tableName: string
+  }[] = []
+
+  for (const [key, value] of Object.entries(tmdbMovie.images)) {
+    const type = key.slice(0, -1) as ImageTypeEnum // e.g., 'backdrops' -> 'backdrop'
+
+    if (!Object.values(ImageTypeEnum).includes(type)) continue
+
+    for (const image of value) {
+      imageEntries.push({
+        type,
+        path: image.file_path,
+        collectionId: movie.id,
+        tableName: 'movies',
+      })
+    }
+  }
+
+  await Image.createMany(imageEntries)
 
   await movie.save()
   return logger.info(text, 'Movie added')

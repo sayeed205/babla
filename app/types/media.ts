@@ -35,3 +35,10 @@ export type MediaMeta = {
   ext: string
   frameRate: number
 }
+
+export enum ImageTypeEnum {
+  BACKDROP = 'backdrop',
+  POSTER = 'poster',
+  LOGO = 'logo',
+  THUMBNAIL = 'thumbnail',
+}

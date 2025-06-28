@@ -97,10 +97,12 @@
                           "type": "string"
                         },
                         "nextPageUrl": {
-                          "type": "null"
+                          "type": "string",
+                          "nullable": true
                         },
                         "previousPageUrl": {
-                          "type": "null"
+                          "type": "string",
+                          "nullable": true
                         }
                       },
                       "required": [
@@ -127,9 +129,6 @@
                             "type": "string"
                           },
                           "releaseDate": {
-                            "type": "string"
-                          },
-                          "poster": {
                             "type": "string"
                           },
                           "runtime": {
@@ -166,20 +165,23 @@
                             },
                             "required": ["id", "title", "poster"],
                             "nullable": true
+                          },
+                          "poster": {
+                            "type": "string"
                           }
                         },
                         "required": [
                           "id",
                           "title",
                           "releaseDate",
-                          "poster",
                           "runtime",
                           "popularity",
                           "voteAverage",
                           "voteCount",
                           "adult",
                           "collectionId",
-                          "collection"
+                          "collection",
+                          "poster"
                         ]
                       }
                     }
@@ -203,20 +205,19 @@
                       "id": "1195506",
                       "title": "Novocaine",
                       "releaseDate": "2025-03-12T00:00:00.000Z",
-                      "poster": "/xmMHGz9dVRaMY6rRAlEX4W0Wdhm.jpg",
                       "runtime": 110,
                       "popularity": 33.2446,
                       "voteAverage": 6.926,
                       "voteCount": 916,
                       "adult": false,
                       "collectionId": null,
-                      "collection": null
+                      "collection": null,
+                      "poster": "/xa5RB5aXQOwDqrEslKQYTTd4TTl.jpg"
                     },
                     {
                       "id": "954",
                       "title": "Mission: Impossible",
                       "releaseDate": "1996-05-22T00:00:00.000Z",
-                      "poster": "/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg",
                       "runtime": 110,
                       "popularity": 22.1827,
                       "voteAverage": 7.003,
@@ -227,7 +228,34 @@
                         "id": "87359",
                         "title": "Mission: Impossible Collection",
                         "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg"
-                      }
+                      },
+                      "poster": "/oS2nP9VogMQpvNYtpEf8j3Hjhpx.jpg"
+                    },
+                    {
+                      "id": "804337",
+                      "title": "Mahaan",
+                      "releaseDate": "2022-02-10T00:00:00.000Z",
+                      "runtime": 163,
+                      "popularity": 2.85,
+                      "voteAverage": 6.885,
+                      "voteCount": 39,
+                      "adult": false,
+                      "collectionId": null,
+                      "collection": null,
+                      "poster": "/rHcwUUy3gRVUEUepYOd7xkesiNf.jpg"
+                    },
+                    {
+                      "id": "391778",
+                      "title": "Azhar",
+                      "releaseDate": "2016-05-13T00:00:00.000Z",
+                      "runtime": 130,
+                      "popularity": 0.9958,
+                      "voteAverage": 5.691,
+                      "voteCount": 34,
+                      "adult": false,
+                      "collectionId": null,
+                      "collection": null,
+                      "poster": "/piOPwfS0epW7gtuYIygGcZBz99i.jpg"
                     }
                   ]
                 }

@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
 import Movie from '#models/movie'
+import { ImageTypeEnum } from '#types/media'
 import { moviePaginateValidator } from '#validators/movie_validator'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
@@ -13,7 +14,6 @@ export default class MoviesController {
         'id',
         'title',
         'release_date',
-        'poster',
         'runtime',
         'popularity',
         'vote_average',
@@ -28,8 +28,20 @@ export default class MoviesController {
       .paginate(page ? page : 1, limit ? limit : 10)
 
     movies.baseUrl(router.makeUrl('movies.index'))
+    const data: any[] = []
 
-    return movies
+    for (const movie of movies) {
+      const m = {
+        ...movie.toJSON(),
+        ...(await movie.getImages(ImageTypeEnum.POSTER)),
+      }
+      data.push(m)
+    }
+
+    return {
+      meta: movies.getMeta(),
+      data,
+    }
   }
 
   async show({ params, response }: HttpContext) {

@@ -7,9 +7,16 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 import Collection from '#models/collection'
 import withID from '#models/utils/with_id'
+import { withImages } from '#models/utils/with_images'
 import { withTimestamps } from '#models/utils/with_timestamps'
+import { ImageTypeEnum } from '#types/media'
 
-export default class Movie extends compose(BaseModel, withID(), withTimestamps()) {
+export default class Movie extends compose(
+  BaseModel,
+  withID(),
+  withTimestamps(),
+  withImages('movies')
+) {
   @column()
   declare title: string
 
@@ -24,15 +31,6 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
 
   @column()
   declare tagline: string
-
-  @column()
-  declare poster: string
-
-  @column()
-  declare backdrop: string
-
-  @column()
-  declare logo?: string
 
   @column()
   declare runtime: number
@@ -97,10 +95,14 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
       {
         id: movie.id,
         title: movie.title,
+        originalTitle: movie.originalTitle,
         tagline: movie.tagline,
-        poster: movie.poster,
-        backdrop: movie.backdrop,
-        logo: movie.logo,
+        overview: movie.overview,
+        ...(await movie.getImages(
+          ImageTypeEnum.BACKDROP,
+          ImageTypeEnum.POSTER,
+          ImageTypeEnum.LOGO
+        )),
         runtime: movie.runtime,
         popularity: movie.popularity,
         voteAverage: movie.voteAverage,
@@ -108,7 +110,6 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
         adult: movie.adult,
         releaseDate: movie.releaseDate,
         genres: movie.genres,
-        overview: movie.overview,
       },
     ])
   }
