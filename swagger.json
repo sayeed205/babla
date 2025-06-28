@@ -97,12 +97,10 @@
                           "type": "string"
                         },
                         "nextPageUrl": {
-                          "type": "string",
-                          "nullable": true
+                          "type": "null"
                         },
                         "previousPageUrl": {
-                          "type": "string",
-                          "nullable": true
+                          "type": "null"
                         }
                       },
                       "required": [
@@ -146,26 +144,6 @@
                           "adult": {
                             "type": "boolean"
                           },
-                          "collectionId": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "collection": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "title": {
-                                "type": "string"
-                              },
-                              "poster": {
-                                "type": "string"
-                              }
-                            },
-                            "required": ["id", "title", "poster"],
-                            "nullable": true
-                          },
                           "poster": {
                             "type": "string"
                           }
@@ -179,8 +157,6 @@
                           "voteAverage",
                           "voteCount",
                           "adult",
-                          "collectionId",
-                          "collection",
                           "poster"
                         ]
                       }
@@ -191,13 +167,13 @@
                 "example": {
                   "meta": {
                     "total": 4,
-                    "perPage": 10,
+                    "perPage": 2,
                     "currentPage": 1,
-                    "lastPage": 1,
+                    "lastPage": 2,
                     "firstPage": 1,
                     "firstPageUrl": "/movies?page=1",
-                    "lastPageUrl": "/movies?page=1",
-                    "nextPageUrl": null,
+                    "lastPageUrl": "/movies?page=2",
+                    "nextPageUrl": "/movies?page=2",
                     "previousPageUrl": null
                   },
                   "data": [
@@ -210,9 +186,7 @@
                       "voteAverage": 6.926,
                       "voteCount": 916,
                       "adult": false,
-                      "collectionId": null,
-                      "collection": null,
-                      "poster": "/xa5RB5aXQOwDqrEslKQYTTd4TTl.jpg"
+                      "poster": "/nRr3JoDXkhK6kz2AIxtrTHB8GGO.jpg"
                     },
                     {
                       "id": "954",
@@ -223,39 +197,7 @@
                       "voteAverage": 7.003,
                       "voteCount": 9343,
                       "adult": false,
-                      "collectionId": "87359",
-                      "collection": {
-                        "id": "87359",
-                        "title": "Mission: Impossible Collection",
-                        "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg"
-                      },
-                      "poster": "/oS2nP9VogMQpvNYtpEf8j3Hjhpx.jpg"
-                    },
-                    {
-                      "id": "804337",
-                      "title": "Mahaan",
-                      "releaseDate": "2022-02-10T00:00:00.000Z",
-                      "runtime": 163,
-                      "popularity": 2.85,
-                      "voteAverage": 6.885,
-                      "voteCount": 39,
-                      "adult": false,
-                      "collectionId": null,
-                      "collection": null,
-                      "poster": "/rHcwUUy3gRVUEUepYOd7xkesiNf.jpg"
-                    },
-                    {
-                      "id": "391778",
-                      "title": "Azhar",
-                      "releaseDate": "2016-05-13T00:00:00.000Z",
-                      "runtime": 130,
-                      "popularity": 0.9958,
-                      "voteAverage": 5.691,
-                      "voteCount": 34,
-                      "adult": false,
-                      "collectionId": null,
-                      "collection": null,
-                      "poster": "/piOPwfS0epW7gtuYIygGcZBz99i.jpg"
+                      "poster": "/9EMjStHHLHBpZS6aImLb7soabv1.jpg"
                     }
                   ]
                 }
@@ -366,15 +308,6 @@
                     "tagline": {
                       "type": "string"
                     },
-                    "poster": {
-                      "type": "string"
-                    },
-                    "backdrop": {
-                      "type": "string"
-                    },
-                    "logo": {
-                      "type": "string"
-                    },
                     "runtime": {
                       "type": "integer"
                     },
@@ -410,8 +343,7 @@
                           "type": {
                             "type": "string"
                           }
-                        },
-                        "required": ["key", "name", "type"]
+                        }
                       }
                     },
                     "links": {
@@ -420,16 +352,83 @@
                     "homepage": {
                       "type": "string"
                     },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "ext": {
+                          "type": "string"
+                        },
+                        "size": {
+                          "type": "integer"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "bitRate": {
+                          "type": "integer"
+                        },
+                        "bitDepth": {
+                          "type": "integer"
+                        },
+                        "frameRate": {
+                          "type": "number"
+                        },
+                        "videoCodec": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "ext",
+                        "size",
+                        "type",
+                        "bitRate",
+                        "bitDepth",
+                        "frameRate",
+                        "videoCodec"
+                      ]
+                    },
                     "productionCountries": {
                       "type": "array",
                       "items": {
                         "type": "string"
                       }
                     },
+                    "collectionId": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "createdAt": {
                       "type": "string"
                     },
                     "updatedAt": {
+                      "type": "string"
+                    },
+                    "collection": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "poster": {
+                          "type": "string"
+                        },
+                        "backdrop": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "title", "poster", "backdrop"],
+                      "nullable": true
+                    },
+                    "poster": {
+                      "type": "string"
+                    },
+                    "backdrop": {
+                      "type": "string"
+                    },
+                    "logo": {
                       "type": "string"
                     }
                   },
@@ -440,9 +439,6 @@
                     "releaseDate",
                     "overview",
                     "tagline",
-                    "poster",
-                    "backdrop",
-                    "logo",
                     "runtime",
                     "popularity",
                     "voteAverage",
@@ -452,54 +448,61 @@
                     "videos",
                     "links",
                     "homepage",
+                    "meta",
                     "productionCountries",
+                    "collectionId",
                     "createdAt",
-                    "updatedAt"
+                    "updatedAt",
+                    "collection",
+                    "poster",
+                    "backdrop",
+                    "logo"
                   ]
                 },
                 "example": {
-                  "id": "1195506",
-                  "title": "Novocaine",
-                  "originalTitle": "Novocaine",
-                  "releaseDate": "2025-03-12T00:00:00.000Z",
-                  "overview": "When the girl of his dreams is kidnapped, everyman Nate turns his inability to feel pain into an unexpected strength in his fight to get her back.",
-                  "tagline": "Nathan Caine can't feel pain.",
-                  "poster": "/xmMHGz9dVRaMY6rRAlEX4W0Wdhm.jpg",
-                  "backdrop": "/lyBH2mFFU6qrHwD5QKotL2JnEb6.jpg",
-                  "logo": "/458Ty20JuTIzJ7X9wNAaHyOORrq.png",
+                  "id": "954",
+                  "title": "Mission: Impossible",
+                  "originalTitle": "Mission: Impossible",
+                  "releaseDate": "1996-05-22T00:00:00.000Z",
+                  "overview": "When Ethan Hunt, the leader of a crack espionage team whose perilous operation has gone awry with no explanation, discovers that a mole has penetrated the CIA, he's surprised to learn that he's the prime suspect. To clear his name, Hunt now must ferret out the real double agent and, in the process, even the score.",
+                  "tagline": "Expect the impossible.",
                   "runtime": 110,
-                  "popularity": 35.1764,
-                  "voteAverage": 6.923,
-                  "voteCount": 909,
+                  "popularity": 22.1827,
+                  "voteAverage": 7.003,
+                  "voteCount": 9343,
                   "adult": false,
-                  "genres": ["Action", "Comedy", "Thriller"],
+                  "genres": ["Adventure", "Action", "Thriller"],
                   "videos": [
                     {
-                      "key": "5jpGbDFViM8",
-                      "name": "Adrenaline Rush",
-                      "type": "Teaser"
-                    },
-                    {
-                      "key": "_9hBEzh1aGk",
-                      "name": "A Genre-Bending Dark Comedy (Behind the Scenes)",
-                      "type": "Behind the Scenes"
-                    },
-                    {
-                      "key": "rdzk8L_LMg4",
-                      "name": "Extended Clip - Nate Reveals He Can’t Feel Pain",
-                      "type": "Clip"
-                    },
-                    {
-                      "key": "99BLnkAlC1M",
-                      "name": "Final Trailer",
+                      "key": "L8Pbjh4EZRk",
+                      "name": "Official Trailer",
                       "type": "Trailer"
                     }
                   ],
                   "links": null,
-                  "homepage": "https://www.novocainemovie.com",
+                  "homepage": "",
+                  "meta": {
+                    "ext": "mkv",
+                    "size": 2279077531,
+                    "type": "video/x-matroska",
+                    "bitRate": 1251,
+                    "bitDepth": 10,
+                    "frameRate": 23.976,
+                    "videoCodec": "HEVC"
+                  },
                   "productionCountries": ["United States of America"],
-                  "createdAt": "2025-06-26T16:16:14.856+00:00",
-                  "updatedAt": "2025-06-26T16:16:14.856+00:00"
+                  "collectionId": "87359",
+                  "createdAt": "2025-06-28T05:36:04.208+00:00",
+                  "updatedAt": "2025-06-28T05:36:04.208+00:00",
+                  "collection": {
+                    "id": "87359",
+                    "title": "Mission: Impossible Collection",
+                    "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
+                    "backdrop": "/mroWh717g0Ah2c0rrPGW6f3EWMM.jpg"
+                  },
+                  "poster": "/tjiQIC8duuHZRndYEjeMvMTvWxS.jpg",
+                  "backdrop": "/3ZfJcWicmh9vLGQ89CrExqpWMll.jpg",
+                  "logo": "/dZUAflbV66xj3ufb2j4rkSEXwqz.png"
                 }
               }
             },

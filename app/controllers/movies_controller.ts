@@ -19,11 +19,7 @@ export default class MoviesController {
         'vote_average',
         'vote_count',
         'adult',
-        'collection_id',
       ])
-      .preload('collection', (q) => {
-        q.select(['id', 'title', 'poster'])
-      })
       .orderBy(sort ? sort : 'title', order ? order : 'asc')
       .paginate(page ? page : 1, limit ? limit : 10)
 
@@ -45,11 +41,19 @@ export default class MoviesController {
   }
 
   async show({ params, response }: HttpContext) {
-    const movie = await Movie.find(params.id)
+    const movie = await Movie.query()
+      .where('id', params.id)
+      .preload('collection', (q) => {
+        q.select(['id', 'title', 'poster', 'backdrop'])
+      })
+      .first()
 
     if (!movie) return response.notFound({ message: 'Movie not found' })
 
-    return movie
+    return {
+      ...movie.toJSON(),
+      ...(await movie.getImages(ImageTypeEnum.POSTER, ImageTypeEnum.BACKDROP, ImageTypeEnum.LOGO)),
+    }
   }
 
   async stream({ request, response, params }: HttpContext) {
