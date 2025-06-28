@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.1",
   "info": {
     "title": "Babla",
     "description": "",
@@ -97,10 +97,10 @@
                           "type": "string"
                         },
                         "nextPageUrl": {
-                          "type": ["string", "null"]
+                          "type": "null"
                         },
                         "previousPageUrl": {
-                          "type": ["string", "null"]
+                          "type": "null"
                         }
                       },
                       "required": [
@@ -146,8 +146,41 @@
                           },
                           "adult": {
                             "type": "boolean"
+                          },
+                          "collectionId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "collection": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "poster": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "title", "poster"],
+                            "nullable": true
                           }
-                        }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "releaseDate",
+                          "poster",
+                          "runtime",
+                          "popularity",
+                          "voteAverage",
+                          "voteCount",
+                          "adult",
+                          "collectionId",
+                          "collection"
+                        ]
                       }
                     }
                   },
@@ -155,7 +188,7 @@
                 },
                 "example": {
                   "meta": {
-                    "total": 1,
+                    "total": 4,
                     "perPage": 10,
                     "currentPage": 1,
                     "lastPage": 1,
@@ -172,10 +205,29 @@
                       "releaseDate": "2025-03-12T00:00:00.000Z",
                       "poster": "/xmMHGz9dVRaMY6rRAlEX4W0Wdhm.jpg",
                       "runtime": 110,
-                      "popularity": 35.1764,
-                      "voteAverage": 6.923,
-                      "voteCount": 909,
-                      "adult": false
+                      "popularity": 33.2446,
+                      "voteAverage": 6.926,
+                      "voteCount": 916,
+                      "adult": false,
+                      "collectionId": null,
+                      "collection": null
+                    },
+                    {
+                      "id": "954",
+                      "title": "Mission: Impossible",
+                      "releaseDate": "1996-05-22T00:00:00.000Z",
+                      "poster": "/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg",
+                      "runtime": 110,
+                      "popularity": 22.1827,
+                      "voteAverage": 7.003,
+                      "voteCount": 9343,
+                      "adult": false,
+                      "collectionId": "87359",
+                      "collection": {
+                        "id": "87359",
+                        "title": "Mission: Impossible Collection",
+                        "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg"
+                      }
                     }
                   ]
                 }

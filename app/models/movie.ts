@@ -1,10 +1,13 @@
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
+import app from '@adonisjs/core/services/app'
+import { BaseModel, beforeCreate, beforeDelete, belongsTo, column } from '@adonisjs/lucid/orm'
 
+import type { ExtraVideos, MediaLinks, MediaMeta, TGMeta } from '#types/media'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+
+import Collection from '#models/collection'
 import withID from '#models/utils/with_id'
 import { withTimestamps } from '#models/utils/with_timestamps'
-import type { ExtraVideos, MediaLinks, MediaMeta, TGMeta } from '#types/media'
-import app from '@adonisjs/core/services/app'
 
 export default class Movie extends compose(BaseModel, withID(), withTimestamps()) {
   @column()
@@ -80,6 +83,12 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
   @column()
   declare productionCountries: string[]
 
+  @column()
+  declare collectionId: string | null
+
+  @belongsTo(() => Collection)
+  declare collection: BelongsTo<typeof Collection>
+
   @beforeCreate()
   public static async embedMovie(movie: Movie) {
     const meilisearch = await app.container.make('meilisearch')
@@ -102,5 +111,12 @@ export default class Movie extends compose(BaseModel, withID(), withTimestamps()
         overview: movie.overview,
       },
     ])
+  }
+
+  @beforeDelete()
+  public static async deleteMovie(movie: Movie) {
+    const meilisearch = await app.container.make('meilisearch')
+    const movieIndex = await meilisearch.getIndex('movies')
+    await movieIndex.deleteDocument(movie.id)
   }
 }

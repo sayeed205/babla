@@ -19,7 +19,11 @@ export default class MoviesController {
         'vote_average',
         'vote_count',
         'adult',
+        'collection_id',
       ])
+      .preload('collection', (q) => {
+        q.select(['id', 'title', 'poster'])
+      })
       .orderBy(sort ? sort : 'title', order ? order : 'asc')
       .paginate(page ? page : 1, limit ? limit : 10)
 

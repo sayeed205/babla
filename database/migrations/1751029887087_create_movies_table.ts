@@ -1,5 +1,6 @@
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
+import logger from '@adonisjs/core/services/logger'
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
@@ -28,6 +29,13 @@ export default class extends BaseSchema {
       table.text('homepage').notNullable()
       table.jsonb('meta').notNullable()
       table.specificType('production_countries', 'text[]').notNullable()
+      table
+        .bigInteger('collection_id')
+        .nullable()
+        .defaultTo(null)
+        .references('id')
+        .inTable('collections')
+        .onDelete('SET NULL')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').notNullable()
@@ -60,7 +68,7 @@ export default class extends BaseSchema {
       throw new Error(`Failed to create embedder: ${await res.text()}`)
     }
     const json = await res.json()
-    console.log(JSON.stringify(json, null, 2))
+    logger.info(json, `${this.tableName}: created meilisearch index and embedder`)
   }
 
   async down() {

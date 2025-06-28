@@ -7,6 +7,7 @@ import { TMDB } from 'tmdb-ts'
 import type { ApplicationService } from '@adonisjs/core/types'
 import type { Document, Video } from '@mtcute/node'
 
+import Collection from '#models/collection'
 import Movie from '#models/movie'
 import env from '#start/env'
 import {
@@ -142,6 +143,21 @@ const handleMovie = async (
 
   if (movieExists) return logger.info(`Movie already exists: ${tmdbMovie.title}`)
 
+  // check if movie has collection
+  if (tmdbMovie.belongs_to_collection) {
+    const collection = await Collection.find(tmdbMovie.belongs_to_collection.id.toString())
+    if (!collection) {
+      const tmdbCollection = await tmdb.collections.details(tmdbMovie.belongs_to_collection.id)
+      await Collection.create({
+        id: tmdbCollection.id.toString(),
+        title: tmdbCollection.name,
+        poster: tmdbCollection.poster_path,
+        backdrop: tmdbCollection.backdrop_path,
+        overview: tmdbCollection.overview,
+      })
+    }
+  }
+
   const movie = await Movie.create({
     id: tmdbMovie.id.toString(),
     title: tmdbMovie.title,
@@ -159,6 +175,7 @@ const handleMovie = async (
       size: media.fileSize!,
       ext: mime.getExtension(media.mimeType)!,
     },
+    collectionId: tmdbMovie.belongs_to_collection?.id.toString() || null,
     overview: tmdbMovie.overview,
     poster: tmdbMovie.poster_path,
     productionCountries: tmdbMovie.production_countries.map((c) => c.name),
