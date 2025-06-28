@@ -9,7 +9,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigInteger('id').primary()
+      table.bigInteger('id').unsigned().primary()
       table.string('title').notNullable()
       table.text('overview').notNullable()
       table.string('poster').notNullable()
@@ -35,7 +35,9 @@ export default class extends BaseSchema {
             source: 'openAi',
             apiKey: env.get('OPENAI_API_KEY'),
             model: 'text-embedding-3-small',
-            documentTemplate: "A movie collection titled '{{doc.title}}' about  {{doc.overview}}.",
+            documentTemplate:
+              "A movie collection titled '{{doc.title}}' that features a series of films. Overview: {{doc.overview}}. " +
+              'It brings together related stories, characters, or themes into a single cinematic universe or narrative arc.',
           },
         }),
       }

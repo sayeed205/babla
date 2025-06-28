@@ -8,26 +8,27 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigInteger('id').primary()
+      table.bigInteger('id').unsigned().primary()
       table.string('title').notNullable()
       table.string('original_title').notNullable()
       table.date('release_date').notNullable()
       table.text('overview').notNullable()
       table.string('tagline').notNullable()
-      table.integer('runtime').notNullable()
-      table.float('popularity').notNullable()
-      table.float('vote_average').notNullable()
-      table.integer('vote_count').notNullable()
+      table.integer('runtime').notNullable().unsigned()
+      table.float('popularity').notNullable().unsigned()
+      table.float('vote_average').notNullable().unsigned()
+      table.integer('vote_count').notNullable().unsigned()
       table.boolean('adult').notNullable()
-      table.specificType('genres', 'text[]').notNullable()
-      table.jsonb('tg_meta').notNullable()
-      table.jsonb('videos').notNullable()
-      table.jsonb('links').nullable()
+      table.specificType('genres', 'varchar(50)[]').notNullable()
       table.text('homepage').notNullable()
+      table.jsonb('tg_meta').notNullable()
+      table.jsonb('videos').nullable()
+      table.jsonb('links').nullable()
       table.jsonb('meta').notNullable()
       table.specificType('production_countries', 'text[]').notNullable()
       table
         .bigInteger('collection_id')
+        .unsigned()
         .nullable()
         .defaultTo(null)
         .references('id')
@@ -41,31 +42,27 @@ export default class extends BaseSchema {
     const meilisearch = await app.container.make('meilisearch')
     await meilisearch.createIndex(this.tableName, { primaryKey: 'id' })
 
-    const res = await fetch(
-      `${meilisearch.config.host}/indexes/${this.tableName}/settings/embedders`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${env.get('MEILISEARCH_API_KEY')}`,
+    const movieTask = await meilisearch.index(this.tableName).updateSettings({
+      distinctAttribute: 'id',
+      rankingRules: ['words', 'typo', 'proximity', 'attribute', 'exactness'],
+      sortableAttributes: ['popularity', 'vote_average', 'vote_count'],
+      searchableAttributes: ['title', 'overview', 'tagline', 'genres'],
+      embedders: {
+        'movie-openai': {
+          source: 'openAi',
+          apiKey: env.get('OPENAI_API_KEY'),
+          model: 'text-embedding-3-small',
+          documentTemplate:
+            'A movie titled "{{doc.title}}" tells the story: {{doc.overview}}. ' +
+            'It belongs to the genres {{doc.genres | join: ", "}} and is tagged with "{{doc.tagline}}". ' +
+            'Originally released on {{doc.releaseDate}}, the film was first titled "{{doc.originalTitle}}". ' +
+            'It runs for {{doc.runtime}} minutes. ' +
+            'With a popularity score of {{doc.popularity}}, it has an average rating of {{doc.voteAverage}} based on {{doc.voteCount}} votes.',
         },
-        body: JSON.stringify({
-          'movie-openai': {
-            source: 'openAi',
-            apiKey: env.get('OPENAI_API_KEY'),
-            model: 'text-embedding-3-small',
-            documentTemplate:
-              'A movie titled \'{{doc.title}}\' about  {{doc.overview}} genres {{doc.genres | join: ", "}} tags {{doc.tagline}} released on {{doc.releaseDate}}.',
-          },
-        }),
-      }
-    )
+      },
+    })
 
-    if (!res.ok) {
-      throw new Error(`Failed to create embedder: ${await res.text()}`)
-    }
-    const json = await res.json()
-    logger.info(json, `${this.tableName}: created meilisearch index and embedder`)
+    logger.info(movieTask, `${this.tableName}: created meilisearch index and embedder`)
   }
 
   async down() {

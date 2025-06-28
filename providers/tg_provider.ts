@@ -8,10 +8,12 @@ import type { ApplicationService } from '@adonisjs/core/types'
 import type { Document, Video } from '@mtcute/node'
 
 import Collection from '#models/collection'
+import Episode from '#models/episode'
 import Image from '#models/image'
 import Movie from '#models/movie'
+import Season from '#models/season'
+import TV from '#models/tv'
 import env from '#start/env'
-import { ImageTypeEnum } from '#types/media'
 import { getVideoMetadata, parseMediaInfo, TGMovieCaption, TGShowsCaption } from '#utils/media'
 
 declare module '@adonisjs/core/types' {
@@ -189,32 +191,10 @@ const handleMovie = async (
   })
 
   // save images
-  const imageEntries: {
-    type: ImageTypeEnum
-    path: string
-    collectionId: string
-    tableName: string
-  }[] = []
-
-  for (const [key, value] of Object.entries(tmdbMovie.images)) {
-    const type = key.slice(0, -1) as ImageTypeEnum // e.g., 'backdrops' -> 'backdrop'
-
-    if (!Object.values(ImageTypeEnum).includes(type)) continue
-
-    for (const image of value) {
-      imageEntries.push({
-        type,
-        path: image.file_path,
-        collectionId: movie.id,
-        tableName: 'movies',
-      })
-    }
-  }
-
-  await Image.createMany(imageEntries)
+  Image.saveImages('movies', movie.id, tmdbMovie.images)
 
   await movie.save()
-  return logger.info(text, 'Movie added')
+  return logger.info(`Movie ${movie.title}:${meta.year} added`)
 }
 
 const handleTV = async (
@@ -233,4 +213,129 @@ const handleTV = async (
           >
     }
   >
-) => {}
+) => {
+  const { media, link, text } = ctx
+  const tvSearch = await tmdb.search.tvShows({
+    query: meta.title,
+    year: meta.year,
+    // first_air_date_year: meta.year,
+    include_adult: true,
+  })
+  if (!tvSearch.total_results) return logger.error(meta, `No results found`)
+  const tvResult = tvSearch.results[0]
+
+  // tv checks
+  const tmdbTV = await tmdb.tvShows.details(tvResult.id, ['videos', 'external_ids', 'images'])
+  let tv = await TV.find(tmdbTV.id.toString())
+  if (tv) logger.info(`TV ${tv.title} already exists`)
+  if (!tv) {
+    tv = await TV.create({
+      id: tmdbTV.id.toString(),
+      // @ts-ignore
+      adult: tmdbTV.adult,
+      title: tmdbTV.name,
+      originalTitle: tmdbTV.original_name,
+      overview: tmdbTV.overview,
+      firstAirDate: tmdbTV.first_air_date,
+      lastAirDate: tmdbTV.last_air_date,
+      genres: tmdbTV.genres.map((genre) => genre.name),
+      homepage: tmdbTV.homepage,
+      popularity: tmdbTV.popularity,
+      voteAverage: tmdbTV.vote_average,
+      voteCount: tmdbTV.vote_count,
+      videos: tmdbTV.videos.results
+        .filter((video) => {
+          return video.site === 'YouTube'
+        })
+        .map((video) => ({
+          key: video.key,
+          name: video.name,
+          type: video.type,
+        })),
+    })
+    await tv.save()
+    Image.saveImages('tvs', tv.id, tmdbTV.images)
+  }
+
+  // season checks
+  const tmdbSeason = await tmdb.tvSeasons.details(
+    {
+      seasonNumber: meta.season,
+      tvShowID: tmdbTV.id,
+    },
+    ['videos', 'external_ids', 'images']
+  )
+  let season = await Season.find(tmdbSeason.id.toString())
+  if (season) logger.info(`TV ${tv.title} Season ${season.seasonNumber} already exists`)
+  if (!season) {
+    season = await tv.related('seasons').create({
+      id: tmdbSeason.id.toString(),
+      seasonNumber: tmdbSeason.season_number,
+      title: tmdbSeason.name,
+      overview: tmdbSeason.overview,
+      airDate: tmdbSeason.air_date,
+      // @ts-ignore
+      voteAverage: tmdbSeason.vote_average,
+      videos: tmdbSeason.videos.results
+        .filter((video) => {
+          return video.site === 'YouTube'
+        })
+        .map((video) => ({
+          key: video.key,
+          name: video.name,
+          type: video.type,
+        })),
+    })
+    await season.save()
+    Image.saveImages('seasons', season.id, tmdbSeason.images)
+  }
+
+  // episode checks
+  const tmdbEpisode = await tmdb.tvEpisode.details(
+    {
+      episodeNumber: meta.episode,
+      seasonNumber: meta.season,
+      tvShowID: tmdbTV.id,
+    },
+    ['videos', 'external_ids', 'images']
+  )
+  const episodeExists = await Episode.find(tmdbEpisode.id.toString())
+
+  if (episodeExists)
+    return logger.info(
+      `TV ${tv.title} Season ${season.seasonNumber} Episode ${episodeExists.episodeNumber} already exists`
+    )
+
+  const episode = await season.related('episodes').create({
+    id: tmdbEpisode.id.toString(),
+    episodeNumber: tmdbEpisode.episode_number,
+    title: tmdbEpisode.name,
+    overview: tmdbEpisode.overview,
+    airDate: tmdbEpisode.air_date,
+    runtime: tmdbEpisode.runtime,
+    voteAverage: tmdbEpisode.vote_average,
+    voteCount: tmdbEpisode.vote_count,
+    tgMeta: { fileId: media.fileId, fileLink: link },
+    meta: {
+      ...(await getVideoMetadata(media.fileId)),
+      type: media.mimeType,
+      size: media.fileSize!,
+      ext: mime.getExtension(media.mimeType)!,
+    },
+    videos: tmdbEpisode.videos.results
+      .filter((video) => {
+        return video.site === 'YouTube'
+      })
+      .map((video) => ({
+        key: video.key,
+        name: video.name,
+        type: video.type,
+      })),
+  })
+  await episode.save()
+  Image.saveImages('episodes', episode.id, tmdbEpisode.images)
+
+  return logger.info(
+    `TV ${tv.title} Season ${season.seasonNumber} Episode ${episode.episodeNumber} added`
+  )
+}

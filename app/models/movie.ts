@@ -98,11 +98,6 @@ export default class Movie extends compose(
         originalTitle: movie.originalTitle,
         tagline: movie.tagline,
         overview: movie.overview,
-        ...(await movie.getImages(
-          ImageTypeEnum.BACKDROP,
-          ImageTypeEnum.POSTER,
-          ImageTypeEnum.LOGO
-        )),
         runtime: movie.runtime,
         popularity: movie.popularity,
         voteAverage: movie.voteAverage,
@@ -110,6 +105,7 @@ export default class Movie extends compose(
         adult: movie.adult,
         releaseDate: movie.releaseDate,
         genres: movie.genres,
+        ...(await movie.getImages(ImageTypeEnum.POSTER)),
       },
     ])
   }

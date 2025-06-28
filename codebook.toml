@@ -1,6 +1,7 @@
 words = [
     "adonisjs",
     "cuid",
+    "embedder",
     "luxon",
     "mediainfo",
     "meilisearch",
