@@ -7,13 +7,361 @@
   },
   "tags": [
     {
+      "name": "Collections"
+    },
+    {
       "name": "Movies"
     }
   ],
   "paths": {
+    "/collections": {
+      "get": {
+        "summary": "All Collections",
+        "deprecated": false,
+        "description": "Get all the collections in a paginated format",
+        "tags": ["Collections"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 1,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 2,
+            "schema": {
+              "type": "number",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 20,
+              "examples": [5]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "asc",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "asc",
+              "examples": ["asc", "desc"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer"
+                        },
+                        "perPage": {
+                          "type": "integer"
+                        },
+                        "currentPage": {
+                          "type": "integer"
+                        },
+                        "lastPage": {
+                          "type": "integer"
+                        },
+                        "firstPage": {
+                          "type": "integer"
+                        },
+                        "firstPageUrl": {
+                          "type": "string"
+                        },
+                        "lastPageUrl": {
+                          "type": "string"
+                        },
+                        "nextPageUrl": {
+                          "type": "null"
+                        },
+                        "previousPageUrl": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "perPage",
+                        "currentPage",
+                        "lastPage",
+                        "firstPage",
+                        "firstPageUrl",
+                        "lastPageUrl",
+                        "nextPageUrl",
+                        "previousPageUrl"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "poster": {
+                            "type": "string"
+                          },
+                          "totalMovies": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["meta", "data"]
+                },
+                "example": {
+                  "meta": {
+                    "total": 1,
+                    "perPage": 2,
+                    "currentPage": 1,
+                    "lastPage": 1,
+                    "firstPage": 1,
+                    "firstPageUrl": "/collections?page=1",
+                    "lastPageUrl": "/collections?page=1",
+                    "nextPageUrl": null,
+                    "previousPageUrl": null
+                  },
+                  "data": [
+                    {
+                      "id": "87359",
+                      "title": "Mission: Impossible Collection",
+                      "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
+                      "totalMovies": 1
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          },
+                          "rule": {
+                            "type": "string"
+                          },
+                          "field": {
+                            "type": "string"
+                          },
+                          "meta": {
+                            "type": "object",
+                            "properties": {
+                              "choices": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": ["choices"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["errors"]
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "The selected order is invalid",
+                      "rule": "enum",
+                      "field": "order",
+                      "meta": {
+                        "choices": ["asc", "desc"]
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/collections/{id}": {
+      "get": {
+        "summary": "Collection by ID",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Collections"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 123424,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "poster": {
+                      "type": "string"
+                    },
+                    "backdrop": {
+                      "type": "string"
+                    },
+                    "movies": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "releaseDate": {
+                            "type": "string"
+                          },
+                          "runtime": {
+                            "type": "integer"
+                          },
+                          "popularity": {
+                            "type": "number"
+                          },
+                          "voteAverage": {
+                            "type": "number"
+                          },
+                          "voteCount": {
+                            "type": "integer"
+                          },
+                          "adult": {
+                            "type": "boolean"
+                          },
+                          "poster": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["id", "title", "overview", "poster", "backdrop", "movies"]
+                },
+                "example": {
+                  "id": "87359",
+                  "title": "Mission: Impossible Collection",
+                  "overview": "Mission: Impossible is a series of a secret agent thriller films based on the popular 1966–73 television series. They chronicle the missions of a team of secret government agents known as the Impossible Missions Force (IMF) under the leadership of agent Ethan Hunt.",
+                  "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
+                  "backdrop": "/mroWh717g0Ah2c0rrPGW6f3EWMM.jpg",
+                  "movies": [
+                    {
+                      "id": "954",
+                      "title": "Mission: Impossible",
+                      "releaseDate": "1996-05-22T00:00:00.000Z",
+                      "runtime": 110,
+                      "popularity": 22.1827,
+                      "voteAverage": 7.003,
+                      "voteCount": 9344,
+                      "adult": false,
+                      "poster": "/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "examples": {
+                  "2": {
+                    "summary": "Exception",
+                    "description": "",
+                    "value": {
+                      "message": "Collection not found"
+                    }
+                  },
+                  "3": {
+                    "summary": "Exception",
+                    "description": "",
+                    "value": {
+                      "message": "Resource not found"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
     "/movies": {
       "get": {
-        "summary": "All paginated Movies",
+        "summary": "All Movies",
         "deprecated": false,
         "description": "Get all the movies in a paginated format",
         "tags": ["Movies"],
@@ -25,7 +373,9 @@
             "required": false,
             "example": 1,
             "schema": {
-              "type": "number"
+              "type": "number",
+              "default": 1,
+              "minimum": 1
             }
           },
           {
@@ -33,11 +383,12 @@
             "in": "query",
             "description": "",
             "required": false,
-            "example": 10,
+            "example": 2,
             "schema": {
               "type": "number",
               "minimum": 1,
-              "maximum": 100
+              "maximum": 20,
+              "default": 20
             }
           },
           {
@@ -49,7 +400,8 @@
             "schema": {
               "type": "string",
               "enum": ["title", "releaseDate", "popularity", "voteAverage", "voteCount"],
-              "examples": ["title", "voteCount"]
+              "examples": ["title", "voteCount"],
+              "default": "title"
             }
           },
           {
@@ -60,7 +412,9 @@
             "example": "desc",
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"]
+              "enum": ["asc", "desc"],
+              "default": "asc",
+              "examples": ["asc", "desc"]
             }
           }
         ],
@@ -266,7 +620,7 @@
     },
     "/movies/{id}": {
       "get": {
-        "summary": "Get a movie by ID",
+        "summary": "Movie by ID",
         "deprecated": false,
         "description": "",
         "tags": ["Movies"],
@@ -534,7 +888,7 @@
     },
     "/movies/{id}/stream": {
       "get": {
-        "summary": "Stream a movie",
+        "summary": "Stream a Movie",
         "deprecated": false,
         "description": "",
         "tags": ["Movies"],

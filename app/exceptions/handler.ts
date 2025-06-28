@@ -1,5 +1,6 @@
+import { errors } from '@adonisjs/core'
+import { ExceptionHandler, HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
-import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -13,6 +14,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof errors.E_ROUTE_NOT_FOUND) {
+      return ctx.response.status(404).send({ message: 'Resource not found' })
+    }
+
     return super.handle(error, ctx)
   }
 

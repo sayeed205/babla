@@ -9,6 +9,7 @@ import router from '@adonisjs/core/services/router'
 export default class MoviesController {
   async index({ request }: HttpContext) {
     const { page, limit, order, sort } = await moviePaginateValidator.validate(request.qs())
+    console.log(page, limit, order, sort)
     const movies = await Movie.query()
       .select([
         'id',
@@ -21,7 +22,7 @@ export default class MoviesController {
         'adult',
       ])
       .orderBy(sort ? sort : 'title', order ? order : 'asc')
-      .paginate(page ? page : 1, limit ? limit : 10)
+      .paginate(page ? page : 1, limit)
 
     movies.baseUrl(router.makeUrl('movies.index'))
     const data: any[] = []

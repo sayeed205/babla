@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const moviePaginateValidator = vine.compile(
+export const collectionPaginateValidator = vine.compile(
   vine.object({
     page: vine.number().positive().optional(),
     limit: vine
@@ -8,7 +8,6 @@ export const moviePaginateValidator = vine.compile(
       .positive()
       .optional()
       .transform((v) => (v > 20 ? 20 : v)),
-    sort: vine.enum(['title', 'releaseDate', 'popularity', 'voteAverage', 'voteCount']).optional(),
     order: vine.enum(['asc', 'desc']).optional(),
   })
 )
