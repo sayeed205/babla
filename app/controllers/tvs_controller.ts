@@ -1,9 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
+import Episode from '#models/episode'
 import Season from '#models/season'
 import TV from '#models/tv'
 import { ImageTypeEnum } from '#types/media'
 import { tvPaginateValidator } from '#validators/tv_validator'
+import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 
 export default class TvsController {
@@ -199,5 +201,62 @@ export default class TvsController {
     }
   }
 
-  async stream({}: HttpContext) {}
+  async stream({ request, response, params }: HttpContext) {
+    const { tvId, seasonNumber, episodeNumber } = params
+
+    // Find the exact episode
+    const episode = await Episode.query()
+      .select(['id', 'title', 'meta', 'tgMeta'])
+      .whereHas('season', (seasonQuery) => {
+        seasonQuery.where('tvId', tvId).where('seasonNumber', seasonNumber)
+      })
+      .where('episodeNumber', episodeNumber)
+      .first()
+
+    if (!episode) return response.notFound({ message: 'Episode not found' })
+
+    const { size, type, ext } = episode.meta
+    const range = request.header('range')
+
+    let start = 0
+    let end = size - 1
+    let contentLength = size
+
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-')
+      start = Number.parseInt(parts[0], 10)
+      end = parts[1] ? Number.parseInt(parts[1], 10) : end
+
+      if (Number.isNaN(start) || Number.isNaN(end) || start >= size || end >= size || start > end) {
+        return response
+          .status(416)
+          .header('Content-Range', `bytes */${size}`)
+          .json({ message: 'Range not satisfiable' })
+      }
+
+      contentLength = end - start + 1
+      response.status(206)
+      response.header('Content-Range', `bytes ${start}-${end}/${size}`)
+    } else {
+      response.status(200)
+    }
+
+    // Set headers
+    response.header('Content-Length', contentLength.toString())
+    response.header('Content-Type', type)
+    response.header('Accept-Ranges', 'bytes')
+    response.header('Content-Disposition', `inline; filename="${episode.title}.${ext}"`)
+    response.header('Access-Control-Allow-Origin', '*')
+    response.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+    response.header('Access-Control-Allow-Headers', 'Range, Content-Type')
+
+    // Telegram stream
+    const { tg } = await app.container.make('tg')
+    const tgStream = tg.downloadAsNodeStream(episode.tgMeta.fileId, {
+      offset: start,
+      limit: contentLength,
+    })
+
+    return response.stream(tgStream)
+  }
 }
