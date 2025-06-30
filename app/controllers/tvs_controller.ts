@@ -149,6 +149,55 @@ export default class TvsController {
       },
     }
   }
-  async episode({}: HttpContext) {}
+
+  async episode({ params, response }: HttpContext) {
+    const { tvId, seasonNumber, episodeNumber } = params
+
+    const tvShow = await TV.query()
+      .where('id', tvId)
+      .select(['id', 'title', 'originalTitle'])
+      .preload('seasons', (seasonQuery) => {
+        seasonQuery.where('seasonNumber', seasonNumber).preload('episodes', (episodeQuery) => {
+          episodeQuery.orderBy('episodeNumber')
+        })
+      })
+      .first()
+
+    if (!tvShow) return response.notFound({ message: 'TV show not found' })
+
+    const season = tvShow.seasons[0]
+    if (!season) return response.notFound({ message: 'Season not found' })
+
+    const episode = season.episodes.find((ep) => ep.episodeNumber === Number(episodeNumber))
+    if (!episode) return response.notFound({ message: 'Episode not found' })
+
+    const [episodeImages, tvImages] = await Promise.all([
+      episode.getImages(ImageTypeEnum.THUMBNAIL),
+      tvShow.getImages(ImageTypeEnum.POSTER, ImageTypeEnum.BACKDROP, ImageTypeEnum.LOGO),
+    ])
+
+    const moreEpisodes = season.episodes
+      .filter((ep) => ep.episodeNumber !== Number(episodeNumber))
+      .map((ep) => ({
+        id: ep.id,
+        episodeNumber: ep.episodeNumber,
+        title: ep.title,
+        airDate: ep.airDate,
+        ...(ep.meta ? { meta: ep.meta } : {}),
+      }))
+    const { seasonId, ...episodeData } = episode.toJSON()
+    return {
+      ...episodeData,
+      ...episodeImages,
+      more: moreEpisodes,
+      tvShow: {
+        id: tvShow.id,
+        title: tvShow.title,
+        originalTitle: tvShow.originalTitle,
+        ...tvImages,
+      },
+    }
+  }
+
   async stream({}: HttpContext) {}
 }
