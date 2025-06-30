@@ -11,6 +11,9 @@
     },
     {
       "name": "Movies"
+    },
+    {
+      "name": "TV Shows"
     }
   ],
   "paths": {
@@ -901,6 +904,929 @@
             "example": "1195506",
             "schema": {
               "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/tvs": {
+      "get": {
+        "summary": "All TV Shows",
+        "deprecated": false,
+        "description": "",
+        "tags": ["TV Shows"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "title",
+            "schema": {
+              "type": "string",
+              "enum": ["title", "firstAirDate", "popularity", "voteAverage", "voteCount"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "asc",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meat": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer"
+                        },
+                        "perPage": {
+                          "type": "integer"
+                        },
+                        "currentPage": {
+                          "type": "integer"
+                        },
+                        "lastPage": {
+                          "type": "integer"
+                        },
+                        "firstPage": {
+                          "type": "integer"
+                        },
+                        "firstPageUrl": {
+                          "type": "string"
+                        },
+                        "lastPageUrl": {
+                          "type": "string"
+                        },
+                        "nextPageUrl": {
+                          "type": "null"
+                        },
+                        "previousPageUrl": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "perPage",
+                        "currentPage",
+                        "lastPage",
+                        "firstPage",
+                        "firstPageUrl",
+                        "lastPageUrl",
+                        "nextPageUrl",
+                        "previousPageUrl"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "firstAirDate": {
+                            "type": "string"
+                          },
+                          "lastAirDate": {
+                            "type": "string"
+                          },
+                          "popularity": {
+                            "type": "number"
+                          },
+                          "voteAverage": {
+                            "type": "number"
+                          },
+                          "voteCount": {
+                            "type": "integer"
+                          },
+                          "adult": {
+                            "type": "boolean"
+                          },
+                          "poster": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["meat", "data"]
+                },
+                "example": {
+                  "meat": {
+                    "total": 1,
+                    "perPage": 20,
+                    "currentPage": 1,
+                    "lastPage": 1,
+                    "firstPage": 1,
+                    "firstPageUrl": "/tvs?page=1",
+                    "lastPageUrl": "/tvs?page=1",
+                    "nextPageUrl": null,
+                    "previousPageUrl": null
+                  },
+                  "data": [
+                    {
+                      "id": "37854",
+                      "title": "One Piece",
+                      "firstAirDate": "1999-10-20T00:00:00.000Z",
+                      "lastAirDate": "2025-06-15T00:00:00.000Z",
+                      "popularity": 99.8754,
+                      "voteAverage": 8.722,
+                      "voteCount": 4920,
+                      "adult": false,
+                      "poster": "/uStT6g4khexdKPyaiosp0fj3zEz.jpg"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          },
+                          "rule": {
+                            "type": "string"
+                          },
+                          "field": {
+                            "type": "string"
+                          },
+                          "meta": {
+                            "type": "object",
+                            "properties": {
+                              "choices": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": ["choices"]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["errors"]
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "The selected order is invalid",
+                      "rule": "enum",
+                      "field": "order",
+                      "meta": {
+                        "choices": ["asc", "desc"]
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/tvs/{id}": {
+      "get": {
+        "summary": "Get a TV Show",
+        "deprecated": false,
+        "description": "",
+        "tags": ["TV Shows"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 37854,
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "examples": [37854]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "originalTitle": {
+                      "type": "string"
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "firstAirDate": {
+                      "type": "string"
+                    },
+                    "lastAirDate": {
+                      "type": "string"
+                    },
+                    "popularity": {
+                      "type": "number"
+                    },
+                    "voteAverage": {
+                      "type": "number"
+                    },
+                    "voteCount": {
+                      "type": "integer"
+                    },
+                    "adult": {
+                      "type": "boolean"
+                    },
+                    "genres": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "seasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "seasonNumber": {
+                            "type": "integer"
+                          },
+                          "voteAverage": {
+                            "type": "number"
+                          },
+                          "poster": {
+                            "type": "string"
+                          },
+                          "totalEpisodes": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "originalTitle",
+                    "overview",
+                    "firstAirDate",
+                    "lastAirDate",
+                    "popularity",
+                    "voteAverage",
+                    "voteCount",
+                    "adult",
+                    "genres",
+                    "seasons"
+                  ]
+                },
+                "example": {
+                  "id": "37854",
+                  "title": "One Piece",
+                  "originalTitle": "ワンピース",
+                  "overview": "Years ago, the fearsome Pirate King, Gol D. Roger was executed leaving a huge pile of treasure and the famous \"One Piece\" behind. Whoever claims the \"One Piece\" will be named the new King of the Pirates.\n\nMonkey D. Luffy, a boy who consumed a \"Devil Fruit,\" decides to follow in the footsteps of his idol, the pirate Shanks, and find the One Piece. It helps, of course, that his body has the properties of rubber and that he's surrounded by a bevy of skilled fighters and thieves to help him along the way.\n\nLuffy will do anything to get the One Piece and become King of the Pirates!",
+                  "firstAirDate": "1999-10-20T00:00:00.000Z",
+                  "lastAirDate": "2025-06-15T00:00:00.000Z",
+                  "popularity": 99.8754,
+                  "voteAverage": 8.722,
+                  "voteCount": 4920,
+                  "adult": false,
+                  "genres": ["Action & Adventure", "Comedy", "Animation"],
+                  "seasons": [
+                    {
+                      "id": "364569",
+                      "title": "Egghead Island",
+                      "seasonNumber": 22,
+                      "voteAverage": 8.8,
+                      "poster": "/4sCCh2TxpABEEg2e6sLjDfjQbcn.jpg",
+                      "totalEpisodes": 1
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "TV Show not found"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/tvs/{tvId}/seasons/{seasonNumber}": {
+      "get": {
+        "summary": "Get a Season",
+        "deprecated": false,
+        "description": "",
+        "tags": ["TV Shows"],
+        "parameters": [
+          {
+            "name": "tvId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 37854,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "seasonNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 22,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "seasonNumber": {
+                      "type": "integer"
+                    },
+                    "airDate": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "voteAverage": {
+                      "type": "number"
+                    },
+                    "episodes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "airDate": {
+                            "type": "string"
+                          },
+                          "episodeNumber": {
+                            "type": "integer"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "overview": {
+                            "type": "string"
+                          },
+                          "runtime": {
+                            "type": "integer"
+                          },
+                          "voteAverage": {
+                            "type": "integer"
+                          },
+                          "voteCount": {
+                            "type": "integer"
+                          },
+                          "thumbnail": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "tvShow": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "originalTitle": {
+                          "type": "string"
+                        },
+                        "seasons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "seasonNumber": {
+                                "type": "integer"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "poster": {
+                          "type": "string"
+                        },
+                        "backdrop": {
+                          "type": "string"
+                        },
+                        "logo": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "originalTitle",
+                        "seasons",
+                        "poster",
+                        "backdrop",
+                        "logo"
+                      ]
+                    },
+                    "poster": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "seasonNumber",
+                    "airDate",
+                    "overview",
+                    "voteAverage",
+                    "episodes",
+                    "tvShow",
+                    "poster"
+                  ]
+                },
+                "example": {
+                  "id": "364569",
+                  "title": "Egghead Island",
+                  "seasonNumber": 22,
+                  "airDate": null,
+                  "overview": "The aftermaths of both the Levely and the Raid on Onigashima, as well as the erasure of the Lulusia Kingdom, cause major shifts across the world that could lead to global war. The Straw Hat Pirates, following their Log Pose, arrive at the mysterious, futuristic island Egghead where the super genius Dr. Vegapunk resides. However, after being tipped off about Vegapunk's research into the Void Century, the World Government decides to dispatch a CP0 team to assassinate Vegapunk. Betrayal and intrigue on all sides leads to a Marine siege on the island that will escalate into an incident that will shock the world.",
+                  "voteAverage": 8.8,
+                  "poster": "/jwvpVSLsoo0he4TDV4RUXpEwFE2.jpg",
+                  "episodes": [
+                    {
+                      "id": "6248132",
+                      "airDate": "2025-06-08T00:00:00.000Z",
+                      "episodeNumber": 1132,
+                      "title": "A Pledge to Ginny - Kuma Becomes a Father",
+                      "overview": "Two years after Ginny’s abduction, the Revolutionary Army suddenly receives a call from her.",
+                      "runtime": 24,
+                      "voteAverage": 0,
+                      "voteCount": 0,
+                      "thumbnail": "/gxy3COlCp0YRN8QM0mIlV1dAoUI.jpg"
+                    }
+                  ],
+                  "tvShow": {
+                    "id": "37854",
+                    "title": "One Piece",
+                    "originalTitle": "ワンピース",
+                    "poster": "/cMD9Ygz11zjJzAovURpO75Qg7rT.jpg",
+                    "backdrop": "/4Mt7WHox67uJ1yErwTBFcV8KWgG.jpg",
+                    "logo": "/eHt1s9ZPazl4jhW5fw4pLdPrENG.png",
+                    "seasons": [
+                      {
+                        "id": "364569",
+                        "seasonNumber": 22,
+                        "title": "Egghead Island"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Season not found"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/tvs/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}": {
+      "get": {
+        "summary": "Get an Episode",
+        "deprecated": false,
+        "description": "",
+        "tags": ["TV Shows"],
+        "parameters": [
+          {
+            "name": "tvId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 37854,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "seasonNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 22,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "episodeNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 1132,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "airDate": {
+                      "type": "string"
+                    },
+                    "episodeNumber": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "overview": {
+                      "type": "string"
+                    },
+                    "runtime": {
+                      "type": "integer"
+                    },
+                    "voteAverage": {
+                      "type": "integer"
+                    },
+                    "voteCount": {
+                      "type": "integer"
+                    },
+                    "videos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["key", "name", "type"]
+                      }
+                    },
+                    "links": {
+                      "type": "null"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "ext": {
+                          "type": "string"
+                        },
+                        "size": {
+                          "type": "integer"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "bitRate": {
+                          "type": "integer"
+                        },
+                        "bitDepth": {
+                          "type": "integer"
+                        },
+                        "frameRate": {
+                          "type": "number"
+                        },
+                        "videoCodec": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "ext",
+                        "size",
+                        "type",
+                        "bitRate",
+                        "bitDepth",
+                        "frameRate",
+                        "videoCodec"
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    },
+                    "thumbnail": {
+                      "type": "string"
+                    },
+                    "more": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "tvShow": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "originalTitle": {
+                          "type": "string"
+                        },
+                        "poster": {
+                          "type": "string"
+                        },
+                        "backdrop": {
+                          "type": "string"
+                        },
+                        "logo": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["id", "title", "originalTitle", "poster", "backdrop", "logo"]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "airDate",
+                    "episodeNumber",
+                    "title",
+                    "overview",
+                    "runtime",
+                    "voteAverage",
+                    "voteCount",
+                    "videos",
+                    "links",
+                    "meta",
+                    "createdAt",
+                    "updatedAt",
+                    "thumbnail",
+                    "more",
+                    "tvShow"
+                  ]
+                },
+                "example": {
+                  "id": "6248132",
+                  "airDate": "2025-06-08T00:00:00.000Z",
+                  "episodeNumber": 1132,
+                  "title": "A Pledge to Ginny - Kuma Becomes a Father",
+                  "overview": "Two years after Ginny’s abduction, the Revolutionary Army suddenly receives a call from her.",
+                  "runtime": 24,
+                  "voteAverage": 0,
+                  "voteCount": 0,
+                  "videos": [
+                    {
+                      "key": "G0ksOykAkXQ",
+                      "name": "Fatherhood is Everything To Kuma - Official Clip [Subtitled]",
+                      "type": "Clip"
+                    },
+                    {
+                      "key": "F6yk7nHlXHM",
+                      "name": "Episode 1132 Preview - A Pledge to Ginny - Kuma Becomes a Father [Subtitled]",
+                      "type": "Trailer"
+                    }
+                  ],
+                  "links": null,
+                  "meta": {
+                    "ext": "mkv",
+                    "size": 1434588233,
+                    "type": "video/x-matroska",
+                    "bitRate": 5925,
+                    "bitDepth": 8,
+                    "frameRate": 23.976,
+                    "videoCodec": "AVC"
+                  },
+                  "createdAt": "2025-06-28T10:14:14.169+00:00",
+                  "updatedAt": "2025-06-28T10:14:14.169+00:00",
+                  "thumbnail": "/2lCHV94GUSJQbKr0LoJMi0halI0.jpg",
+                  "more": [],
+                  "tvShow": {
+                    "id": "37854",
+                    "title": "One Piece",
+                    "originalTitle": "ワンピース",
+                    "poster": "/gJI77i79KnRuc9mGPKADPZWAE8O.jpg",
+                    "backdrop": "/6fRwRD7GdCfg6owzmCT3VgQtowl.jpg",
+                    "logo": "/ralWJWCZaKJDcz9y95ja8tqzI1B.png"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "TV show not found"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/tvs/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/stream": {
+      "get": {
+        "summary": "Stream an Episode",
+        "deprecated": false,
+        "description": "",
+        "tags": ["TV Shows"],
+        "parameters": [
+          {
+            "name": "tvId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "seasonNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "episodeNumber",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": 1
             }
           }
         ],
