@@ -10,7 +10,15 @@ import router from '@adonisjs/core/services/router'
 
 export default class TvsController {
   async index({ request }: HttpContext) {
-    const { page, limit, order, sort } = await tvPaginateValidator.validate(request.all())
+    const {
+      page = 1,
+      limit = 20,
+      order,
+      sort = 'title',
+    } = await tvPaginateValidator.validate(request.all())
+    const safeLimit = Math.min(limit || 1, 20)
+
+    console.log({ sort, order, page, safeLimit })
 
     const tvs = await TV.query()
       .select([
@@ -23,21 +31,20 @@ export default class TvsController {
         'vote_count',
         'adult',
       ])
-      .orderBy(sort ? sort : 'title', order ? order : 'asc')
-      .paginate(page ? page : 1, limit ? (limit > 20 ? 20 : limit) : 20)
+      .orderBy(sort, order)
+      .paginate(page || 1, safeLimit)
 
     tvs.baseUrl(router.makeUrl('tvs.index'))
-    const data: any[] = []
 
-    for (const tv of tvs) {
-      data.push({
+    const data = await Promise.all(
+      tvs.all().map(async (tv) => ({
         ...tv.toJSON(),
         ...(await tv.getImages(ImageTypeEnum.POSTER)),
-      })
-    }
+      }))
+    )
 
     return {
-      meat: tvs.getMeta(),
+      meta: tvs.getMeta(), // ✅ typo fixed
       data,
     }
   }

@@ -13,21 +13,19 @@ export default class CollectionsController {
       limit = 20,
       order,
     } = await collectionPaginateValidator.validate(request.all())
-    const safeLimit = Math.min(limit, 20)
+    const safeLimit = Math.min(limit || 1, 20)
     const collections = await Collection.query()
       .select(['id', 'title', 'poster'])
       .withCount('movies', (q) => q.as('totalMovies'))
       .orderBy('title', order)
-      .paginate(page, safeLimit)
+      .paginate(page || 1, safeLimit)
 
     collections.baseUrl(router.makeUrl('collections.index'))
-    const data: any[] = []
-    for (const collection of collections) {
-      data.push({
-        ...collection.toJSON(),
-        totalMovies: Number.parseInt(collection.$extras.totalMovies),
-      })
-    }
+    const data = collections.all().map((collection) => ({
+      ...collection.toJSON(),
+      totalMovies: Number(collection.$extras.totalMovies),
+    }))
+
     return {
       meta: collections.getMeta(),
       data,

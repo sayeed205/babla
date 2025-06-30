@@ -8,8 +8,13 @@ import router from '@adonisjs/core/services/router'
 
 export default class MoviesController {
   async index({ request }: HttpContext) {
-    const { page, limit, order, sort } = await moviePaginateValidator.validate(request.qs())
-    console.log(page, limit, order, sort)
+    const {
+      page = 1,
+      limit = 20,
+      order,
+      sort = 'title',
+    } = await moviePaginateValidator.validate(request.qs())
+    const safeLimit = Math.min(limit || 1, 20)
     const movies = await Movie.query()
       .select([
         'id',
@@ -21,20 +26,20 @@ export default class MoviesController {
         'vote_count',
         'adult',
       ])
-      .orderBy(sort ? sort : 'title', order ? order : 'asc')
-      .paginate(page ? page : 1, limit)
+      .orderBy(sort, order)
+      .paginate(page || 1, safeLimit)
 
     movies.baseUrl(router.makeUrl('movies.index'))
-    const data: any[] = []
-
-    for (const movie of movies) {
-      const m = {
-        ...movie.toJSON(),
-        ...(await movie.getImages(ImageTypeEnum.POSTER)),
-      }
-      data.push(m)
-    }
-
+    const data = await Promise.all(
+      movies.all().map(async (movie) => {
+        const base = movie.toJSON()
+        const images = await movie.getImages(ImageTypeEnum.POSTER)
+        return {
+          ...base,
+          ...images,
+        }
+      })
+    )
     return {
       meta: movies.getMeta(),
       data,
