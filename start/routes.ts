@@ -50,3 +50,27 @@ router
 |--------------------------------------------------------------------------
 */
 const TVShowsController = () => import('#controllers/tvs_controller')
+router
+  .resource('tvs', TVShowsController)
+  .only(['index', 'show'])
+  .where('id', router.matchers.number())
+router
+  .get('tvs/:tvId/seasons/:seasonNumber', [TVShowsController, 'season'])
+  .where('tvId', router.matchers.number())
+  .where('seasonNumber', router.matchers.number())
+  .as('tvs.season')
+router
+  .get('tvs/:tvId/seasons/:seasonNumber/episodes/:episodeNumber', [TVShowsController, 'episode'])
+  .where('tvId', router.matchers.number())
+  .where('seasonNumber', router.matchers.number())
+  .where('episodeNumber', router.matchers.number())
+  .as('tvs.episode')
+router
+  .get('tvs/:tvId/seasons/:seasonNumber/episodes/:episodeNumber/stream', [
+    TVShowsController,
+    'stream',
+  ])
+  .where('tvId', router.matchers.number())
+  .where('seasonNumber', router.matchers.number())
+  .where('episodeNumber', router.matchers.number())
+  .as('tvs.episode.stream')

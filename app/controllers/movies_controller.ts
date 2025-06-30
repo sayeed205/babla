@@ -70,11 +70,11 @@ export default class MoviesController {
 
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-')
-      start = parseInt(parts[0], 10)
-      end = parts[1] ? parseInt(parts[1], 10) : size - 1
+      start = Number.parseInt(parts[0], 10)
+      end = parts[1] ? Number.parseInt(parts[1], 10) : size - 1
 
       // Validate range (NEW: end boundary check)
-      if (isNaN(start) || isNaN(end) || start >= size || end >= size || start > end) {
+      if (Number.isNaN(start) || Number.isNaN(end) || start >= size || end >= size || start > end) {
         return response
           .status(416)
           .header('Content-Range', `bytes */${size}`)

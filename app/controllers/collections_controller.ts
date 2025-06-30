@@ -44,7 +44,7 @@ export default class CollectionsController {
           'vote_count',
           'adult',
         ])
-          .orderBy('release_date', 'asc')
+          .orderBy('release_date')
           .orderBy('title', 'asc')
       })
       .first()

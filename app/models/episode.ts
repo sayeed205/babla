@@ -15,7 +15,7 @@ export default class Episode extends compose(
   BaseModel,
   withID(),
   withTimestamps(),
-  withImages('tvs')
+  withImages('episodes')
 ) {
   @column()
   declare airDate: string
