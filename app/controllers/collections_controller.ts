@@ -8,12 +8,17 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class CollectionsController {
   async index({ request }: HttpContext) {
-    const { page, limit, order } = await collectionPaginateValidator.validate(request.all())
+    const {
+      page = 1,
+      limit = 20,
+      order,
+    } = await collectionPaginateValidator.validate(request.all())
+    const safeLimit = Math.min(limit, 20)
     const collections = await Collection.query()
       .select(['id', 'title', 'poster'])
       .withCount('movies', (q) => q.as('totalMovies'))
       .orderBy('title', order)
-      .paginate(page ? page : 1, limit)
+      .paginate(page, safeLimit)
 
     collections.baseUrl(router.makeUrl('collections.index'))
     const data: any[] = []
@@ -49,15 +54,18 @@ export default class CollectionsController {
       })
       .first()
     if (!collection) return response.notFound({ message: 'Collection not found' })
-    const movies: any[] = []
 
-    for (const movie of collection.movies) {
-      const { collectionId, ...m } = movie.toJSON()
-      movies.push({
-        ...m,
-        ...(await movie.getImages(ImageTypeEnum.POSTER)),
+    const movies = await Promise.all(
+      collection.movies.map(async (movie) => {
+        const { collectionId, ...data } = movie.toJSON()
+        const images = await movie.getImages(ImageTypeEnum.POSTER)
+        return {
+          ...data,
+          ...images,
+        }
       })
-    }
+    )
+
     return {
       ...collection.toJSON(),
       movies,
