@@ -1,11 +1,10 @@
 import logger from '@adonisjs/core/services/logger'
-import { Dispatcher, filters, MessageContext } from '@mtcute/dispatcher'
-import { TelegramClient } from '@mtcute/node'
+import { filters, MessageContext } from '@mtcute/dispatcher'
+import type { Document, Video } from '@mtcute/node'
 import mime from 'mime'
 import { TMDB } from 'tmdb-ts'
 
 import type { ApplicationService } from '@adonisjs/core/types'
-import type { Document, Video } from '@mtcute/node'
 
 import Collection from '#models/collection'
 import Episode from '#models/episode'
@@ -15,13 +14,11 @@ import Season from '#models/season'
 import TV from '#models/tv'
 import env from '#start/env'
 import { getVideoMetadata, parseMediaInfo, TGMovieCaption, TGShowsCaption } from '#utils/media'
+import { TGService } from '#services/tg_service'
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
-    tg: {
-      tg: TelegramClient
-      dp: Dispatcher<never>
-    }
+    tg: TGService
   }
 }
 
@@ -35,13 +32,7 @@ export default class TGProvider {
    */
   register() {
     this.app.container.singleton('tg', () => {
-      const tg = new TelegramClient({
-        apiId: env.get('TG_API_ID'),
-        apiHash: env.get('TG_API_HASH'),
-        enableErrorReporting: true,
-      })
-      const dp = Dispatcher.for(tg)
-      return { tg, dp }
+      return new TGService()
     })
   }
 
@@ -214,7 +205,7 @@ const handleTV = async (
     }
   >
 ) => {
-  const { media, link, text } = ctx
+  const { media, link } = ctx
   const tvSearch = await tmdb.search.tvShows({
     query: meta.title,
     year: meta.year,

@@ -13,11 +13,17 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder, withID(), withTimestamps()) {
-  @column()
-  declare email: string
-
-  @column({ serializeAs: null })
-  declare password: string
-
   static accessTokens = DbAccessTokensProvider.forModel(User)
+
+  @column()
+  declare firstName: string | null
+
+  @column()
+  declare lastName: string | null
+
+  @column()
+  declare username: string | null
+
+  @column()
+  declare avatar: string | null
 }

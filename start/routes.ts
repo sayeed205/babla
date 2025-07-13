@@ -20,6 +20,22 @@ router.get('docs/swagger.json', [DocsController, 'swagger']).as('docs.swagger')
 
 /*
 |--------------------------------------------------------------------------
+| AUTH Routes
+|--------------------------------------------------------------------------
+*/
+const AuthController = () => import('#controllers/auth_controller')
+router
+  .group(() => {
+    router.get('start', [AuthController, 'start']).as('start')
+    router.get('callback/:id', [AuthController, 'callback']).as('callback')
+    router.post('callback/:id', [AuthController, 'verifyCallback']).as('verifyCallback')
+    router.get('/poll/:id', [AuthController, 'poll']).as('poll')
+  })
+  .as('auth')
+  .prefix('auth')
+
+/*
+|--------------------------------------------------------------------------
 | COLLECTIONS Routes
 |--------------------------------------------------------------------------
 */

@@ -18,8 +18,6 @@ export default class TvsController {
     } = await tvPaginateValidator.validate(request.all())
     const safeLimit = Math.min(limit || 1, 20)
 
-    console.log({ sort, order, page, safeLimit })
-
     const tvs = await TV.query()
       .select([
         'id',
