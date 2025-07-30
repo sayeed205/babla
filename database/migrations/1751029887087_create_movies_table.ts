@@ -1,6 +1,3 @@
-import env from '#start/env'
-import app from '@adonisjs/core/services/app'
-import logger from '@adonisjs/core/services/logger'
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
@@ -39,30 +36,30 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable()
     })
 
-    const meilisearch = await app.container.make('meilisearch')
-    await meilisearch.createIndex(this.tableName, { primaryKey: 'id' })
-
-    const movieTask = await meilisearch.index(this.tableName).updateSettings({
-      distinctAttribute: 'id',
-      rankingRules: ['words', 'typo', 'proximity', 'attribute', 'exactness'],
-      sortableAttributes: ['popularity', 'vote_average', 'vote_count'],
-      searchableAttributes: ['title', 'overview', 'tagline', 'genres'],
-      embedders: {
-        'movie-openai': {
-          source: 'openAi',
-          apiKey: env.get('OPENAI_API_KEY'),
-          model: 'text-embedding-3-small',
-          documentTemplate:
-            'A movie titled "{{doc.title}}" tells the story: {{doc.overview}}. ' +
-            'It belongs to the genres {{doc.genres | join: ", "}} and is tagged with "{{doc.tagline}}". ' +
-            'Originally released on {{doc.releaseDate}}, the film was first titled "{{doc.originalTitle}}". ' +
-            'It runs for {{doc.runtime}} minutes. ' +
-            'With a popularity score of {{doc.popularity}}, it has an average rating of {{doc.voteAverage}} based on {{doc.voteCount}} votes.',
-        },
-      },
-    })
-
-    logger.info(movieTask, `${this.tableName}: created meilisearch index and embedder`)
+    // const meilisearch = await app.container.make('meilisearch')
+    // await meilisearch.createIndex(this.tableName, { primaryKey: 'id' })
+    //
+    // const movieTask = await meilisearch.index(this.tableName).updateSettings({
+    //   distinctAttribute: 'id',
+    //   rankingRules: ['words', 'typo', 'proximity', 'attribute', 'exactness'],
+    //   sortableAttributes: ['popularity', 'vote_average', 'vote_count'],
+    //   searchableAttributes: ['title', 'overview', 'tagline', 'genres'],
+    //   embedders: {
+    //     'movie-openai': {
+    //       source: 'openAi',
+    //       apiKey: env.get('OPENAI_API_KEY'),
+    //       model: 'text-embedding-3-small',
+    //       documentTemplate:
+    //         'A movie titled "{{doc.title}}" tells the story: {{doc.overview}}. ' +
+    //         'It belongs to the genres {{doc.genres | join: ", "}} and is tagged with "{{doc.tagline}}". ' +
+    //         'Originally released on {{doc.releaseDate}}, the film was first titled "{{doc.originalTitle}}". ' +
+    //         'It runs for {{doc.runtime}} minutes. ' +
+    //         'With a popularity score of {{doc.popularity}}, it has an average rating of {{doc.voteAverage}} based on {{doc.voteCount}} votes.',
+    //     },
+    //   },
+    // })
+    //
+    // logger.info(movieTask, `${this.tableName}: created meilisearch index and embedder`)
   }
 
   async down() {

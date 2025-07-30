@@ -30,14 +30,14 @@ export function parseMediaInfo(input: string): TGCaption | null {
   const title = rawTitle.trim()
   const year = Number(yearStr)
 
-  if (!title || isNaN(year)) return null
+  if (!title || Number.isNaN(year)) return null
 
   // TV show
   if (seasonStr && episodeStr) {
     const season = Number(seasonStr)
     const episode = Number(episodeStr)
 
-    if (isNaN(season) || isNaN(episode)) return null
+    if (Number.isNaN(season) || Number.isNaN(episode)) return null
 
     return {
       title,
@@ -93,9 +93,9 @@ export async function getVideoMetadata(
   mediainfo.close()
 
   return {
-    bitRate: parseInt(general.OverallBitRate || '0', 10),
-    bitDepth: parseInt(video.BitDepth || '0', 10),
+    bitRate: Number.parseInt(general.OverallBitRate || '0', 10),
+    bitDepth: Number.parseInt(video.BitDepth || '0', 10),
     videoCodec: video.Format || video.CodecID || video.CodecIDHint || '',
-    frameRate: parseFloat(video.FrameRate || '0'),
+    frameRate: Number.parseFloat(video.FrameRate || '0'),
   }
 }

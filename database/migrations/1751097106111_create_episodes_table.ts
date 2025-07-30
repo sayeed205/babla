@@ -1,8 +1,4 @@
-import app from '@adonisjs/core/services/app'
-import logger from '@adonisjs/core/services/logger'
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
-import env from '#start/env'
 
 export default class extends BaseSchema {
   protected tableName = 'episodes'
@@ -33,28 +29,28 @@ export default class extends BaseSchema {
       table.timestamp('updated_at')
     })
 
-    const meilisearch = await app.container.make('meilisearch')
-
-    await meilisearch.createIndex(this.tableName, { primaryKey: 'id' })
-
-    const episodeTask = await meilisearch.index(this.tableName).updateSettings({
-      distinctAttribute: 'id',
-      searchableAttributes: ['title', 'overview'],
-      sortableAttributes: ['episode_number', 'vote_average', 'vote_count', 'air_date'],
-      embedders: {
-        'episode-openai': {
-          source: 'openAi',
-          apiKey: env.get('OPENAI_API_KEY'),
-          model: 'text-embedding-3-small',
-          documentTemplate:
-            `Episode {{doc.episode_number}} titled "{{doc.title}}" aired on {{doc.air_date}}. ` +
-            `It has a runtime of {{doc.runtime}} minutes, an average rating of {{doc.vote_average}} ` +
-            `based on {{doc.vote_count}} votes. Overview: {{doc.overview}}.`,
-        },
-      },
-    })
-
-    logger.info(episodeTask, `${this.tableName}: created Meilisearch index and embedder`)
+    // const meilisearch = await app.container.make('meilisearch')
+    //
+    // await meilisearch.createIndex(this.tableName, { primaryKey: 'id' })
+    //
+    // const episodeTask = await meilisearch.index(this.tableName).updateSettings({
+    //   distinctAttribute: 'id',
+    //   searchableAttributes: ['title', 'overview'],
+    //   sortableAttributes: ['episode_number', 'vote_average', 'vote_count', 'air_date'],
+    //   embedders: {
+    //     'episode-openai': {
+    //       source: 'openAi',
+    //       apiKey: env.get('OPENAI_API_KEY'),
+    //       model: 'text-embedding-3-small',
+    //       documentTemplate:
+    //         `Episode {{doc.episode_number}} titled "{{doc.title}}" aired on {{doc.air_date}}. ` +
+    //         `It has a runtime of {{doc.runtime}} minutes, an average rating of {{doc.vote_average}} ` +
+    //         `based on {{doc.vote_count}} votes. Overview: {{doc.overview}}.`,
+    //     },
+    //   },
+    // })
+    //
+    // logger.info(episodeTask, `${this.tableName}: created Meilisearch index and embedder`)
   }
 
   async down() {
