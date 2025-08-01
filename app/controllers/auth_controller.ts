@@ -3,6 +3,7 @@ import AuthSession from '#models/auth_session'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import User from '#models/user'
+import env from '#start/env'
 
 export default class AuthController {
   async start({ request }: HttpContext) {
@@ -182,6 +183,31 @@ const data = params.get('tgAuthResult');
 
       const user = await User.find(authData.id)
       if (!user) {
+        //  check if the id is admin's id
+        if (authData.id === env.get('TG_ADMIN_ID')) {
+          const { tg } = await app.container.make('tg')
+          const adminUser = await tg.getUser(authData.id)
+          await User.create({
+            id: adminUser.id,
+            firstName: adminUser.firstName,
+            lastName: adminUser.lastName,
+            avatar: authData.photo_url,
+            username: adminUser.username,
+          })
+          const authSession = await AuthSession.find(sessionId)
+
+          if (!authSession) {
+            return {
+              error: 'Authentication failed',
+              message: 'Authentication failed',
+            }
+          }
+          authSession.tgId = authData.id
+          authSession.verifiedAt = DateTime.now()
+          await authSession.save()
+          return authData
+        }
+
         return {
           error: 'Invalid user',
           message: 'You are not authorized to use this service.',
@@ -245,7 +271,7 @@ const data = params.get('tgAuthResult');
       return response.status(202).json({ message: 'Please continue polling.' })
     }
     if (authSession.tgId) {
-      const user = await User.find(authSession.id)
+      const user = await User.find(authSession.tgId)
       if (!user) {
         await authSession.delete()
         return response.status(400).json({ message: 'Authentication failed' })
@@ -255,5 +281,9 @@ const data = params.get('tgAuthResult');
     }
     await authSession.delete()
     return response.status(403).json({ message: 'Authentication failed' })
+  }
+
+  async me({ auth }: HttpContext) {
+    return auth.getUserOrFail()
   }
 }

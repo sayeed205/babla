@@ -8,6 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,7 @@ router
     router.get('callback/:id', [AuthController, 'callback']).as('callback')
     router.post('callback/:id', [AuthController, 'verifyCallback']).as('verifyCallback')
     router.get('/poll/:id', [AuthController, 'poll']).as('poll')
+    router.get('me', [AuthController, 'me']).use([middleware.auth()]).as('me')
   })
   .as('auth')
   .prefix('auth')
