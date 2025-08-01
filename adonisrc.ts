@@ -56,6 +56,7 @@ export default defineConfig({
       environment: ['web'],
     },
     () => import('#providers/meilisearch_provider'),
+    () => import('#providers/trakt_provider'),
   ],
 
   /*

@@ -61,7 +61,7 @@ export default class TGProvider {
   }
 
   /**
-   * Preparing to shutdown the app
+   * Preparing to shut down the app
    */
   async shutdown() {
     const { tg, dp } = await this.app.container.make('tg')

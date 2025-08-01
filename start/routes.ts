@@ -32,6 +32,14 @@ router
     router.post('callback/:id', [AuthController, 'verifyCallback']).as('verifyCallback')
     router.get('/poll/:id', [AuthController, 'poll']).as('poll')
     router.get('me', [AuthController, 'me']).use([middleware.auth()]).as('me')
+    router
+      .group(() => {
+        router.get('/start', [AuthController, 'startTrakt']).as('start')
+        router.post('/poll', [AuthController, 'pollTrakt']).as('poll')
+      })
+      .use([middleware.auth()])
+      .as('trakt')
+      .prefix('trakt')
   })
   .as('auth')
   .prefix('auth')

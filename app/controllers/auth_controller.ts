@@ -1,8 +1,10 @@
-import type { HttpContext } from '@adonisjs/core/http'
-import AuthSession from '#models/auth_session'
-import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
+import type { HttpContext } from '@adonisjs/core/http'
+import app from '@adonisjs/core/services/app'
+
+import AuthSession from '#models/auth_session'
 import User from '#models/user'
+import { traktPollValidator } from '#validators/auth_validator'
 import env from '#start/env'
 
 export default class AuthController {
@@ -207,7 +209,6 @@ const data = params.get('tgAuthResult');
           await authSession.save()
           return authData
         }
-
         return {
           error: 'Invalid user',
           message: 'You are not authorized to use this service.',
@@ -285,5 +286,22 @@ const data = params.get('tgAuthResult');
 
   async me({ auth }: HttpContext) {
     return auth.getUserOrFail()
+  }
+
+  async startTrakt({}: HttpContext) {
+    const trakt = await app.container.make('trakt')
+    return await trakt.getCodes()
+  }
+
+  async pollTrakt({ auth, request, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const { code } = await request.validateUsing(traktPollValidator)
+
+    const trakt = await app.container.make('trakt')
+    const res = await trakt.checkCodes(code)
+    if (res.status !== 200) return response.status(res.status).json(res)
+    user.trakt = res.data
+    await user.save()
+    return response.json({ message: res.message, status: res.status })
   }
 }
