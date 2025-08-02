@@ -1,21 +1,22 @@
-import { DateTime } from 'luxon'
 import type { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
+import { DateTime } from 'luxon'
 
 import AuthSession from '#models/auth_session'
 import User from '#models/user'
-import { traktPollValidator } from '#validators/auth_validator'
 import env from '#start/env'
+import { traktPollValidator } from '#validators/auth_validator'
 
 export default class AuthController {
-  async start({}: HttpContext) {
+  async start({ request }: HttpContext) {
+    const source = request.input('source', 'app')
     const backendUrl = env.get('BACKEND_URL')
     const { tg } = await app.container.make('tg')
     const bot = await tg.getUser('self')
 
     // todo)) update origin
     const session = await AuthSession.create({})
-    const callbackUrl = `${backendUrl}/auth/callback/${session.id}`
+    const callbackUrl = `${backendUrl}/api/auth/callback/${session.id}?source=${source}`
     const authUrl = `https://oauth.telegram.org/auth?bot_id=${bot.id}&origin=${backendUrl}&return_to=${callbackUrl}&request_access=write`
     return {
       authUrl,
@@ -24,7 +25,10 @@ export default class AuthController {
     }
   }
 
-  async callback({ response }: HttpContext) {
+  async callback({ request, response, params }: HttpContext) {
+    const source = request.input('source', 'app')
+    const sessionId = params.id
+
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -92,6 +96,16 @@ export default class AuthController {
       cursor: pointer;
       margin-top: 1rem;
     }
+
+    a.button {
+      display: inline-block;
+      background-color: #3498db;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -102,15 +116,16 @@ export default class AuthController {
   </div>
 
   <script>
+    const source = "${source}";
+    const sessionId = "${sessionId}";
+
     function getAuthResult() {
       const params = new URLSearchParams(window.location.hash.substring(1));
-const data = params.get('tgAuthResult');
+      const data = params.get('tgAuthResult');
 
       if (data) {
         try {
-        console.log(data)
           const decoded = JSON.parse(atob(data));
-          console.log('decoded', decoded);
           return decoded;
         } catch (e) {
           console.error('Error decoding auth result:', e);
@@ -129,7 +144,7 @@ const data = params.get('tgAuthResult');
         return;
       }
 
-      fetch(window.location.href, {
+      fetch(window.location.pathname, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,18 +153,22 @@ const data = params.get('tgAuthResult');
       })
       .then(response => response.json())
       .then(data => {
+        document.querySelector('.loader').style.display = 'none';
+
         if (!data.error) {
-          document.querySelector('.loader').style.display = 'none';
-          document.getElementById('status').innerHTML =
-            '<div class="success">Authentication successful!</div>' +
-            '<div class="user-info">Logged in as: <strong>' +
-            (data?.first_name || 'Unknown') +
-            ' (@' + (data?.username || 'unknown') + ')</strong></div>' +
-            '<div class="user-info">You can now safely close this window.</div>';
+          let message = '<div class="success">Authentication successful!</div>';
+          message += '<div class="user-info">Logged in as: <strong>' +
+                     (data?.first_name || 'Unknown') +
+                     ' (@' + (data?.username || 'unknown') + ')</strong></div>';
 
+          if (source === 'web') {
+            message += '<a class="button" href="/login?authSession=' + sessionId + '">Go Back</a>';
+          } else {
+            message += '<div class="user-info">You can now safely close this window.</div>';
+          }
 
+          document.getElementById('status').innerHTML = message;
         } else {
-          document.querySelector('.loader').style.display = 'none';
           document.getElementById('status').innerHTML =
             '<div class="error">Authentication failed: ' + (data.message || 'Unknown error') + '</div>';
         }
@@ -214,6 +233,7 @@ const data = params.get('tgAuthResult');
       }
 
       const { verifyTGAuth } = await app.container.make('tg')
+      console.log(authData)
 
       if (!verifyTGAuth(authData)) {
         return {
@@ -276,10 +296,17 @@ const data = params.get('tgAuthResult');
         return response.status(400).json({ message: 'Authentication failed' })
       }
       const token = await User.accessTokens.create(user)
+      await authSession.delete()
       return response.status(200).json({ user, token })
     }
     await authSession.delete()
     return response.status(403).json({ message: 'Authentication failed' })
+  }
+
+  async logout({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    await User.accessTokens.delete(user, user.currentAccessToken.identifier)
+    return response.noContent()
   }
 
   async me({ auth }: HttpContext) {

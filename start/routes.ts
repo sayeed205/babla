@@ -35,6 +35,7 @@ router
         router.post('callback/:id', [AuthController, 'verifyCallback']).as('verifyCallback')
         router.get('/poll/:id', [AuthController, 'poll']).as('poll')
         router.get('me', [AuthController, 'me']).use([middleware.auth()]).as('me')
+        router.get('logout', [AuthController, 'logout']).use([middleware.auth()]).as('logout')
         router
           .group(() => {
             router.get('/start', [AuthController, 'startTrakt']).as('start')

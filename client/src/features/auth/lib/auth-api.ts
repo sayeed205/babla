@@ -12,8 +12,8 @@ export const authApi = {
    * Returns auth URL and session ID for polling
    * Requirement: 1.3 - WHEN a user clicks the Telegram login widget THEN the system SHALL redirect to Telegram OAuth
    */
-  start: async (): Promise<AuthSession> => {
-    const response = await apiClient.get<AuthSession>('/auth/start')
+  start: async (source: 'web' | 'app' = 'web'): Promise<AuthSession> => {
+    const response = await apiClient.get<AuthSession>(`/auth/start?source=${source}`)
     return response.data
   },
 

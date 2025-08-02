@@ -123,7 +123,8 @@ export const useAuth = () => {
    * Initialize auth on mount
    */
   useEffect(() => {
-    initializeAuth()
+    // Call async initialization
+    initializeAuth().catch(console.error)
   }, [initializeAuth])
 
   /**

@@ -11,7 +11,7 @@ interface AuthGuardProps {
  * Auth Guard component for protecting routes
  * Requirements: 3.1, 3.2, 3.3, 3.4
  */
-export function AuthGuard({ children, redirectTo = '/auth/login' }: AuthGuardProps) {
+export function AuthGuard({ children, redirectTo = '/login' }: AuthGuardProps) {
   const router = useRouter()
   const { isAuthenticated, isLoading, checkTokenExpiration, initializeAuth } = useAuthStore()
 

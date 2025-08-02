@@ -74,10 +74,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   /**
-   * Initialize auth state from localStorage on app startup
-   * Requirements: 2.2, 2.3, 2.4, 2.5
+   * Initialize auth state from localStorage and verify with backend
+   * Requirements: 2.2, 2.3, 2.4, 2.5, 4.1
    */
-  initializeAuth: () => {
+  initializeAuth: async () => {
     set({ isLoading: true })
 
     const storedAuth = storage.get()
@@ -101,12 +101,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return
     }
 
-    // Token is valid, restore auth state
-    set({
-      user: storedAuth.user,
-      token: storedAuth.token,
-      isAuthenticated: true,
-      isLoading: false,
-    })
+    // Token exists and is not expired, verify with backend
+    try {
+      const { authApi } = await import('../lib/auth-api')
+      const currentUser = await authApi.me()
+
+      // Update stored user data with fresh data from backend
+      const updatedAuth = {
+        ...storedAuth,
+        user: currentUser,
+      }
+      storage.set(updatedAuth)
+
+      // Token is valid and verified, restore auth state with fresh user data
+      set({
+        user: currentUser,
+        token: storedAuth.token,
+        isAuthenticated: true,
+        isLoading: false,
+      })
+    } catch (error) {
+      console.warn('Failed to verify token with backend:', error)
+      // Token might be invalid, clear storage and state
+      storage.remove()
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+      })
+    }
   },
 }))

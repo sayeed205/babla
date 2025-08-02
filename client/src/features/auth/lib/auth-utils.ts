@@ -15,7 +15,12 @@ export const tokenUtils = {
    * Check if a token is expired based on expiration date
    * Requirements: 2.3, 2.4
    */
-  isExpired: (expiresAt: string): boolean => {
+  isExpired: (expiresAt: string | null): boolean => {
+    // If expiration is null, token is valid for eternity
+    if (expiresAt === null || expiresAt === undefined) {
+      return false
+    }
+
     try {
       const expirationDate = new Date(expiresAt)
       const now = new Date()
@@ -48,7 +53,12 @@ export const tokenUtils = {
    * Get time until token expires in milliseconds
    * Returns null if token is already expired or invalid
    */
-  getTimeUntilExpiry: (expiresAt: string): number | null => {
+  getTimeUntilExpiry: (expiresAt: string | null): number | null => {
+    // If expiration is null, token never expires
+    if (expiresAt === null || expiresAt === undefined) {
+      return null // Represents infinite time
+    }
+
     try {
       const expirationDate = new Date(expiresAt)
       const now = new Date()
@@ -177,8 +187,16 @@ export const authValidation = {
       return false
     }
 
-    // Validate types
-    if (typeof user.id !== 'number' || typeof user.firstName !== 'string') {
+    // Validate types - ID can be number or string (Telegram IDs can be large numbers sent as strings)
+    if (
+      (typeof user.id !== 'number' && typeof user.id !== 'string') ||
+      typeof user.firstName !== 'string'
+    ) {
+      return false
+    }
+
+    // If ID is a string, it should be a valid number string
+    if (typeof user.id === 'string' && isNaN(Number(user.id))) {
       return false
     }
 

@@ -8,7 +8,10 @@ import type { TokenResponse } from '@hitarashi/trakt/types'
 import { withTimestamps } from '#models/utils/with_timestamps'
 
 export default class User extends compose(BaseModel, withTimestamps()) {
-  static accessTokens = DbAccessTokensProvider.forModel(User)
+  static accessTokens = DbAccessTokensProvider.forModel(User, {
+    type: 'Bearer',
+    expiresIn: '30 days',
+  })
 
   @column({ isPrimary: true })
   declare id: number

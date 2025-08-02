@@ -18,23 +18,31 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from localStorage using the same key as auth store
-    const storedAuth = localStorage.getItem('auth-data')
+    const storedAuth = localStorage.getItem('auth_data')
+
     if (storedAuth) {
       try {
         const { token, expiresAt } = JSON.parse(storedAuth)
 
-        // Check if token is not expired
-        if (token && new Date(expiresAt) > new Date()) {
-          config.headers.Authorization = `Bearer ${token}`
-        } else {
-          // Token is expired, remove from storage
-          localStorage.removeItem('auth-data')
+        if (token) {
+          // Check if token is not expired (null expiresAt means eternal token)
+          const isExpired =
+            expiresAt !== null && expiresAt !== undefined && new Date(expiresAt) <= new Date()
+
+          if (!isExpired) {
+            config.headers.Authorization = `Bearer ${token}`
+          } else {
+            // Token is expired, remove from storage
+            localStorage.removeItem('auth_data')
+          }
         }
       } catch (error) {
         // Invalid stored auth data, remove it
-        localStorage.removeItem('auth-data')
+        localStorage.removeItem('auth_data')
         console.warn('Invalid auth data in localStorage, removing...')
       }
+    } else {
+      console.log('No auth data found in localStorage for request:', config.url)
     }
 
     return config
@@ -52,17 +60,16 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     // Handle 401 Unauthorized responses
     if (error.response?.status === 401) {
-      // Clear auth data from localStorage
-      localStorage.removeItem('auth')
-      localStorage.removeItem('auth-data') // Also clear the auth store key
+      // Clear auth data from localStorage using the correct key
+      localStorage.removeItem('auth_data')
 
       // Trigger auth store logout if available
       // Note: We avoid direct import to prevent circular dependencies
       // The auth store will handle its own cleanup via localStorage changes
 
       // Only redirect if we're not already on the login page
-      if (window.location.pathname !== '/auth/login') {
-        window.location.href = '/auth/login'
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
       }
     }
 
