@@ -36,18 +36,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   TG_MAIN_BOT_TOKEN: Env.schema.string(),
   TG_ADMIN_ID: Env.schema.number(),
 
-  TMDB_API_KEY: Env.schema.string(),
-
-  /*
-  |----------------------------------------------------------
-  | Variables for configuring Meilisearch
-  |----------------------------------------------------------
-  */
-  MEILISEARCH_HOST: Env.schema.string(),
-  MEILISEARCH_API_KEY: Env.schema.string.optional(),
-
-  OPENAI_API_KEY: Env.schema.string(),
-
   TRAKT_CLIENT_ID: Env.schema.string(),
   TRAKT_CLIENT_SECRET: Env.schema.string(),
 })

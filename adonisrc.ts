@@ -55,7 +55,6 @@ export default defineConfig({
       file: () => import('#providers/tg_logger_provider'),
       environment: ['web'],
     },
-    () => import('#providers/meilisearch_provider'),
     () => import('#providers/trakt_provider'),
   ],
 

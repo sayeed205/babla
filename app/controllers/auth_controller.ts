@@ -290,7 +290,7 @@ const data = params.get('tgAuthResult');
 
   async startTrakt({}: HttpContext) {
     const trakt = await app.container.make('trakt')
-    return await trakt.getCodes()
+    return await trakt.getDeviceCode()
   }
 
   async pollTrakt({ auth, request, response }: HttpContext) {
@@ -298,7 +298,7 @@ const data = params.get('tgAuthResult');
     const { code } = await request.validateUsing(traktPollValidator)
 
     const trakt = await app.container.make('trakt')
-    const res = await trakt.checkCodes(code)
+    const res = await trakt.checkDeviceCode(code)
     if (res.status !== 200) return response.status(res.status).json(res)
     user.trakt = res.data
     await user.save()
