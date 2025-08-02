@@ -8,10 +8,8 @@ import { traktPollValidator } from '#validators/auth_validator'
 import env from '#start/env'
 
 export default class AuthController {
-  async start({ request }: HttpContext) {
-    const backendUrl = app.inProduction
-      ? `${request.protocol()}://${request.host()}`
-      : 'https://iahmed.us.kg'
+  async start({}: HttpContext) {
+    const backendUrl = env.get('BACKEND_URL')
     const { tg } = await app.container.make('tg')
     const bot = await tg.getUser('self')
 
