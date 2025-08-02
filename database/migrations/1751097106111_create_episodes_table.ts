@@ -8,12 +8,11 @@ export default class extends BaseSchema {
       table.string('id', 25).primary()
       table.integer('season').unsigned().notNullable()
       table.integer('number').unsigned().notNullable()
-      table.string('title').notNullable()
+      table.text('title').notNullable()
       table.integer('trakt').unsigned().notNullable().unique()
       table.integer('tvdb').unsigned().notNullable().unique()
       table.integer('tmdb').unsigned().notNullable().unique()
       table.string('imdb').notNullable()
-      table.text('title').notNullable()
       table.jsonb('metadata').notNullable()
       table.jsonb('tg_metadata').notNullable()
       table

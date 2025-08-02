@@ -10,13 +10,7 @@ export default class extends BaseSchema {
       table.integer('trakt').notNullable().unsigned().unique()
       table.integer('tvdb').notNullable().unsigned().unique()
       table.integer('tmdb').notNullable().unsigned().unique()
-      table
-        .bigInteger('tv_id')
-        .unsigned()
-        .notNullable()
-        .references('id')
-        .inTable('tvs')
-        .onDelete('CASCADE')
+      table.string('tv_id').notNullable().references('id').inTable('tvs').onDelete('CASCADE')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').notNullable()

@@ -121,8 +121,8 @@ const handleMovie = async (
   const movieExists = await Movie.query()
     .where('id', '=', traktMovie.ids.slug)
     .orWhere('trakt', '=', traktMovie.ids.trakt)
-    .if(traktMovie.ids.imdb, (q) => q.orWhere('trakt', '=', traktMovie.ids.imdb!))
-    .if(traktMovie.ids.tmdb, (q) => q.orWhere('trakt', '=', traktMovie.ids.tmdb!))
+    .if(traktMovie.ids.imdb, (q) => q.orWhere('imdb', '=', traktMovie.ids.imdb!))
+    .if(traktMovie.ids.tmdb, (q) => q.orWhere('tmdb', '=', traktMovie.ids.tmdb!))
     .first()
 
   if (movieExists) return logger.info(`Movie already exists: ${traktMovie.title}`)
@@ -228,7 +228,7 @@ const handleTV = async (
   const traktEpisode = await trakt.shows.episode(traktShow.ids.slug, season.number, meta.episode)
   const episodeExists = await Episode.query()
     .where('season', '=', traktEpisode.season)
-    .andWhere('episode', '=', traktEpisode.number)
+    .andWhere('number', '=', traktEpisode.number)
     .andWhere('trakt', '=', traktEpisode.ids.trakt)
     .first()
 

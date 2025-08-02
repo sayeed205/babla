@@ -1,24 +1,42 @@
 import { ParsedMediaText } from '#types/tg'
 
 export function parseMediaText(text: string): ParsedMediaText | null {
-  const movieRegex = /^movie\s+imdb:([a-zA-Z0-9]+)$/i
-  const showRegex = /^show\s+imdb:([a-zA-Z0-9]+)\s+season:(\d+)\s+episode:(\d+)$/i
+  const lower = text.trim().toLowerCase()
 
-  const movieMatch = text.match(movieRegex)
-  if (movieMatch) {
+  // Match IMDb ID (starts with tt followed by digits)
+  const imdbMatch = lower.match(/tt\d{5,}/i)
+  if (!imdbMatch) return null
+  const imdb = imdbMatch[0]
+
+  if (lower.includes('movie')) {
     return {
       type: 'movie',
-      imdb: movieMatch[1],
+      imdb,
     }
   }
 
-  const showMatch = text.match(showRegex)
-  if (showMatch) {
-    return {
-      type: 'show',
-      imdb: showMatch[1],
-      season: Number(showMatch[2]),
-      episode: Number(showMatch[3]),
+  if (lower.includes('show')) {
+    // Flexible season & episode match
+    const seasonEpisodeShorthand = lower.match(/s(\d+)\s*e(\d+)/i)
+    const seasonMatch = lower.match(/season[:\s]*(\d+)/i)
+    const episodeMatch = lower.match(/episode[:\s]*(\d+)/i)
+
+    if (seasonEpisodeShorthand) {
+      return {
+        type: 'show',
+        imdb,
+        season: Number(seasonEpisodeShorthand[1]),
+        episode: Number(seasonEpisodeShorthand[2]),
+      }
+    }
+
+    if (seasonMatch && episodeMatch) {
+      return {
+        type: 'show',
+        imdb,
+        season: Number(seasonMatch[1]),
+        episode: Number(episodeMatch[1]),
+      }
     }
   }
 
