@@ -4,6 +4,7 @@ import Movie from '#models/movie'
 import { moviePaginateValidator } from '#validators/movie_validator'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
+import cache from '@adonisjs/cache/services/main'
 
 export default class MoviesController {
   async index({ request }: HttpContext) {
@@ -24,9 +25,15 @@ export default class MoviesController {
       movies.all().map(async (movie) => {
         const movieId = movie.id
         return {
-          id: movie.id,
+          id: `movie-${movie.id}`,
           metadata: movie.metadata,
-          ...(await trakt.movies.get(movieId, true)),
+          ...(await cache.getOrSet({
+            key: movieId,
+            factory: async () => await trakt.movies.get(movieId, true),
+            grace: '24h',
+            ttl: '24h',
+            tags: ['movie'],
+          })),
         }
       })
     )

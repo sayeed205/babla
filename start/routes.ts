@@ -74,7 +74,7 @@ router
     router
       .get('movies/:id/stream', [MoviesController, 'stream'])
       .as('movies.stream')
-      .where('id', router.matchers.number())
+      .where('id', router.matchers.slug())
 
     /*
     |--------------------------------------------------------------------------
