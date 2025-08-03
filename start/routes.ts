@@ -11,6 +11,12 @@ import router from '@adonisjs/core/services/router'
 
 import { middleware } from '#start/kernel'
 
+const DocsController = () => import('#controllers/docs_controller')
+const AuthController = () => import('#controllers/auth_controller')
+const CollectionsController = () => import('#controllers/collections_controller')
+const MoviesController = () => import('#controllers/movies_controller')
+const TVShowsController = () => import('#controllers/tvs_controller')
+
 router
   .group(() => {
     /*
@@ -18,7 +24,6 @@ router
     | API DOCS Routes
     |--------------------------------------------------------------------------
     */
-    const DocsController = () => import('#controllers/docs_controller')
     router.get('docs', [DocsController, 'index']).as('docs.index')
     router.get('docs/swagger.json', [DocsController, 'swagger']).as('docs.swagger')
 
@@ -27,7 +32,6 @@ router
     | AUTH Routes
     |--------------------------------------------------------------------------
     */
-    const AuthController = () => import('#controllers/auth_controller')
     router
       .group(() => {
         router.get('start', [AuthController, 'start']).as('start')
@@ -53,7 +57,6 @@ router
     | COLLECTIONS Routes
     |--------------------------------------------------------------------------
     */
-    const CollectionsController = () => import('#controllers/collections_controller')
     router
       .resource('collections', CollectionsController)
       .only(['index', 'show'])
@@ -64,7 +67,6 @@ router
     | MOVIES Routes
     |--------------------------------------------------------------------------
     */
-    const MoviesController = () => import('#controllers/movies_controller')
     router
       .resource('movies', MoviesController)
       .only(['index', 'show'])
@@ -79,7 +81,6 @@ router
     | TV SHOWS Routes
     |--------------------------------------------------------------------------
     */
-    const TVShowsController = () => import('#controllers/tvs_controller')
     router
       .resource('tvs', TVShowsController)
       .only(['index', 'show'])

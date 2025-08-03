@@ -40,7 +40,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
+  '__root__': typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute

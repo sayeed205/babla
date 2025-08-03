@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
 import Movie from '#models/movie'
-import { ImageTypeEnum } from '#types/media'
 import { moviePaginateValidator } from '#validators/movie_validator'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
@@ -16,27 +15,18 @@ export default class MoviesController {
     } = await moviePaginateValidator.validate(request.qs())
     const safeLimit = Math.min(limit || 1, 20)
     const movies = await Movie.query()
-      .select([
-        'id',
-        'title',
-        'release_date',
-        'runtime',
-        'popularity',
-        'vote_average',
-        'vote_count',
-        'adult',
-      ])
       .orderBy(sort, order)
       .paginate(page || 1, safeLimit)
 
-    movies.baseUrl(router.makeUrl('movies.index'))
+    movies.baseUrl(router.makeUrl('api.movies.index'))
+    const trakt = await app.container.make('trakt')
     const data = await Promise.all(
       movies.all().map(async (movie) => {
-        const base = movie.toJSON()
-        const images = await movie.getImages(ImageTypeEnum.POSTER)
+        const movieId = movie.id
         return {
-          ...base,
-          ...images,
+          id: movie.id,
+          metadata: movie.metadata,
+          ...(await trakt.movies.get(movieId, true)),
         }
       })
     )
@@ -58,7 +48,6 @@ export default class MoviesController {
 
     return {
       ...movie.toJSON(),
-      ...(await movie.getImages(ImageTypeEnum.POSTER, ImageTypeEnum.BACKDROP, ImageTypeEnum.LOGO)),
     }
   }
 
@@ -66,7 +55,7 @@ export default class MoviesController {
     const movie = await Movie.find(params.id)
     if (!movie) return response.notFound({ message: 'Movie not found' })
 
-    const { size, type } = movie.meta
+    const { size, mimeType } = movie.metadata
     const range = request.header('range')
 
     let start = 0
@@ -95,9 +84,8 @@ export default class MoviesController {
 
     // Unified header configuration
     response.header('Content-Length', contentLength.toString())
-    response.header('Content-Type', type)
+    response.header('Content-Type', mimeType)
     response.header('Accept-Ranges', 'bytes')
-    response.header('Content-Disposition', `inline; filename="${movie.title}.${movie.meta.ext}"`)
     response.header('Access-Control-Allow-Origin', '*')
     response.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
     response.header('Access-Control-Allow-Headers', 'Range, Content-Type')
@@ -107,7 +95,7 @@ export default class MoviesController {
     const tgLimit = contentLength
 
     const { tg } = await app.container.make('tg')
-    const tgStream = tg.downloadAsNodeStream(movie.tgMeta.fileId, {
+    const tgStream = tg.downloadAsNodeStream(movie.tgMetadata.fileId, {
       offset: tgOffset,
       limit: tgLimit,
     })
