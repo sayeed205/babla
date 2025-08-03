@@ -1,35 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+
 import { Button } from '../components/ui/button'
-import { useAuth } from '../features/auth/hooks/use-auth'
+import { useAuthStore } from '@/features/auth/stores/auth-store.ts'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
 
 function LandingPage() {
-  const { isAuthenticated, isLoading, user } = useAuth()
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-
-  // Give some time for auth initialization
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCheckingAuth(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (isLoading || isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
+  const { isAuthenticated, user, logout } = useAuthStore()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -73,8 +52,7 @@ function LandingPage() {
                     className="w-full sm:w-auto"
                     onClick={() => {
                       // Add logout functionality
-                      const { logout } = require('../features/auth/hooks/use-auth')
-                      logout()
+                      logout().then()
                       window.location.reload()
                     }}
                   >
@@ -93,7 +71,7 @@ function LandingPage() {
                   </p>
                 </div>
 
-                <Link to="/login">
+                <Link to="/login" search={{ authSession: undefined }}>
                   <Button size="lg" className="w-full sm:w-auto">
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 0C5.374 0 0 5.373 0 12s5.374 12 12 12 12-5.373 12-12S18.626 0 12 0zm5.568 8.16c-.169 1.858-.896 6.728-.896 6.728-.896 6.728-1.268 8.368-1.268 8.368-.159.708-.534.708-.534.708s-2.697-.534-3.761-1.011c-.534-.239-2.697-1.268-3.761-1.507-.534-.159-.896-.477-.896-.896 0-.419.362-.737.896-.896 1.064-.318 2.697-.896 3.761-1.268.534-.186 1.268-.534 1.268-1.268 0-.534-.534-.896-1.268-.896-1.064 0-2.697.534-3.761.896-.534.186-1.268.534-1.268 1.268 0 .534.534.896 1.268.896 1.064 0 2.697-.534 3.761-.896.534-.186 1.268-.534 1.268-1.268 0-.534-.534-.896-1.268-.896z" />

@@ -1,6 +1,6 @@
-import axios, { AxiosError } from 'axios'
-
 import type { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosError } from 'axios'
+import type { AuthResponse } from '@/features/auth/types/auth-types.ts'
 
 // Base API configuration
 const API_BASE_URL = '/api' // Uses Vite proxy configuration
@@ -18,12 +18,11 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // Get token from localStorage using the same key as auth store
-    const storedAuth = localStorage.getItem('auth_data')
-
-    if (storedAuth) {
+    const savedToken = localStorage.getItem('babla-auth-store')
+    const { state } = JSON.parse(savedToken ?? '{}') as unknown as { state: AuthResponse }
+    if (state.token) {
+      const { token, expiresAt } = state.token
       try {
-        const { token, expiresAt } = JSON.parse(storedAuth)
-
         if (token) {
           // Check if token is not expired (null expiresAt means eternal token)
           const isExpired =
@@ -33,12 +32,11 @@ apiClient.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`
           } else {
             // Token is expired, remove from storage
-            localStorage.removeItem('auth_data')
+            // TODO)) add set
           }
         }
       } catch (error) {
         // Invalid stored auth data, remove it
-        localStorage.removeItem('auth_data')
         console.warn('Invalid auth data in localStorage, removing...')
       }
     } else {

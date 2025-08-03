@@ -1,22 +1,9 @@
-import { useAuthStore } from '@/features/auth/stores/auth-store'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '../components/ui/button'
-import { useAuth } from '../features/auth/hooks/use-auth'
+import { useAuthStore } from '@/features/auth/stores/auth-store.ts'
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
-  beforeLoad: () => {
-    // Check if user is authenticated
-    const state = useAuthStore.getState()
-
-    if (!state.isAuthenticated && !state.isLoading) {
-      // User is not authenticated, redirect to login
-      throw redirect({
-        to: '/login',
-        replace: true,
-      })
-    }
-  },
 })
 
 /**
@@ -24,7 +11,7 @@ export const Route = createFileRoute('/dashboard')({
  * Requirements: 3.1, 3.2, 4.1
  */
 function DashboardPage() {
-  const { user, logout, isLoading } = useAuth()
+  const { user, logout, isLoading } = useAuthStore()
 
   if (isLoading) {
     return (

@@ -1,4 +1,5 @@
-import { apiClient } from '../../../lib/api-client'
+import { apiClient } from '@/lib/api-client.ts'
+
 import type { AuthResponse, AuthSession, User } from '../types/auth-types'
 
 /**
@@ -34,6 +35,11 @@ export const authApi = {
    */
   me: async (): Promise<User> => {
     const response = await apiClient.get<User>('/auth/me')
+    return response.data
+  },
+
+  logout: async () => {
+    const response = await apiClient.get<AuthResponse>('/auth/logout')
     return response.data
   },
 }

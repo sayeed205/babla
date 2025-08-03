@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import React, { useCallback, useEffect, useState } from 'react'
-import { useAuth } from '../hooks/use-auth'
 import { authApi } from '../lib/auth-api'
 import type { AuthSession } from '../types/auth-types'
+import { useAuthStore } from '@/features/auth/stores/auth-store.ts'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -18,7 +18,7 @@ interface LoginFormProps {
  * Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 7.1, 7.2, 7.3, 7.4, 7.5
  */
 export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError, initialSessionId }) => {
-  const { login, isLoading: authLoading } = useAuth()
+  const { login, isLoading: authLoading } = useAuthStore()
 
   // Component state
   const [isStarting, setIsStarting] = useState(false)

@@ -31,23 +31,23 @@ export interface AuthSession {
  * Local storage schema for persisted auth data
  */
 export interface StoredAuth {
-  token: string
+  token: AuthToken
   expiresAt: string
   user: User
 }
 
-/**
- * Auth state interface for Zustand store
- */
 export interface AuthState {
   user: User | null
-  token: string | null
+  token: AuthToken | null
   isAuthenticated: boolean
   isLoading: boolean
+}
 
-  // Actions
+export interface AuthActions {
   login: (authData: AuthResponse) => void
-  logout: () => void
+  logout: () => Promise<void>
   checkTokenExpiration: () => boolean
   initializeAuth: () => void
 }
+
+export type AuthStore = AuthActions & AuthState
