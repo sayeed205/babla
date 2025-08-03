@@ -62,6 +62,7 @@ export default defineConfig({
     () => import('#providers/trakt_provider'),
     () => import('@adonisjs/cache/cache_provider'),
     () => import('@adonisjs/redis/redis_provider'),
+    () => import('#providers/fanart_provider'),
   ],
 
   /*

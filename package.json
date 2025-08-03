@@ -62,6 +62,7 @@
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/lucid": "^21.8.0",
     "@adonisjs/redis": "^9.2.0",
+    "@hitarashi/fanart": "npm:@jsr/hitarashi__fanart@^1.0.0",
     "@hitarashi/trakt": "npm:@jsr/hitarashi__trakt@^0.1.4",
     "@mtcute/dispatcher": "^0.25.7",
     "@mtcute/node": "^0.25.7",

@@ -21,15 +21,25 @@ export default class MoviesController {
 
     movies.baseUrl(router.makeUrl('api.movies.index'))
     const trakt = await app.container.make('trakt')
+    const fanart = await app.container.make('fanart')
     const data = await Promise.all(
       movies.all().map(async (movie) => {
         const movieId = movie.id
         return {
-          id: `movie-${movie.id}`,
+          id: movieId,
           metadata: movie.metadata,
+          images: {
+            ...(await cache.getOrSet({
+              key: `movie-img-${movie.id}`,
+              factory: async () => await fanart.movie.get(movie.tmdb),
+              grace: '24h',
+              ttl: '24h',
+              tags: ['movie', 'images'],
+            })),
+          },
           ...(await cache.getOrSet({
-            key: movieId,
-            factory: async () => await trakt.movies.get(movieId, true),
+            key: `movie-min-${movie.id}`,
+            factory: async () => await trakt.movies.get(movieId),
             grace: '24h',
             ttl: '24h',
             tags: ['movie'],
