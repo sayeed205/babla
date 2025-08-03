@@ -28,15 +28,13 @@ export default class MoviesController {
         return {
           id: movieId,
           metadata: movie.metadata,
-          images: {
-            ...(await cache.getOrSet({
-              key: `movie-img-${movie.id}`,
-              factory: async () => await fanart.movie.get(movie.tmdb),
-              grace: '24h',
-              ttl: '24h',
-              tags: ['movie', 'images'],
-            })),
-          },
+          images: await cache.getOrSet({
+            key: `movie-img-${movie.id}`,
+            factory: async () => await fanart.movie.get(movie.tmdb),
+            grace: '24h',
+            ttl: '24h',
+            tags: ['movie', 'images'],
+          }),
           ...(await cache.getOrSet({
             key: `movie-min-${movie.id}`,
             factory: async () => await trakt.movies.get(movieId),
@@ -54,17 +52,28 @@ export default class MoviesController {
   }
 
   async show({ params, response }: HttpContext) {
-    const movie = await Movie.query()
-      .where('id', params.id)
-      .preload('collection', (q) => {
-        q.select(['id', 'title', 'poster', 'backdrop'])
-      })
-      .first()
+    const movie = await Movie.query().where('id', params.id).first()
 
     if (!movie) return response.notFound({ message: 'Movie not found' })
 
+    const trakt = await app.container.make('trakt')
+    const fanart = await app.container.make('fanart')
     return {
-      ...movie.toJSON(),
+      id: movie.id,
+      image: await cache.getOrSet({
+        key: `movie-img-${movie.id}`,
+        factory: async () => await fanart.movie.get(movie.tmdb),
+        grace: '24h',
+        ttl: '24h',
+        tags: ['movie', 'images'],
+      }),
+      ...(await cache.getOrSet({
+        key: `movie-ful-${movie.id}`,
+        factory: async () => await trakt.movies.get(movie.id, true),
+        grace: '24h',
+        ttl: '24h',
+        tags: ['movie'],
+      })),
     }
   }
 

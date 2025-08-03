@@ -70,7 +70,7 @@ router
     router
       .resource('movies', MoviesController)
       .only(['index', 'show'])
-      .where('id', router.matchers.number())
+      .where('id', router.matchers.slug())
     router
       .get('movies/:id/stream', [MoviesController, 'stream'])
       .as('movies.stream')

@@ -4,7 +4,6 @@ import type { Document, Video } from '@mtcute/node'
 
 import type { ApplicationService } from '@adonisjs/core/types'
 
-import Collection from '#models/collection'
 import Episode from '#models/episode'
 import Movie from '#models/movie'
 import Season from '#models/season'
@@ -136,29 +135,6 @@ const handleMovie = async (
     metadata: { size: media.fileSize!, mimeType: media.mimeType },
     tgMetadata: { fileId: media.fileId, fileLink: link },
   })
-
-  // check if movie has collection
-  const traktMovieLists = await trakt.movies.lists({ id: traktMovie.ids.trakt, type: 'official' })
-
-  if (traktMovieLists.length) {
-    const movieCollection = traktMovieLists[0]
-    const collection = await Collection.query()
-      .where('trakt', '=', movieCollection.ids.trakt)
-      .orWhere('id', '=', movieCollection.ids.slug)
-      .first()
-    movie.collectionId = collection?.id
-
-    if (!collection) {
-      const newCollection = await Collection.create({
-        id: movieCollection.ids.slug,
-        name: movieCollection.name,
-        trakt: movieCollection.ids.trakt,
-      })
-      movie.collectionId = newCollection.id
-    }
-  }
-
-  // save images
 
   await movie.save()
   return logger.info(`Movie ${movie.title}:${movie.imdb} added`)
