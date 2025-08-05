@@ -30,15 +30,6 @@ export interface AuthSession {
   expires: string
 }
 
-/**
- * Local storage schema for persisted auth data
- */
-export interface StoredAuth {
-  token: AuthToken
-  expiresAt: string
-  user: User
-}
-
 export interface AuthState {
   user: User | null
   token: AuthToken | null
@@ -49,7 +40,6 @@ export interface AuthState {
 export interface AuthActions {
   login: (authData: AuthResponse) => void
   logout: () => Promise<void>
-  checkTokenExpiration: () => boolean
   initializeAuth: () => void
 }
 

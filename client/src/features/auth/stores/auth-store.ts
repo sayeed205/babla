@@ -3,11 +3,11 @@ import { persist } from 'zustand/middleware'
 
 import { storage, tokenUtils } from '../lib/auth-utils'
 import type { AuthResponse, AuthStore } from '../types/auth-types'
-import { apiClient, apiQuery } from '@/lib/api-client.ts'
+import { apiClient } from '@/lib/api-client.ts'
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -44,40 +44,17 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       /**
-       * Check if current token is expired
-       * Requirements: 2.3, 2.4
-       */
-      checkTokenExpiration: (): boolean => {
-        const state = get()
-
-        if (!state.token) {
-          return true // No token means expired
-        }
-
-        const expired = tokenUtils.isExpired(state.token.expiresAt)
-
-        if (expired) {
-          // Auto-logout if token is expired
-          get().logout()
-        }
-
-        return expired
-      },
-
-      /**
        * Initialize auth state from localStorage and verify with backend
        * Requirements: 2.2, 2.3, 2.4, 2.5, 4.1
        */
       initializeAuth: async () => {
         set({ isLoading: true })
 
-        const savedToken = localStorage.getItem('babla-auth-store')
-
-        if (!savedToken) {
+        const state = storage.get()
+        if (!state) {
           set({ isLoading: false })
           return
         }
-        const { state } = JSON.parse(savedToken) as unknown as { state: AuthResponse }
 
         // Check if token is expired
         if (state.token && tokenUtils.isExpired(state.token.expiresAt)) {
@@ -94,7 +71,7 @@ export const useAuthStore = create<AuthStore>()(
 
         // Token exists and is not expired, verify with backend
         try {
-          const { data: currentUser } = apiQuery.useQuery('get', '/auth/me')
+          const { data: currentUser } = await apiClient.GET('/auth/me', {})
 
           // Token is valid and verified, restore auth state with fresh user data
           set({

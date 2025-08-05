@@ -3,9 +3,9 @@
  * Requirements: 2.3, 2.4, 6.6
  */
 
-import type { StoredAuth } from '../types/auth-types'
+import type { AuthResponse } from '../types/auth-types'
 
-const AUTH_STORAGE_KEY = 'auth_data'
+const AUTH_STORAGE_KEY = 'babla-auth-store'
 
 /**
  * Token validation and expiration utilities
@@ -45,9 +45,9 @@ export const storage = {
    * Store auth data in localStorage
    * Requirements: 2.1, 2.2
    */
-  set: (authData: StoredAuth): void => {
+  set: (authData: AuthResponse): void => {
     try {
-      const serialized = JSON.stringify(authData)
+      const serialized = JSON.stringify({ state: authData, version: 1 })
       localStorage.setItem(AUTH_STORAGE_KEY, serialized)
     } catch (error) {
       console.error('Failed to store auth data:', error)
@@ -58,23 +58,23 @@ export const storage = {
    * Retrieve auth data from localStorage
    * Requirements: 2.2
    */
-  get: (): StoredAuth | null => {
+  get: (): AuthResponse | null => {
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY)
       if (!stored) {
         return null
       }
 
-      const parsed = JSON.parse(stored) as StoredAuth
+      const { state } = JSON.parse(stored) as { state: AuthResponse; version: number }
 
       // Validate the structure of stored data
-      if (!parsed.token || !parsed.expiresAt || !parsed.user) {
+      if (!state.token || !state.token.expiresAt || !state.user) {
         console.warn('Invalid stored auth data structure')
         storage.remove() // Clean up invalid data
         return null
       }
 
-      return parsed
+      return state
     } catch (error) {
       console.error('Failed to retrieve auth data:', error)
       storage.remove() // Clean up corrupted data

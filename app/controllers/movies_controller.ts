@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@foadonis/openapi/decorators'
 
 import Movie from '#models/movie'
 import { moviePaginateValidator } from '#validators/movie_validator'
@@ -7,20 +6,8 @@ import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import cache from '@adonisjs/cache/services/main'
 import bindMovie from '#decorators/bind_movie'
-import { PaginatedMovieResponse } from '../openapi/movie_responses.js'
 
-@ApiBearerAuth()
-@ApiTags('Movies')
 export default class MoviesController {
-  @ApiOperation({
-    summary: 'List all paginated movies.',
-    description: 'Movies list description.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'All movies available.',
-    type: PaginatedMovieResponse,
-  })
   async index({ request }: HttpContext) {
     const {
       page = 1,
