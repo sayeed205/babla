@@ -3,17 +3,20 @@
  */
 
 export interface User {
-  id: number
+  id: string
   firstName: string
-  lastName?: string
-  username?: string
+  lastName?: string | null
+  username?: string | null
   avatar?: string
 }
 
 export interface AuthToken {
+  abilities: string[]
+  expiresAt: string | Date | null
+  lastUsedAt: string | Date | null
+  name: null | string
   token: string
-  expiresAt: string
-  type: 'bearer'
+  type: string
 }
 
 export interface AuthResponse {

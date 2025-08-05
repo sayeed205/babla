@@ -14,7 +14,6 @@ export default class AuthController {
     const { tg } = await app.container.make('tg')
     const bot = await tg.getUser('self')
 
-    // todo)) update origin
     const session = await AuthSession.create({})
     const callbackUrl = `${backendUrl}/api/auth/callback/${session.id}?source=${source}`
     const authUrl = `https://oauth.telegram.org/auth?bot_id=${bot.id}&origin=${backendUrl}&return_to=${callbackUrl}&request_access=write`
@@ -233,7 +232,6 @@ export default class AuthController {
       }
 
       const { verifyTGAuth } = await app.container.make('tg')
-      console.log(authData)
 
       if (!verifyTGAuth(authData)) {
         return {
@@ -305,6 +303,7 @@ export default class AuthController {
 
   async logout({ auth, response }: HttpContext) {
     const user = auth.getUserOrFail()
+    await auth.use('api').invalidateToken()
     await User.accessTokens.delete(user, user.currentAccessToken.identifier)
     return response.noContent()
   }

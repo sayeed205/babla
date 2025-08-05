@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 
 import { storage, tokenUtils } from '../lib/auth-utils'
 import type { AuthResponse, AuthStore } from '../types/auth-types'
-import authApi from '@/features/auth/lib/auth-api.ts'
+import { apiClient, apiQuery } from '@/lib/api-client.ts'
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -32,8 +32,7 @@ export const useAuthStore = create<AuthStore>()(
       logout: async () => {
         // Clear localStorage
         storage.remove()
-        await authApi.logout()
-        // TODO)) hit logout api call
+        await apiClient.GET('/auth/logout')
 
         // Clear Zustand state
         set({
@@ -95,7 +94,7 @@ export const useAuthStore = create<AuthStore>()(
 
         // Token exists and is not expired, verify with backend
         try {
-          const currentUser = await authApi.me()
+          const { data: currentUser } = apiQuery.useQuery('get', '/auth/me')
 
           // Token is valid and verified, restore auth state with fresh user data
           set({

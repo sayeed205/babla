@@ -15,7 +15,7 @@ export const tokenUtils = {
    * Check if a token is expired based on expiration date
    * Requirements: 2.3, 2.4
    */
-  isExpired: (expiresAt: string | null): boolean => {
+  isExpired: (expiresAt: Date | string | null): boolean => {
     // If expiration is null, token is valid for eternity
     if (expiresAt === null || expiresAt === undefined) {
       return false
@@ -32,41 +32,6 @@ export const tokenUtils = {
       // If we can't parse the date, consider it expired
       console.warn('Failed to parse token expiration date:', expiresAt)
       return true
-    }
-  },
-
-  /**
-   * Validate token format (basic validation)
-   * Requirements: 6.6
-   */
-  isValidFormat: (token: string): boolean => {
-    if (!token || typeof token !== 'string') {
-      return false
-    }
-
-    // Basic validation - token should be a non-empty string
-    // In a real app, you might want more sophisticated validation
-    return token.trim().length > 0
-  },
-
-  /**
-   * Get time until token expires in milliseconds
-   * Returns null if token is already expired or invalid
-   */
-  getTimeUntilExpiry: (expiresAt: string | null): number | null => {
-    // If expiration is null, token never expires
-    if (expiresAt === null || expiresAt === undefined) {
-      return null // Represents infinite time
-    }
-
-    try {
-      const expirationDate = new Date(expiresAt)
-      const now = new Date()
-      const timeUntilExpiry = expirationDate.getTime() - now.getTime()
-
-      return timeUntilExpiry > 0 ? timeUntilExpiry : null
-    } catch (error) {
-      return null
     }
   },
 }
@@ -138,111 +103,5 @@ export const storage = {
     } catch (error) {
       return false
     }
-  },
-}
-
-/**
- * Auth validation utilities
- * Requirements: 2.3, 2.4, 6.6
- */
-export const authValidation = {
-  /**
-   * Validate stored auth data completeness and token expiration
-   * Requirements: 2.3, 2.4
-   */
-  isValidStoredAuth: (storedAuth: StoredAuth | null): boolean => {
-    if (!storedAuth) {
-      return false
-    }
-
-    // Check required fields
-    if (!storedAuth.token || !storedAuth.expiresAt || !storedAuth.user) {
-      return false
-    }
-
-    // Check token format
-    if (!tokenUtils.isValidFormat(storedAuth.token)) {
-      return false
-    }
-
-    // Check if token is expired
-    if (tokenUtils.isExpired(storedAuth.expiresAt)) {
-      return false
-    }
-
-    return true
-  },
-
-  /**
-   * Validate user object structure
-   * Requirements: 6.6
-   */
-  isValidUser: (user: any): boolean => {
-    if (!user || typeof user !== 'object') {
-      return false
-    }
-
-    // Check required fields
-    if (!user.id || !user.firstName) {
-      return false
-    }
-
-    // Validate types - ID can be number or string (Telegram IDs can be large numbers sent as strings)
-    if (
-      (typeof user.id !== 'number' && typeof user.id !== 'string') ||
-      typeof user.firstName !== 'string'
-    ) {
-      return false
-    }
-
-    // If ID is a string, it should be a valid number string
-    if (typeof user.id === 'string' && isNaN(Number(user.id))) {
-      return false
-    }
-
-    return true
-  },
-}
-
-/**
- * Auth helper utilities
- */
-export const authHelpers = {
-  /**
-   * Create authorization header value from token
-   * Requirements: 6.1
-   */
-  createAuthHeader: (token: string): string => {
-    return `Bearer ${token}`
-  },
-
-  /**
-   * Extract token from authorization header
-   */
-  extractTokenFromHeader: (authHeader: string): string | null => {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null
-    }
-
-    return authHeader.substring(7) // Remove 'Bearer ' prefix
-  },
-
-  /**
-   * Format user display name
-   */
-  formatUserDisplayName: (user: {
-    firstName: string
-    lastName?: string
-    username?: string
-  }): string => {
-    if (user.lastName) {
-      return `${user.firstName} ${user.lastName}`
-    }
-
-    if (user.username) {
-      return `${user.firstName} (@${user.username})`
-    }
-
-    return user.firstName
   },
 }

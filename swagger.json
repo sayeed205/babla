@@ -26,7 +26,18 @@
         "deprecated": false,
         "description": "",
         "tags": ["Authentication"],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "example": "web",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -34,7 +45,23 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "authUrl": {
+                      "type": "string"
+                    },
+                    "session": {
+                      "type": "string"
+                    },
+                    "expires": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["authUrl", "session", "expires"]
+                },
+                "example": {
+                  "authUrl": "https://oauth.telegram.org/auth?bot_id=6206001545&origin=http://127.0.0.1:3333&return_to=http://127.0.0.1:3333/api/auth/callback/ndid6g4dhwowkru8ak1jl324?source=web&request_access=write",
+                  "session": "ndid6g4dhwowkru8ak1jl324",
+                  "expires": "2025-08-05T14:46:19.236+00:00"
                 }
               }
             },
@@ -71,66 +98,10 @@
                   "type": "object",
                   "properties": {
                     "user": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "firstName": {
-                          "type": "string"
-                        },
-                        "lastName": {
-                          "type": "null"
-                        },
-                        "username": {
-                          "type": "string"
-                        },
-                        "avatar": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string"
-                        },
-                        "updatedAt": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "firstName",
-                        "lastName",
-                        "username",
-                        "avatar",
-                        "createdAt",
-                        "updatedAt"
-                      ]
+                      "$ref": "#/components/schemas/UserInfo"
                     },
                     "token": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string"
-                        },
-                        "name": {
-                          "type": "null"
-                        },
-                        "token": {
-                          "type": "string"
-                        },
-                        "abilities": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "lastUsedAt": {
-                          "type": "null"
-                        },
-                        "expiresAt": {
-                          "type": "null"
-                        }
-                      },
-                      "required": ["type", "name", "token", "abilities", "lastUsedAt", "expiresAt"]
+                      "$ref": "#/components/schemas/UserToken"
                     }
                   },
                   "required": ["user", "token"]
@@ -245,6 +216,40 @@
                 }
               }
             },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedAccess"
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "summary": "Logout",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Authentication"],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "",
             "headers": {}
           },
           "401": {
@@ -2341,6 +2346,43 @@
           }
         },
         "required": ["id", "firstName", "lastName", "username", "avatar", "createdAt", "updatedAt"]
+      },
+      "UserToken": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "examples": ["Bearer"],
+            "minLength": 1
+          },
+          "name": {
+            "type": ["string", "null"],
+            "minLength": 1
+          },
+          "token": {
+            "type": "string",
+            "minLength": 1
+          },
+          "abilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "examples": ["*"]
+            }
+          },
+          "lastUsedAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "minLength": 1
+          },
+          "expiresAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "minLength": 1
+          }
+        },
+        "required": ["type", "name", "token", "abilities", "lastUsedAt", "expiresAt"]
       }
     },
     "securitySchemes": {

@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import React, { useCallback, useEffect, useState } from 'react'
-import { authApi } from '../lib/auth-api'
-import type { AuthSession } from '../types/auth-types'
+import type { AuthResponse, AuthSession } from '../types/auth-types'
 import { useAuthStore } from '@/features/auth/stores/auth-store.ts'
+import { apiClient } from '@/lib/api-client.ts'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -106,20 +106,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError, initia
 
           try {
             // Requirement: 1.3 - WHEN a user completes Telegram authentication THEN the system SHALL poll the backend for authentication status
-            const authResponse = await authApi.poll(sessionId)
+            const {
+              data: authResponse,
+              error,
+              response,
+            } = await apiClient.GET('/auth/poll/{id}', {
+              params: { path: { id: sessionId } },
+            })
 
             // Check if the response has the expected structure
-            if (!authResponse || typeof authResponse !== 'object') {
+            if (error) {
               console.error('Invalid response format:', authResponse)
               throw new Error('Invalid response format from server')
             }
 
-            if (!authResponse.user || !authResponse.token) {
-              console.error('Missing user or token in response:', {
-                hasUser: !!authResponse.user,
-                hasToken: !!authResponse.token,
-                response: authResponse,
-              })
+            if (response.status === 202) {
               // This might be a 202-like response, continue polling
               setTimeout(() => poll(attempt + 1), POLL_INTERVAL)
               return
@@ -127,7 +128,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError, initia
 
             // 200 response with valid user and token - authentication successful!
             // Requirement: 1.4 - WHEN authentication is successful THEN the system SHALL store the user token and redirect to the dashboard
-            login(authResponse)
+            login(authResponse as AuthResponse)
 
             setIsPolling(false)
             setAuthSession(null)
@@ -243,11 +244,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onError, initia
                   setIsStarting(true)
 
                   // Call start endpoint to get auth URL and session
-                  const session = await authApi.start('web')
-                  console.log('Auth session received:', session)
+                  const { data, error } = await apiClient.GET('/auth/start', {
+                    params: {
+                      query: { source: 'web' },
+                    },
+                  })
+
+                  if (error) {
+                    return
+                  }
 
                   // Redirect directly to Telegram in the same tab
-                  window.location.href = session.authUrl
+                  window.location.href = data.authUrl
                 } catch (err) {
                   const errorMessage =
                     err instanceof Error ? err.message : 'Failed to start authentication'
