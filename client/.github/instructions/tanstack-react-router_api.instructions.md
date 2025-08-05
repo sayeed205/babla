@@ -8,8 +8,7 @@ applyTo: '**'
 
 # ActiveLinkOptions type
 
-The `ActiveLinkOptions` type extends the [`LinkOptions`](../LinkOptionsType.md) type and contains additional options
-that can be used to describe how a link should be styled when it is active.
+The `ActiveLinkOptions` type extends the [`LinkOptions`](../LinkOptionsType.md) type and contains additional options that can be used to describe how a link should be styled when it is active.
 
 ```tsx
 type ActiveLinkOptions = LinkOptions & {
@@ -40,8 +39,7 @@ The `ActiveLinkOptions` object accepts/contains the following properties:
 
 # AsyncRouteComponent type
 
-The `AsyncRouteComponent` type is used to describe a code-split route component that can be preloaded using a
-`component.preload()` method.
+The `AsyncRouteComponent` type is used to describe a code-split route component that can be preloaded using a `component.preload()` method.
 
 ```tsx
 type AsyncRouteComponent<TProps> = SyncRouteComponent<TProps> & {
@@ -55,8 +53,7 @@ type AsyncRouteComponent<TProps> = SyncRouteComponent<TProps> & {
 > This class has been deprecated and will be removed in the next major version of TanStack Router.
 > Please use the [`createFileRoute`](../createFileRouteFunction.md) function instead.
 
-The `FileRoute` class is a factory that can be used to create a file-based route instance. This route instance can then
-be used to automatically generate a route tree with the `tsr generate` and `tsr watch` commands.
+The `FileRoute` class is a factory that can be used to create a file-based route instance. This route instance can then be used to automatically generate a route tree with the `tsr generate` and `tsr watch` commands.
 
 ## `FileRoute` constructor
 
@@ -78,23 +75,20 @@ The `FileRoute` class implements the following method(s):
 
 ### `.createRoute` method
 
-The `createRoute` method is a method that can be used to configure the file route instance. It accepts a single
-argument: the `options` that will be used to configure the file route instance.
+The `createRoute` method is a method that can be used to configure the file route instance. It accepts a single argument: the `options` that will be used to configure the file route instance.
 
 #### .createRoute options
 
 - Type: `Omit<RouteOptions, 'getParentRoute' | 'path' | 'id'>`
 - [`RouteOptions`](../RouteOptionsType.md)
 - Optional
-- The same options that are available to the `Route` class, but with the `getParentRoute`, `path`, and `id` options
-  omitted since they are unnecessary for file-based routing.
+- The same options that are available to the `Route` class, but with the `getParentRoute`, `path`, and `id` options omitted since they are unnecessary for file-based routing.
 
 #### .createRoute returns
 
 A [`Route`](../RouteType.md) instance that can be used to configure the route to be inserted into the route-tree.
 
-> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file
-> using the `Route` identifier.
+> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file using the `Route` identifier.
 
 ### Examples
 
@@ -116,8 +110,7 @@ function IndexComponent() {
 
 # LinkOptions type
 
-The `LinkOptions` type extends the [`NavigateOptions`](../NavigateOptionsType.md) type and contains additional options
-that can be used by TanStack Router when handling actual anchor element attributes.
+The `LinkOptions` type extends the [`NavigateOptions`](../NavigateOptionsType.md) type and contains additional options that can be used by TanStack Router when handling actual anchor element attributes.
 
 ```tsx
 type LinkOptions = NavigateOptions & {
@@ -156,8 +149,7 @@ The `LinkOptions` object accepts/contains the following properties:
 
 - Type: `number`
 - Optional
-- Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be
-  cancelled.
+- Delay intent preloading by this many milliseconds. If the intent exits before this delay, the preload will be cancelled.
 
 ### `disabled`
 
@@ -167,8 +159,7 @@ The `LinkOptions` object accepts/contains the following properties:
 
 # LinkProps type
 
-The `LinkProps` type extends the [`ActiveLinkOptions`](../ActiveLinkOptionsType.md) and
-`React.AnchorHTMLAttributes<HTMLAnchorElement>` types and contains additional props specific to the `Link` component.
+The `LinkProps` type extends the [`ActiveLinkOptions`](../ActiveLinkOptionsType.md) and `React.AnchorHTMLAttributes<HTMLAnchorElement>` types and contains additional props specific to the `Link` component.
 
 ```tsx
 type LinkProps = ActiveLinkOptions &
@@ -186,8 +177,7 @@ type LinkProps = ActiveLinkOptions &
 
 - Type: `React.ReactNode | ((state: { isActive: boolean }) => React.ReactNode)`
 - Optional
-- The children that will be rendered inside of the anchor element. If a function is provided, it will be called with an
-  object that contains the `isActive` boolean value that can be used to determine if the link is active.
+- The children that will be rendered inside of the anchor element. If a function is provided, it will be called with an object that contains the `isActive` boolean value that can be used to determine if the link is active.
 
 # MatchRouteOptions type
 
@@ -222,20 +212,17 @@ The `MatchRouteOptions` type has the following properties:
 
 - Type: `boolean`
 - Optional
-- If `true`, will match against the current location's search params using a deep inclusive check. e.g. `{ a: 1 }` will
-  match for a current location of `{ a: 1, b: 2 }`
+- If `true`, will match against the current location's search params using a deep inclusive check. e.g. `{ a: 1 }` will match for a current location of `{ a: 1, b: 2 }`
 
 ### `fuzzy` property
 
 - Type: `boolean`
 - Optional
-- If `true`, will match against the current location using a fuzzy match. e.g. `/posts` will match for a current
-  location of `/posts/123`
+- If `true`, will match against the current location using a fuzzy match. e.g. `/posts` will match for a current location of `/posts/123`
 
 # NavigateOptions type
 
-The `NavigateOptions` type is used to describe the options that can be used when describing a navigation action in
-TanStack Router.
+The `NavigateOptions` type is used to describe the options that can be used when describing a navigation action in TanStack Router.
 
 ```tsx
 type NavigateOptions = ToOptions & {
@@ -264,21 +251,17 @@ The `NavigateOptions` object accepts the following properties:
 
 - Type: `boolean`
 - Optional
-- Defaults to `true` so that the scroll position will be reset to 0,0 after the location is committed to the browser
-  history.
+- Defaults to `true` so that the scroll position will be reset to 0,0 after the location is committed to the browser history.
 - If `false`, the scroll position will not be reset to 0,0 after the location is committed to history.
 
 ### `hashScrollIntoView`
 
 - Type: `boolean | ScrollIntoViewOptions`
 - Optional
-- Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is
-  committed to history.
-- If `false`, the element with an id matching the hash will not be scrolled into view after the location is committed to
-  history.
+- Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is committed to history.
+- If `false`, the element with an id matching the hash will not be scrolled into view after the location is committed to history.
 - If an object is provided, it will be passed to the `scrollIntoView` method as options.
-- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on
-  `ScrollIntoViewOptions`.
+- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on `ScrollIntoViewOptions`.
 
 ### `viewTransition`
 
@@ -286,15 +269,10 @@ The `NavigateOptions` object accepts the following properties:
 - Optional
 - Defaults to `false`.
 - If `true`, navigation will be called using `document.startViewTransition()`.
-- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using
-  `document.startViewTransition({update, types})` where `types` will be the strings array passed with
-  `ViewTransitionOptions["types"]`. If the browser does not support viewTransition types, the navigation will fall back
-  to normal `document.startTransition()`, same as if `true` was passed.
+- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using `document.startViewTransition({update, types})` where `types` will be the strings array passed with `ViewTransitionOptions["types"]`. If the browser does not support viewTransition types, the navigation will fall back to normal `document.startTransition()`, same as if `true` was passed.
 - If the browser does not support this api, this option will be ignored.
-- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition) for more information on how
-  this function works.
-- See [Google](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) for
-  more information on viewTransition types
+- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition) for more information on how this function works.
+- See [Google](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) for more information on viewTransition types
 
 ### `ignoreBlocker`
 
@@ -308,8 +286,7 @@ The `NavigateOptions` object accepts the following properties:
 - Type: `boolean`
 - Optional
 - Defaults to `false`.
-- If `true`, navigation to a route inside of router will trigger a full page load instead of the traditional SPA
-  navigation.
+- If `true`, navigation to a route inside of router will trigger a full page load instead of the traditional SPA navigation.
 
 ### `href`
 
@@ -346,24 +323,19 @@ The `NotFoundError` object accepts/contains the following properties:
 
 - Type: `boolean`
 - Optional - `default: false`
-- If true, the not-found error will be handled by the `notFoundComponent` of the root route instead of bubbling up from
-  the route that threw it. This has the same behavior as importing the root route and calling `RootRoute.notFound()`.
+- If true, the not-found error will be handled by the `notFoundComponent` of the root route instead of bubbling up from the route that threw it. This has the same behavior as importing the root route and calling `RootRoute.notFound()`.
 
 ### `route` property
 
 - Type: `string`
 - Optional
-- The ID of the route that will attempt to handle the not-found error. If the route does not have a `notFoundComponent`,
-  the error will bubble up to the parent route (and be handled by the root route if necessary). By default, TanStack
-  Router will attempt to handle the not-found error with the route that threw it.
+- The ID of the route that will attempt to handle the not-found error. If the route does not have a `notFoundComponent`, the error will bubble up to the parent route (and be handled by the root route if necessary). By default, TanStack Router will attempt to handle the not-found error with the route that threw it.
 
 ### `throw` property
 
 - Type: `boolean`
 - Optional - `default: false`
-- If provided, will throw the not-found object instead of returning it. This can be useful in places where `throwing` in
-  a function might cause it to have a return type of `never`. In that case, you can use `notFound({ throw: true })` to
-  throw the not-found object instead of returning it.
+- If provided, will throw the not-found object instead of returning it. This can be useful in places where `throwing` in a function might cause it to have a return type of `never`. In that case, you can use `notFound({ throw: true })` to throw the not-found object instead of returning it.
 
 # NotFoundRoute class
 
@@ -372,9 +344,7 @@ The `NotFoundError` object accepts/contains the following properties:
 > Please use the `notFoundComponent` route option that is present during route configuration.
 > See the [Not Found Errors guide](../../../guide/not-found-errors.md) for more information.
 
-The `NotFoundRoute` class extends the `Route` class and can be used to create a not found route instance. A not found
-route instance can be passed to the `routerOptions.notFoundRoute` option to configure a default not-found/404 route for
-every branch of the route tree.
+The `NotFoundRoute` class extends the `Route` class and can be used to create a not found route instance. A not found route instance can be passed to the `routerOptions.notFoundRoute` option to configure a default not-found/404 route for every branch of the route tree.
 
 ## Constructor options
 
@@ -415,8 +385,7 @@ const router = createRouter({
 
 # ParsedHistoryState type
 
-The `ParsedHistoryState` type represents a parsed state object. Additionally to `HistoryState`, it contains the index
-and the unique key of the route.
+The `ParsedHistoryState` type represents a parsed state object. Additionally to `HistoryState`, it contains the index and the unique key of the route.
 
 ```tsx
 export type ParsedHistoryState = HistoryState & {
@@ -428,8 +397,7 @@ export type ParsedHistoryState = HistoryState & {
 
 # ParsedLocation type
 
-The `ParsedLocation` type represents a parsed location in TanStack Router. It contains a lot of useful information about
-the current location, including the pathname, search params, hash, location state, and route masking information.
+The `ParsedLocation` type represents a parsed location in TanStack Router. It contains a lot of useful information about the current location, including the pathname, search params, hash, location state, and route masking information.
 
 ```tsx
 interface ParsedLocation {
@@ -472,9 +440,7 @@ The `Redirect` object accepts/contains the following properties:
 
 - Type: `any`
 - Optional
-- If provided, will throw the redirect object instead of returning it. This can be useful in places where `throwing` in
-  a function might cause it to have a return type of `never`. In that case, you can use `redirect({ throw: true })` to
-  throw the redirect object instead of returning it.
+- If provided, will throw the redirect object instead of returning it. This can be useful in places where `throwing` in a function might cause it to have a return type of `never`. In that case, you can use `redirect({ throw: true })` to throw the redirect object instead of returning it.
 
 ### `headers` property
 
@@ -489,13 +455,11 @@ Since `Redirect` extends `NavigateOptions`, it also supports navigation properti
 - **`to`**: Use for internal application routes (e.g., `/dashboard`, `../profile`)
 - **`href`**: Use for external URLs (e.g., `https://example.com`, `https://authprovider.com`)
 
-> **Important**: For external URLs, always use the `href` property instead of `to`. The `to` property is designed for
-> internal navigation within your application.
+> **Important**: For external URLs, always use the `href` property instead of `to`. The `to` property is designed for internal navigation within your application.
 
 # Register type
 
-This type is used to register a route tree with a router instance. Doing so unlocks the full type safety of TanStack
-Router, including top-level exports from the `@tanstack/react-router` package.
+This type is used to register a route tree with a router instance. Doing so unlocks the full type safety of TanStack Router, including top-level exports from the `@tanstack/react-router` package.
 
 ```tsx
 export type Register = {
@@ -503,8 +467,7 @@ export type Register = {
 }
 ```
 
-To register a route tree with a router instance, use declaration merging to add the type of your router instance to the
-Register interface under the `router` property:
+To register a route tree with a router instance, use declaration merging to add the type of your router instance to the Register interface under the `router` property:
 
 ## Examples
 
@@ -526,8 +489,7 @@ declare module '@tanstack/react-router' {
 > This class has been deprecated and will be removed in the next major version of TanStack Router.
 > Please use the [`createRootRoute`](../createRootRouteFunction.md) function instead.
 
-The `RootRoute` class extends the `Route` class and can be used to create a root route instance. A root route instance
-can then be used to create a route tree.
+The `RootRoute` class extends the `Route` class and can be used to create a root route instance. A root route instance can then be used to create a route tree.
 
 ## `RootRoute` constructor
 
@@ -578,14 +540,11 @@ const router = createRouter({
 > This class has been deprecated and will be removed in the next major version of TanStack Router.
 > Please use the [`getRouteApi`](../getRouteApiFunction.md) function instead.
 
-The `RouteApi` class provides type-safe version of common hooks like `useParams`, `useSearch`, `useRouteContext`,
-`useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and corresponding
-registered route types.
+The `RouteApi` class provides type-safe version of common hooks like `useParams`, `useSearch`, `useRouteContext`, `useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and corresponding registered route types.
 
 ## Constructor options
 
-The `RouteApi` constructor accepts a single argument: the `options` that will be used to configure the `RouteApi`
-instance.
+The `RouteApi` constructor accepts a single argument: the `options` that will be used to configure the `RouteApi` instance.
 
 ### `opts.routeId` option
 
@@ -612,9 +571,7 @@ export function PostsPage() {
 
 # RouteApi Type
 
-The `RouteApi` describes an instance that provides type-safe versions of common hooks like `useParams`, `useSearch`,
-`useRouteContext`, `useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and
-corresponding registered route types.
+The `RouteApi` describes an instance that provides type-safe versions of common hooks like `useParams`, `useSearch`, `useRouteContext`, `useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and corresponding registered route types.
 
 ## `RouteApi` properties and methods
 
@@ -628,15 +585,12 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useMatch`](../useMatchHook.md) hook that is pre-bound to the route ID that the `RouteApi`
-  instance was created with.
+- A type-safe version of the [`useMatch`](../useMatchHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: RouteMatch) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useMatch`. This value will also be used to determine if the hook should re-render its parent component using
-      shallow equality checks.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useMatch`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
   - `opts.structuralSharing`
     - Optional
     - `boolean`
@@ -644,8 +598,7 @@ The `RouteApi` has the following properties and methods:
     - See the [Render Optimizations guide](../../../guide/render-optimizations.md) for more information.
 - Returns
   - If a `select` function is provided, the return value of the `select` function.
-  - If no `select` function is provided, the `RouteMatch` object or a loosened version of the `RouteMatch` object if
-    `opts.strict` is `false`.
+  - If no `select` function is provided, the `RouteMatch` object or a loosened version of the `RouteMatch` object if `opts.strict` is `false`.
 
 ### `useRouteContext` method
 
@@ -655,19 +608,15 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useRouteContext`](../useRouteContextHook.md) hook that is pre-bound to the route ID that
-  the `RouteApi` instance was created with.
+- A type-safe version of the [`useRouteContext`](../useRouteContextHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: RouteContext) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useRouteContext`. This value will also be used to determine if the hook should re-render its parent component
-      using shallow equality checks.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useRouteContext`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 - Returns
   - If a `select` function is provided, the return value of the `select` function.
-  - If no `select` function is provided, the `RouteContext` object or a loosened version of the `RouteContext` object if
-    `opts.strict` is `false`.
+  - If no `select` function is provided, the `RouteContext` object or a loosened version of the `RouteContext` object if `opts.strict` is `false`.
 
 ### `useSearch` method
 
@@ -677,15 +626,12 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useSearch`](../useSearchHook.md) hook that is pre-bound to the route ID that the
-  `RouteApi` instance was created with.
+- A type-safe version of the [`useSearch`](../useSearchHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: TFullSearchSchema) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useSearch`. This value will also be used to determine if the hook should re-render its parent component using
-      shallow equality checks.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useSearch`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
   - `opts.structuralSharing`
     - Optional
     - `boolean`
@@ -693,8 +639,7 @@ The `RouteApi` has the following properties and methods:
     - See the [Render Optimizations guide](../../../guide/render-optimizations.md) for more information.
 - Returns
   - If a `select` function is provided, the return value of the `select` function.
-  - If no `select` function is provided, the `TFullSearchSchema` object or a loosened version of the `TFullSearchSchema`
-    object if `opts.strict` is `false`.
+  - If no `select` function is provided, the `TFullSearchSchema` object or a loosened version of the `TFullSearchSchema` object if `opts.strict` is `false`.
 
 ### `useParams` method
 
@@ -704,15 +649,12 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useParams`](../useParamsHook.md) hook that is pre-bound to the route ID that the
-  `RouteApi` instance was created with.
+- A type-safe version of the [`useParams`](../useParamsHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: TAllParams) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useParams`. This value will also be used to determine if the hook should re-render its parent component using
-      shallow equality checks.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useParams`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
   - `opts.structuralSharing`
     - Optional
     - `boolean`
@@ -720,8 +662,7 @@ The `RouteApi` has the following properties and methods:
     - See the [Render Optimizations guide](../../../guide/render-optimizations.md) for more information.
 - Returns
   - If a `select` function is provided, the return value of the `select` function.
-  - If no `select` function is provided, the `TAllParams` object or a loosened version of the `TAllParams` object if
-    `opts.strict` is `false`.
+  - If no `select` function is provided, the `TAllParams` object or a loosened version of the `TAllParams` object if `opts.strict` is `false`.
 
 ### `useLoaderData` method
 
@@ -731,15 +672,12 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useLoaderData`](../useLoaderDataHook.md) hook that is pre-bound to the route ID that the
-  `RouteApi` instance was created with.
+- A type-safe version of the [`useLoaderData`](../useLoaderDataHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: TLoaderData) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useLoaderData`. This value will also be used to determine if the hook should re-render its parent component using
-      shallow equality checks.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useLoaderData`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
   - `opts.structuralSharing`
     - Optional
     - `boolean`
@@ -747,8 +685,7 @@ The `RouteApi` has the following properties and methods:
     - See the [Render Optimizations guide](../../../guide/render-optimizations.md) for more information.
 - Returns
   - If a `select` function is provided, the return value of the `select` function.
-  - If no `select` function is provided, the `TLoaderData` object or a loosened version of the `TLoaderData` object if
-    `opts.strict` is `false`.
+  - If no `select` function is provided, the `TLoaderData` object or a loosened version of the `TLoaderData` object if `opts.strict` is `false`.
 
 ### `useLoaderDeps` method
 
@@ -758,14 +695,12 @@ The `RouteApi` has the following properties and methods:
   }): TSelected
 ```
 
-- A type-safe version of the [`useLoaderDeps`](../useLoaderDepsHook.md) hook that is pre-bound to the route ID that the
-  `RouteApi` instance was created with.
+- A type-safe version of the [`useLoaderDeps`](../useLoaderDepsHook.md) hook that is pre-bound to the route ID that the `RouteApi` instance was created with.
 - Options
   - `opts.select`
     - Optional
     - `(match: TLoaderDeps) => TSelected`
-    - If supplied, this function will be called with the route match and the return value will be returned from
-      `useLoaderDeps`.
+    - If supplied, this function will be called with the route match and the return value will be returned from `useLoaderDeps`.
   - `opts.structuralSharing`
     - Optional
     - `boolean`
@@ -781,8 +716,7 @@ The `RouteApi` has the following properties and methods:
   useNavigate(): // navigate function
 ```
 
-- A type-safe version of [`useNavigate`](../useNavigateHook.md) that is pre-bound to the route ID that the `RouteApi`
-  instance was created with.
+- A type-safe version of [`useNavigate`](../useNavigateHook.md) that is pre-bound to the route ID that the `RouteApi` instance was created with.
 
 # Route class
 
@@ -790,8 +724,7 @@ The `RouteApi` has the following properties and methods:
 > This class has been deprecated and will be removed in the next major version of TanStack Router.
 > Please use the [`createRoute`](../createRouteFunction.md) function instead.
 
-The `Route` class implements the `RouteApi` class and can be used to create route instances. A route instance can then
-be used to create a route tree.
+The `Route` class implements the `RouteApi` class and can be used to create route instances. A route instance can then be used to create a route tree.
 
 ## `Route` constructor
 
@@ -830,8 +763,7 @@ function IndexComponent() {
 
 # RouteMask type
 
-The `RouteMask` type extends the [`ToOptions`](../ToOptionsType.md) type and has other the necessary properties to
-create a route mask.
+The `RouteMask` type extends the [`ToOptions`](../ToOptionsType.md) type and has other the necessary properties to create a route mask.
 
 ## RouteMask properties
 
@@ -895,8 +827,7 @@ The `RouteOptions` type accepts an object with the following properties:
 
 - Type: `() => TParentRoute`
 - Required
-- A function that returns the parent route of the route being created. This is required to provide full type safety to
-  child route configurations and to ensure that the route tree is built correctly.
+- A function that returns the parent route of the route being created. This is required to provide full type safety to child route configurations and to ensure that the route tree is built correctly.
 
 ### `path` property
 
@@ -908,8 +839,7 @@ The `RouteOptions` type accepts an object with the following properties:
 
 - Type: `string`
 - Optional, but required if a `path` is not provided
-- The unique identifier for the route if it is to be configured as a pathless layout route. If provided, the route will
-  not match against the location pathname and its routes will be flattened into its parent route for matching.
+- The unique identifier for the route if it is to be configured as a pathless layout route. If provided, the route will not match against the location pathname and its routes will be flattened into its parent route for matching.
 
 ### `component` property
 
@@ -939,55 +869,38 @@ The `RouteOptions` type accepts an object with the following properties:
 
 - Type: `(rawSearchParams: unknown) => TSearchSchema`
 - Optional
-- A function that will be called when this route is matched and passed the raw search params from the current location
-  and return valid parsed search params. If this function throws, the route will be put into an error state and the
-  error will be thrown during render. If this function does not throw, its return value will be used as the route's
-  search params and the return type will be inferred into the rest of the router.
-- Optionally, the parameter type can be tagged with the `SearchSchemaInput` type like this:
-  `(searchParams: TSearchSchemaInput & SearchSchemaInput) => TSearchSchema`. If this tag is present,
-  `TSearchSchemaInput` will be used to type the `search` property of `<Link />` and `navigate()` **instead of**
-  `TSearchSchema`. The difference between `TSearchSchemaInput` and `TSearchSchema` can be useful, for example, to
-  express optional search parameters.
+- A function that will be called when this route is matched and passed the raw search params from the current location and return valid parsed search params. If this function throws, the route will be put into an error state and the error will be thrown during render. If this function does not throw, its return value will be used as the route's search params and the return type will be inferred into the rest of the router.
+- Optionally, the parameter type can be tagged with the `SearchSchemaInput` type like this: `(searchParams: TSearchSchemaInput & SearchSchemaInput) => TSearchSchema`. If this tag is present, `TSearchSchemaInput` will be used to type the `search` property of `<Link />` and `navigate()` **instead of** `TSearchSchema`. The difference between `TSearchSchemaInput` and `TSearchSchema` can be useful, for example, to express optional search parameters.
 
 ### `search.middlewares` property
 
 - Type: `(({search: TSearchSchema, next: (newSearch: TSearchSchema) => TSearchSchema}) => TSearchSchema)[]`
 - Optional
-- Search middlewares are functions that transform the search parameters when generating new links for a route or its
-  descendants.
-- A search middleware is passed in the current search (if it is the first middleware to run) or is invoked by the
-  previous middleware calling `next`.
+- Search middlewares are functions that transform the search parameters when generating new links for a route or its descendants.
+- A search middleware is passed in the current search (if it is the first middleware to run) or is invoked by the previous middleware calling `next`.
 
 ### `parseParams` method (⚠️ deprecated, use `params.parse` instead)
 
 - Type: `(rawParams: Record<string, string>) => TParams`
 - Optional
-- A function that will be called when this route is matched and passed the raw params from the current location and
-  return valid parsed params. If this function throws, the route will be put into an error state and the error will be
-  thrown during render. If this function does not throw, its return value will be used as the route's params and the
-  return type will be inferred into the rest of the router.
+- A function that will be called when this route is matched and passed the raw params from the current location and return valid parsed params. If this function throws, the route will be put into an error state and the error will be thrown during render. If this function does not throw, its return value will be used as the route's params and the return type will be inferred into the rest of the router.
 
 ### `stringifyParams` method (⚠️ deprecated, use `params.stringify` instead)
 
 - Type: `(params: TParams) => Record<string, string>`
 - Required if `parseParams` is provided
-- A function that will be called when this route's parsed params are being used to build a location. This function
-  should return a valid object of `Record<string, string>` mapping.
+- A function that will be called when this route's parsed params are being used to build a location. This function should return a valid object of `Record<string, string>` mapping.
 
 ### `params.parse` method
 
 - Type: `(rawParams: Record<string, string>) => TParams`
 - Optional
-- A function that will be called when this route is matched and passed the raw params from the current location and
-  return valid parsed params. If this function throws, the route will be put into an error state and the error will be
-  thrown during render. If this function does not throw, its return value will be used as the route's params and the
-  return type will be inferred into the rest of the router.
+- A function that will be called when this route is matched and passed the raw params from the current location and return valid parsed params. If this function throws, the route will be put into an error state and the error will be thrown during render. If this function does not throw, its return value will be used as the route's params and the return type will be inferred into the rest of the router.
 
 ### `params.stringify` method
 
 - Type: `(params: TParams) => Record<string, string>`
-- A function that will be called when this route's parsed params are being used to build a location. This function
-  should return a valid object of `Record<string, string>` mapping.
+- A function that will be called when this route's parsed params are being used to build a location. This function should return a valid object of `Record<string, string>` mapping.
 
 ### `beforeLoad` method
 
@@ -1011,21 +924,12 @@ type beforeLoad = (
 
 - Optional
 - [`ParsedLocation`](../ParsedLocationType.md)
-- This async function is called before a route is loaded. If an error is thrown here, the route's loader will not be
-  called and the route will not render. If thrown during a navigation, the navigation will be canceled and the error
-  will be passed to the `onError` function. If thrown during a preload event, the error will be logged to the console
-  and the preload will fail.
-- If this function returns a promise, the route will be put into a pending state and cause rendering to suspend until
-  the promise resolves. If this route's pendingMs threshold is reached, the `pendingComponent` will be shown until it
-  resolves. If the promise rejects, the route will be put into an error state and the error will be thrown during
-  render.
-- If this function returns a `TRouteContext` object, that object will be merged into the route's context and be made
-  available in the `loader` and other related route components/methods.
-- It's common to use this function to check if a user is authenticated and redirect them to a login page if they are
-  not. To do this, you can either return or throw a `redirect` object from this function.
+- This async function is called before a route is loaded. If an error is thrown here, the route's loader will not be called and the route will not render. If thrown during a navigation, the navigation will be canceled and the error will be passed to the `onError` function. If thrown during a preload event, the error will be logged to the console and the preload will fail.
+- If this function returns a promise, the route will be put into a pending state and cause rendering to suspend until the promise resolves. If this route's pendingMs threshold is reached, the `pendingComponent` will be shown until it resolves. If the promise rejects, the route will be put into an error state and the error will be thrown during render.
+- If this function returns a `TRouteContext` object, that object will be merged into the route's context and be made available in the `loader` and other related route components/methods.
+- It's common to use this function to check if a user is authenticated and redirect them to a login page if they are not. To do this, you can either return or throw a `redirect` object from this function.
 
-> 🚧 `opts.navigate` has been deprecated and will be removed in the next major release. Use
-> `throw redirect({ to: '/somewhere' })` instead. Read more about the `redirect` function [here](../redirectFunction.md).
+> 🚧 `opts.navigate` has been deprecated and will be removed in the next major release. Use `throw redirect({ to: '/somewhere' })` instead. Read more about the `redirect` function [here](../redirectFunction.md).
 
 ### `loader` method
 
@@ -1050,21 +954,12 @@ type loader = (
 
 - Optional
 - [`ParsedLocation`](../ParsedLocationType.md)
-- This async function is called when a route is matched and passed the route's match object. If an error is thrown here,
-  the route will be put into an error state and the error will be thrown during render. If thrown during a navigation,
-  the navigation will be canceled and the error will be passed to the `onError` function. If thrown during a preload
-  event, the error will be logged to the console and the preload will fail.
-- If this function returns a promise, the route will be put into a pending state and cause rendering to suspend until
-  the promise resolves. If this route's pendingMs threshold is reached, the `pendingComponent` will be shown until it
-  resolves. If the promise rejects, the route will be put into an error state and the error will be thrown during
-  render.
-- If this function returns a `TLoaderData` object, that object will be stored on the route match until the route match
-  is no longer active. It can be accessed using the `useLoaderData` hook in any component that is a child of the route
-  match before another `<Outlet />` is rendered.
+- This async function is called when a route is matched and passed the route's match object. If an error is thrown here, the route will be put into an error state and the error will be thrown during render. If thrown during a navigation, the navigation will be canceled and the error will be passed to the `onError` function. If thrown during a preload event, the error will be logged to the console and the preload will fail.
+- If this function returns a promise, the route will be put into a pending state and cause rendering to suspend until the promise resolves. If this route's pendingMs threshold is reached, the `pendingComponent` will be shown until it resolves. If the promise rejects, the route will be put into an error state and the error will be thrown during render.
+- If this function returns a `TLoaderData` object, that object will be stored on the route match until the route match is no longer active. It can be accessed using the `useLoaderData` hook in any component that is a child of the route match before another `<Outlet />` is rendered.
 - Deps must be returned by your `loaderDeps` function in order to appear.
 
-> 🚧 `opts.navigate` has been deprecated and will be removed in the next major release. Use
-> `throw redirect({ to: '/somewhere' })` instead. Read more about the `redirect` function [here](../redirectFunction.md).
+> 🚧 `opts.navigate` has been deprecated and will be removed in the next major release. Use `throw redirect({ to: '/somewhere' })` instead. Read more about the `redirect` function [here](../redirectFunction.md).
 
 ### `loaderDeps` method
 
@@ -1075,37 +970,30 @@ type loaderDeps = (opts: { search: TFullSearchSchema }) => Record<string, any>
 ```
 
 - Optional
-- A function that will be called before this route is matched to provide additional unique identification to the route
-  match and serve as a dependency tracker for when the match should be reloaded. It should return any serializable value
-  that can uniquely identify the route match from navigation to navigation.
+- A function that will be called before this route is matched to provide additional unique identification to the route match and serve as a dependency tracker for when the match should be reloaded. It should return any serializable value that can uniquely identify the route match from navigation to navigation.
 - By default, path params are already used to uniquely identify a route match, so it's unnecessary to return these here.
-- If your route match relies on search params for unique identification, it's required that you return them here so they
-  can be made available in the `loader`'s `deps` argument.
+- If your route match relies on search params for unique identification, it's required that you return them here so they can be made available in the `loader`'s `deps` argument.
 
 ### `staleTime` property
 
 - Type: `number`
 - Optional
 - Defaults to `routerOptions.defaultStaleTime`, which defaults to `0`
-- The amount of time in milliseconds that a route match's loader data will be considered fresh. If a route match is
-  matched again within this time frame, its loader data will not be reloaded.
+- The amount of time in milliseconds that a route match's loader data will be considered fresh. If a route match is matched again within this time frame, its loader data will not be reloaded.
 
 ### `preloadStaleTime` property
 
 - Type: `number`
 - Optional
 - Defaults to `routerOptions.defaultPreloadStaleTime`, which defaults to `30_000` ms (30 seconds)
-- The amount of time in milliseconds that a route match's loader data will be considered fresh when preloading. If a
-  route match is preloaded again within this time frame, its loader data will not be reloaded. If a route match is
-  loaded (for navigation) within this time frame, the normal `staleTime` is used instead.
+- The amount of time in milliseconds that a route match's loader data will be considered fresh when preloading. If a route match is preloaded again within this time frame, its loader data will not be reloaded. If a route match is loaded (for navigation) within this time frame, the normal `staleTime` is used instead.
 
 ### `gcTime` property
 
 - Type: `number`
 - Optional
 - Defaults to `routerOptions.defaultGcTime`, which defaults to 30 minutes.
-- The amount of time in milliseconds that a route match's loader data will be kept in memory after a preload or it is no
-  longer in use.
+- The amount of time in milliseconds that a route match's loader data will be kept in memory after a preload or it is no longer in use.
 
 ### `shouldReload` property
 
@@ -1113,8 +1001,7 @@ type loaderDeps = (opts: { search: TFullSearchSchema }) => Record<string, any>
 - Optional
 - If `false` or returns `false`, the route match's loader data will not be reloaded on subsequent matches.
 - If `true` or returns `true`, the route match's loader data will be reloaded on subsequent matches.
-- If `undefined` or returns `undefined`, the route match's loader data will adhere to the default stale-while-revalidate
-  behavior.
+- If `undefined` or returns `undefined`, the route match's loader data will adhere to the default stale-while-revalidate behavior.
 
 ### `caseSensitive` property
 
@@ -1126,8 +1013,7 @@ type loaderDeps = (opts: { search: TFullSearchSchema }) => Record<string, any>
 
 - Type: `boolean`
 - Optional
-- If `true`, this route will be forcefully wrapped in a suspense boundary, regardless if a reason is found to do so from
-  inspecting its provided components.
+- If `true`, this route will be forcefully wrapped in a suspense boundary, regardless if a reason is found to do so from inspecting its provided components.
 
 ### `pendingMs` property
 
@@ -1141,44 +1027,37 @@ type loaderDeps = (opts: { search: TFullSearchSchema }) => Record<string, any>
 - Type: `number`
 - Optional
 - Defaults to `routerOptions.defaultPendingMinMs` which defaults to `500`
-- The minimum amount of time in milliseconds that the pending component will be shown for if it is shown. This is useful
-  to prevent the pending component from flashing on the screen for a split second.
+- The minimum amount of time in milliseconds that the pending component will be shown for if it is shown. This is useful to prevent the pending component from flashing on the screen for a split second.
 
 ### `preloadMaxAge` property
 
 - Type: `number`
 - Optional
 - Defaults to `30_000` ms (30 seconds)
-- The maximum amount of time in milliseconds that a route's preloaded route data will be cached for. If a route is not
-  matched within this time frame, its loader data will be discarded.
+- The maximum amount of time in milliseconds that a route's preloaded route data will be cached for. If a route is not matched within this time frame, its loader data will be discarded.
 
 ### `preSearchFilters` property (⚠️ deprecated, use `search.middlewares` instead)
 
 - Type: `((search: TFullSearchSchema) => TFullSearchSchema)[]`
 - Optional
 - An array of functions that will be called when generating any new links to this route or its grandchildren.
-- Each function will be called with the current search params and should return a new search params object that will be
-  used to generate the link.
-- It has a `pre` prefix because it is called before the user-provided function that is passed to `navigate`/`Link` etc
-  has a chance to modify the search params.
+- Each function will be called with the current search params and should return a new search params object that will be used to generate the link.
+- It has a `pre` prefix because it is called before the user-provided function that is passed to `navigate`/`Link` etc has a chance to modify the search params.
 
 ### `postSearchFilters` property (⚠️ deprecated, use `search.middlewares` instead)
 
 - Type: `((search: TFullSearchSchema) => TFullSearchSchema)[]`
 - Optional
 - An array of functions that will be called when generating any new links to this route or its grandchildren.
-- Each function will be called with the current search params and should return a new search params object that will be
-  used to generate the link.
-- It has a `post` prefix because it is called after the user-provided function that is passed to `navigate`/`Link` etc
-  has modified the search params.
+- Each function will be called with the current search params and should return a new search params object that will be used to generate the link.
+- It has a `post` prefix because it is called after the user-provided function that is passed to `navigate`/`Link` etc has modified the search params.
 
 ### `onError` property
 
 - Type: `(error: any) => void`
 - Optional
 - A function that will be called when an error is thrown during a navigation or preload event.
-- If this function throws a [`redirect`](../redirectFunction.md), then the router will process and apply the redirect
-  immediately.
+- If this function throws a [`redirect`](../redirectFunction.md), then the router will process and apply the redirect immediately.
 
 ### `onEnter` property
 
@@ -1225,8 +1104,7 @@ interface RemountDepsOptions<
 ```
 
 - Optional
-- A function that will be called to determine whether a route component shall be remounted after navigation. If this
-  function returns a different value than previously, it will remount.
+- A function that will be called to determine whether a route component shall be remounted after navigation. If this function returns a different value than previously, it will remount.
 - The return value needs to be JSON serializable.
 - By default, a route component will not be remounted if it stays active after a navigation.
 
@@ -1251,8 +1129,7 @@ type headers = (opts: {
 ```
 
 - Optional
-- Allows you to specify custom HTTP headers to be sent when this route is rendered during SSR. The function receives the
-  current match context and should return a plain object of header name/value pairs.
+- Allows you to specify custom HTTP headers to be sent when this route is rendered during SSR. The function receives the current match context and should return a plain object of header name/value pairs.
 
 ### `head` method
 
@@ -1280,8 +1157,7 @@ type head = (ctx: {
 ```
 
 - Optional
-- Returns additional elements to inject into the document `<head>` for this route. Use it to add route-level SEO
-  metadata, preload links, inline styles, or custom scripts.
+- Returns additional elements to inject into the document `<head>` for this route. Use it to add route-level SEO metadata, preload links, inline styles, or custom scripts.
 
 ### `scripts` method
 
@@ -1297,15 +1173,13 @@ type scripts = (ctx: {
 ```
 
 - Optional
-- A shorthand helper to return only `<script>` elements. Equivalent to returning the `scripts` field from the `head`
-  method.
+- A shorthand helper to return only `<script>` elements. Equivalent to returning the `scripts` field from the `head` method.
 
 ### `codeSplitGroupings` property
 
 - Type: `Array<Array<'loader' | 'component' | 'pendingComponent' | 'notFoundComponent' | 'errorComponent'>>`
 - Optional
-- Fine-grained control over how the router groups lazy-loaded pieces of a route into chunks. Each inner array represents
-  a group of assets that will be placed into the same bundle during code-splitting.
+- Fine-grained control over how the router groups lazy-loaded pieces of a route into chunks. Each inner array represents a group of assets that will be placed into the same bundle during code-splitting.
 
 # Route type
 
@@ -1318,23 +1192,19 @@ An instance of the `Route` has the following properties and methods:
 ### `.addChildren` method
 
 - Type: `(children: Route[]) => this`
-- Adds child routes to the route instance and returns the route instance (but with updated types to reflect the new
-  children).
+- Adds child routes to the route instance and returns the route instance (but with updated types to reflect the new children).
 
 ### `.update` method
 
 - Type: `(options: Partial<UpdatableRouteOptions>) => this`
-- Updates the route instance with new options and returns the route instance (but with updated types to reflect the new
-  options).
-- In some circumstances, it can be useful to update a route instance's options after it has been created to avoid
-  circular type references.
+- Updates the route instance with new options and returns the route instance (but with updated types to reflect the new options).
+- In some circumstances, it can be useful to update a route instance's options after it has been created to avoid circular type references.
 - ...`RouteApi` methods
 
 ### `.lazy` method
 
 - Type: `(lazyImporter: () => Promise<Partial<UpdatableRouteOptions>>) => this`
-- Updates the route instance with a new lazy importer which will be resolved lazily when loading the route. This can be
-  useful for code splitting.
+- Updates the route instance with a new lazy importer which will be resolved lazily when loading the route. This can be useful for code splitting.
 
 ### ...`RouteApi` methods
 
@@ -1380,8 +1250,7 @@ export default function App() {
 
 # RouterEvents type
 
-The `RouterEvents` type contains all of the events that the router can emit. Each top-level key of this type, represents
-the name of an event that the router can emit. The values of the keys are the event payloads.
+The `RouterEvents` type contains all of the events that the router can emit. Each top-level key of this type, represents the name of an event that the router can emit. The values of the keys are the event payloads.
 
 ```tsx
 type RouterEvents = {
@@ -1493,8 +1362,7 @@ The `RouterOptions` type accepts an object with the following properties and met
 
 - Type: `RouterHistory`
 - Optional
-- The history object that will be used to manage the browser history. If not provided, a new `createBrowserHistory`
-  instance will be created and used.
+- The history object that will be used to manage the browser history. If not provided, a new `createBrowserHistory` instance will be created and used.
 
 ### `stringifySearch` method
 
@@ -1525,8 +1393,7 @@ The `RouterOptions` type accepts an object with the following properties and met
 - Optional
 - Defaults to `false`
 - If `false`, routes will not be preloaded by default in any way.
-- If `'intent'`, routes will be preloaded by default when the user hovers over a link or a `touchstart` event is
-  detected on a `<Link>`.
+- If `'intent'`, routes will be preloaded by default when the user hovers over a link or a `touchstart` event is detected on a `<Link>`.
 - If `'viewport'`, routes will be preloaded by default when they are within the viewport of the browser.
 - If `'render'`, routes will be preloaded by default as soon as they are rendered in the DOM.
 
@@ -1617,8 +1484,7 @@ The `RouterOptions` type accepts an object with the following properties and met
 - Type: `boolean`
 - Optional
 - Defaults to `false`
-- When `true`, disables the global catch boundary that normally wraps all route matches. This allows unhandled errors to
-  bubble up to top-level error handlers in the browser.
+- When `true`, disables the global catch boundary that normally wraps all route matches. This allows unhandled errors to bubble up to top-level error handlers in the browser.
 - Useful for testing tools, error reporting services, and debugging scenarios.
 
 ### `defaultViewTransition` property
@@ -1626,28 +1492,21 @@ The `RouterOptions` type accepts an object with the following properties and met
 - Type: `boolean | ViewTransitionOptions`
 - Optional
 - If `true`, route navigations will be called using `document.startViewTransition()`.
-- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using
-  `document.startViewTransition({update, types})`
-  where `types` will be the strings array passed with `ViewTransitionOptions["types"]`. If the browser does not support
-  viewTransition types,
+- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using `document.startViewTransition({update, types})`
+  where `types` will be the strings array passed with `ViewTransitionOptions["types"]`. If the browser does not support viewTransition types,
   the navigation will fall back to normal `document.startTransition()`, same as if `true` was passed.
 - If the browser does not support this api, this option will be ignored.
-- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition) for more information on how
-  this function works.
-- See [Google](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) for
-  more information on viewTransition types
+- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition) for more information on how this function works.
+- See [Google](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) for more information on viewTransition types
 
 ### `defaultHashScrollIntoView` property
 
 - Type: `boolean | ScrollIntoViewOptions`
 - Optional
-- Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is
-  committed to history.
-- If `false`, the element with an id matching the hash will not be scrolled into view after the location is committed to
-  history.
+- Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is committed to history.
+- If `false`, the element with an id matching the hash will not be scrolled into view after the location is committed to history.
 - If an object is provided, it will be passed to the `scrollIntoView` method as options.
-- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on
-  `ScrollIntoViewOptions`.
+- See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on `ScrollIntoViewOptions`.
 
 ### `caseSensitive` property
 
@@ -1666,48 +1525,39 @@ The `RouterOptions` type accepts an object with the following properties and met
 ### `context` property
 
 - Type: `any`
-- Optional or required if the root route was created with [
-  `createRootRouteWithContext()`](../createRootRouteWithContextFunction.md).
-- The root context that will be provided to all routes in the route tree. This can be used to provide a context to all
-  routes in the tree without having to provide it to each route individually.
+- Optional or required if the root route was created with [`createRootRouteWithContext()`](../createRootRouteWithContextFunction.md).
+- The root context that will be provided to all routes in the route tree. This can be used to provide a context to all routes in the tree without having to provide it to each route individually.
 
 ### `dehydrate` method
 
 - Type: `() => TDehydrated`
 - Optional
-- A function that will be called when the router is dehydrated. The return value of this function will be serialized and
-  stored in the router's dehydrated state.
+- A function that will be called when the router is dehydrated. The return value of this function will be serialized and stored in the router's dehydrated state.
 
 ### `hydrate` method
 
 - Type: `(dehydrated: TDehydrated) => void`
 - Optional
-- A function that will be called when the router is hydrated. The return value of this function will be serialized and
-  stored in the router's dehydrated state.
+- A function that will be called when the router is hydrated. The return value of this function will be serialized and stored in the router's dehydrated state.
 
 ### `routeMasks` property
 
 - Type: `RouteMask[]`
 - Optional
-- An array of route masks that will be used to mask routes in the route tree. Route masking is when you display a route
-  at a different path than the one it is configured to match, like a modal popup that when shared will unmask to the
-  modal's content instead of the modal's context.
+- An array of route masks that will be used to mask routes in the route tree. Route masking is when you display a route at a different path than the one it is configured to match, like a modal popup that when shared will unmask to the modal's content instead of the modal's context.
 
 ### `unmaskOnReload` property
 
 - Type: `boolean`
 - Optional
 - Defaults to `false`
-- If `true`, route masks will, by default, be removed when the page is reloaded. This can be overridden on a per-mask
-  basis by setting the `unmaskOnReload` option on the mask, or on a per-navigation basis by setting the `unmaskOnReload`
-  option in the `Navigate` options.
+- If `true`, route masks will, by default, be removed when the page is reloaded. This can be overridden on a per-mask basis by setting the `unmaskOnReload` option on the mask, or on a per-navigation basis by setting the `unmaskOnReload` option in the `Navigate` options.
 
 ### `Wrap` property
 
 - Type: `React.Component`
 - Optional
-- A component that will be used to wrap the entire router. This is useful for providing a context to the entire router.
-  Only non-DOM-rendering components like providers should be used, anything else will cause a hydration error.
+- A component that will be used to wrap the entire router. This is useful for providing a context to the entire router. Only non-DOM-rendering components like providers should be used, anything else will cause a hydration error.
 
 **Example**
 
@@ -1726,9 +1576,7 @@ const router = createRouter({
 
 - Type: `React.Component`
 - Optional
-- A component that will be used to wrap the inner contents of the router. This is useful for providing a context to the
-  inner contents of the router where you also need access to the router context and hooks. Only non-DOM-rendering
-  components like providers should be used, anything else will cause a hydration error.
+- A component that will be used to wrap the inner contents of the router. This is useful for providing a context to the inner contents of the router where you also need access to the router context and hooks. Only non-DOM-rendering components like providers should be used, anything else will cause a hydration error.
 
 **Example**
 
@@ -1754,24 +1602,21 @@ const router = createRouter({
 - Type: `'root' | 'fuzzy'`
 - Optional
 - Defaults to `'fuzzy'`
-- This property controls how TanStack Router will handle scenarios where it cannot find a route to match the current
-  location. See the [Not Found Errors guide](../../../guide/not-found-errors.md) for more information.
+- This property controls how TanStack Router will handle scenarios where it cannot find a route to match the current location. See the [Not Found Errors guide](../../../guide/not-found-errors.md) for more information.
 
 ### `notFoundRoute` property
 
 - **Deprecated**
 - Type: `NotFoundRoute`
 - Optional
-- A route that will be used as the default not found route for every branch of the route tree. This can be overridden on
-  a per-branch basis by providing a not found route to the `NotFoundRoute` option on the root route of the branch.
+- A route that will be used as the default not found route for every branch of the route tree. This can be overridden on a per-branch basis by providing a not found route to the `NotFoundRoute` option on the root route of the branch.
 
 ### `trailingSlash` property
 
 - Type: `'always' | 'never' | 'preserve'`
 - Optional
 - Defaults to `never`
-- Configures how trailing slashes are treated. `'always'` will add a trailing slash if not present, `'never'` will
-  remove the trailing slash if present and `'preserve'` will not modify the trailing slash.
+- Configures how trailing slashes are treated. `'always'` will add a trailing slash if not present, `'never'` will remove the trailing slash if present and `'preserve'` will not modify the trailing slash.
 
 ### `pathParamsAllowedCharacters` property
 
@@ -1808,8 +1653,7 @@ interface RemountDepsOptions<
 ```
 
 - Optional
-- A default function that will be called to determine whether a route component shall be remounted after navigation. If
-  this function returns a different value than previously, it will remount.
+- A default function that will be called to determine whether a route component shall be remounted after navigation. If this function returns a different value than previously, it will remount.
 - The return value needs to be JSON serializable.
 - By default, a route component will not be remounted if it stays active after a navigation
 
@@ -1822,9 +1666,7 @@ remountDeps: ({ params }) => params
 
 # RouterState type
 
-The `RouterState` type represents shape of the internal state of the router. The Router's internal state is useful, if
-you need to access certain internals of the router, such as any pending matches, is the router in its loading state,
-etc.
+The `RouterState` type represents shape of the internal state of the router. The Router's internal state is useful, if you need to access certain internals of the router, such as any pending matches, is the router in its loading state, etc.
 
 ```tsx
 type RouterState = {
@@ -1845,8 +1687,7 @@ The `RouterState` type contains all of the properties that are available on the 
 ### `status` property
 
 - Type: `'pending' | 'idle'`
-- The current status of the router. If the router is pending, it means that it is currently loading a route or the
-  router is still transitioning to the new route.
+- The current status of the router. If the router is pending, it means that it is currently loading a route or the router is still transitioning to the new route.
 
 ### `isLoading` property
 
@@ -1871,8 +1712,7 @@ The `RouterState` type contains all of the properties that are available on the 
 ### `location` property
 
 - Type: [`ParsedLocation`](../ParsedLocationType.md)
-- The latest location that the router has parsed from the browser history. This location may not be resolved and loaded
-  yet.
+- The latest location that the router has parsed from the browser history. This location may not be resolved and loaded yet.
 
 ### `resolvedLocation` property
 
@@ -1897,9 +1737,7 @@ An instance of the `Router` has the following properties and methods:
 - Type: [`RouterState`](../RouterStateType.md)
 - The current state of the router.
 
-> ⚠️⚠️⚠️ **`router.state` is always up to date, but NOT REACTIVE. If you use `router.state` in a component, the
-> component will not re-render when the router state changes. To get a reactive version of the router state, use
-> the [`useRouterState`](../useRouterStateHook.md) hook.**
+> ⚠️⚠️⚠️ **`router.state` is always up to date, but NOT REACTIVE. If you use `router.state` in a component, the component will not re-render when the router state changes. To get a reactive version of the router state, use the [`useRouterState`](../useRouterStateHook.md) hook.**
 
 ### `.subscribe` method
 
@@ -1912,8 +1750,7 @@ An instance of the `Router` has the following properties and methods:
 
 - Type: `(pathname: string, locationSearch?: Record<string, any>, opts?: { throwOnError?: boolean; }) => RouteMatch[]`
 - Matches a pathname and search params against the router's route tree and returns an array of route matches.
-- If `opts.throwOnError` is `true`, any errors that occur during the matching process will be thrown (in addition to
-  being returned in the route match's `error` property).
+- If `opts.throwOnError` is `true`, any errors that occur during the matching process will be thrown (in addition to being returned in the route match's `error` property).
 
 ### `.cancelMatch` method
 
@@ -1942,23 +1779,19 @@ Builds a new parsed location object that can be used later to navigate to a new 
   - `params`
     - Type: `true | Updater<unknown>`
     - Optional
-    - If `true`, the current params will be used. If a function is provided, it will be called with the current params
-      and the return value will be used.
+    - If `true`, the current params will be used. If a function is provided, it will be called with the current params and the return value will be used.
   - `search`
     - Type: `true | Updater<unknown>`
     - Optional
-    - If `true`, the current search params will be used. If a function is provided, it will be called with the current
-      search params and the return value will be used.
+    - If `true`, the current search params will be used. If a function is provided, it will be called with the current search params and the return value will be used.
   - `hash`
     - Type: `true | Updater<string>`
     - Optional
-    - If `true`, the current hash will be used. If a function is provided, it will be called with the current hash and
-      the return value will be used.
+    - If `true`, the current hash will be used. If a function is provided, it will be called with the current hash and the return value will be used.
   - `state`
     - Type: `true | NonNullableUpdater<ParsedHistoryState, HistoryState>`
     - Optional
-    - If `true`, the current state will be used. If a function is provided, it will be called with the current state and
-      the return value will be used.
+    - If `true`, the current state will be used. If a function is provided, it will be called with the current state and the return value will be used.
   - `mask`
     - Type: `object`
     - Optional
@@ -1966,8 +1799,7 @@ Builds a new parsed location object that can be used later to navigate to a new 
     - `unmaskOnReload`
       - Type: `boolean`
       - Optional
-      - If `true`, the route mask will be removed when the page is reloaded. This can be overridden on a per-navigation
-        basis by setting the `unmaskOnReload` option in the `Navigate` options.
+      - If `true`, the route mask will be removed when the page is reloaded. This can be overridden on a per-navigation basis by setting the `unmaskOnReload` option in the `Navigate` options.
 
 ### `.commitLocation` method
 
@@ -1993,24 +1825,19 @@ Commits a new location object to the browser history.
     - Type: `boolean`
     - Optional
     - Defaults to `false`.
-    - If `true`, the location will be committed to the browser history using `history.replace` instead of
-      `history.push`.
+    - If `true`, the location will be committed to the browser history using `history.replace` instead of `history.push`.
   - `resetScroll`
     - Type: `boolean`
     - Optional
-    - Defaults to `true` so that the scroll position will be reset to 0,0 after the location is committed to the browser
-      history.
+    - Defaults to `true` so that the scroll position will be reset to 0,0 after the location is committed to the browser history.
     - If `false`, the scroll position will not be reset to 0,0 after the location is committed to history.
   - `hashScrollIntoView`
     - Type: `boolean | ScrollIntoViewOptions`
     - Optional
-    - Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is
-      committed to history.
-    - If `false`, the element with an id matching the hash will not be scrolled into view after the location is
-      committed to history.
+    - Defaults to `true` so the element with an id matching the hash will be scrolled into view after the location is committed to history.
+    - If `false`, the element with an id matching the hash will not be scrolled into view after the location is committed to history.
     - If an object is provided, it will be passed to the `scrollIntoView` method as options.
-    - See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on
-      `ScrollIntoViewOptions`.
+    - See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView) for more information on `ScrollIntoViewOptions`.
   - `ignoreBlocker`
     - Type: `boolean`
     - Optional
@@ -2030,19 +1857,13 @@ Navigates to a new location.
 
 Invalidates route matches by forcing their `beforeLoad` and `load` functions to be called again.
 
-- Type:
-  `(opts?: {filter?: (d: MakeRouteMatchUnion<TRouter>) => boolean, sync?: boolean, forcePending?: boolean }) => Promise<void>`
-- This is useful any time your loader data might be out of date or stale. For example, if you have a route that displays
-  a list of posts, and you have a loader function that fetches the list of posts from an API, you might want to
-  invalidate the route matches for that route any time a new post is created so that the list of posts is always
-  up-to-date.
+- Type: `(opts?: {filter?: (d: MakeRouteMatchUnion<TRouter>) => boolean, sync?: boolean, forcePending?: boolean }) => Promise<void>`
+- This is useful any time your loader data might be out of date or stale. For example, if you have a route that displays a list of posts, and you have a loader function that fetches the list of posts from an API, you might want to invalidate the route matches for that route any time a new post is created so that the list of posts is always up-to-date.
 - if `filter` is not supplied, all matches will be invalidated
 - if `filter` is supplied, only matches for which `filter` returns `true` will be invalidated.
 - if `sync` is true, the promise returned by this function will only resolve once all loaders have finished.
-- if `forcePending` is true, the invalidated matches will be put into `'pending'` state regardless whether they are in
-  `'error'` state or not.
-- You might also want to invalidate the Router if you imperatively `reset` the router's `CatchBoundary` to trigger
-  loaders again.
+- if `forcePending` is true, the invalidated matches will be put into `'pending'` state regardless whether they are in `'error'` state or not.
+- You might also want to invalidate the Router if you imperatively `reset` the router's `CatchBoundary` to trigger loaders again.
 
 ### `.clearCache` method
 
@@ -2056,20 +1877,17 @@ Remove cached route matches.
 
 Loads all of the currently matched route matches and resolves when they are all loaded and ready to be rendered.
 
-> ⚠️⚠️⚠️ **`router.load()` respects `route.staleTime` and will not forcefully reload a route match if it is still fresh.
-> If you need to forcefully reload a route match, use `router.invalidate()` instead.**
+> ⚠️⚠️⚠️ **`router.load()` respects `route.staleTime` and will not forcefully reload a route match if it is still fresh. If you need to forcefully reload a route match, use `router.invalidate()` instead.**
 
 - Type: `(opts?: {sync?: boolean}) => Promise<void>`
 - if `sync` is true, the promise returned by this function will only resolve once all loaders have finished.
-- The most common use case for this method is to call it when doing SSR to ensure that all of the critical data for the
-  current route is loaded before attempting to stream or render the application to the client.
+- The most common use case for this method is to call it when doing SSR to ensure that all of the critical data for the current route is loaded before attempting to stream or render the application to the client.
 
 ### `.preloadRoute` method
 
 Preloads all of the matches that match the provided `NavigateOptions`.
 
-> ⚠️⚠️⚠️ **Preloaded route matches are not stored long-term in the router state. They are only stored until the next
-> attempted navigation action.**
+> ⚠️⚠️⚠️ **Preloaded route matches are not stored long-term in the router state. They are only stored until the next attempted navigation action.**
 
 - Type: `(opts?: NavigateOptions) => Promise<RouteMatch[]>`
 - Properties
@@ -2088,8 +1906,7 @@ Loads the JS chunk of the route.
 
 ### `.matchRoute` method
 
-Matches a pathname and search params against the router's route tree and returns a route match's params or false if no
-match was found.
+Matches a pathname and search params against the router's route tree and returns a route match's params or false if no match was found.
 
 - Type: `(dest: ToOptions, matchOpts?: MatchRouteOptions) => RouteMatch['params'] | false`
 - Properties
@@ -2126,8 +1943,7 @@ Hydrates the router's critical state from a serializable object that was sent fr
 
 # ToMaskOptions type
 
-The `ToMaskOptions` type extends the [`ToOptions`](../ToOptionsType.md) type and describes additional options available
-when using route masks.
+The `ToMaskOptions` type extends the [`ToOptions`](../ToOptionsType.md) type and describes additional options available when using route masks.
 
 ```tsx
 type ToMaskOptions = ToOptions & {
@@ -2161,8 +1977,7 @@ type PathParamOptions = {
 
 # UseMatchRouteOptions type
 
-The `UseMatchRouteOptions` type extends the [`ToOptions`](../ToOptionsType.md) type and describes additional options
-available when using the [`useMatchRoute`](../useMatchRouteHook.md) hook.
+The `UseMatchRouteOptions` type extends the [`ToOptions`](../ToOptionsType.md) type and describes additional options available when using the [`useMatchRoute`](../useMatchRouteHook.md) hook.
 
 ```tsx
 export type UseMatchRouteOptions = ToOptions & MatchRouteOptions
@@ -2218,8 +2033,7 @@ The `Await` component accepts the following props:
 
 - Throws an error if the promise is rejected.
 - Suspends (throws a promise) if the promise is pending.
-- Returns the resolved value of a deferred promise if the promise is resolved using `props.children` as the render
-  function.
+- Returns the resolved value of a deferred promise if the promise is resolved using `props.children` as the render function.
 
 ## Examples
 
@@ -2235,9 +2049,7 @@ function Component() {
 
 # CatchBoundary component
 
-The `CatchBoundary` component is a component that catches errors thrown by its children, renders an error component and
-optionally calls the `onCatch` callback. It also accepts a `getResetKey` function that can be used to declaratively
-reset the component's state when the key changes.
+The `CatchBoundary` component is a component that catches errors thrown by its children, renders an error component and optionally calls the `onCatch` callback. It also accepts a `getResetKey` function that can be used to declaratively reset the component's state when the key changes.
 
 ## CatchBoundary props
 
@@ -2288,8 +2100,7 @@ function Component() {
 
 # CatchNotFound Component
 
-The `CatchNotFound` component is a component that catches not-found errors thrown by its children, renders a fallback
-component and optionally calls the `onCatch` callback. It resets when the pathname changes.
+The `CatchNotFound` component is a component that catches not-found errors thrown by its children, renders a fallback component and optionally calls the `onCatch` callback. It resets when the pathname changes.
 
 ## CatchNotFound props
 
@@ -2334,8 +2145,7 @@ function Component() {
 
 # ClientOnly Component
 
-The `ClientOnly` component is used to render a components only in the client, without breaking the server-side rendering
-due to hydration errors. It accepts a `fallback` prop that will be rendered if the JS is not yet loaded in the client.
+The `ClientOnly` component is used to render a components only in the client, without breaking the server-side rendering due to hydration errors. It accepts a `fallback` prop that will be rendered if the JS is not yet loaded in the client.
 
 ## Props
 
@@ -2380,13 +2190,11 @@ function Dashboard() {
 
 # createFileRoute function
 
-The `createFileRoute` function is a factory that can be used to create a file-based route instance. This route instance
-can then be used to automatically generate a route tree with the `tsr generate` and `tsr watch` commands.
+The `createFileRoute` function is a factory that can be used to create a file-based route instance. This route instance can then be used to automatically generate a route tree with the `tsr generate` and `tsr watch` commands.
 
 ## createFileRoute options
 
-The `createFileRoute` function accepts a single argument of type `string` that represents the `path` of the file that
-the route will be generated from.
+The `createFileRoute` function accepts a single argument of type `string` that represents the `path` of the file that the route will be generated from.
 
 ### `path` option
 
@@ -2396,11 +2204,9 @@ the route will be generated from.
 
 ## createFileRoute returns
 
-A new function that accepts a single argument of type [`RouteOptions`](../RouteOptionsType.md) that will be used to
-configure the file [`Route`](../RouteType.md) instance.
+A new function that accepts a single argument of type [`RouteOptions`](../RouteOptionsType.md) that will be used to configure the file [`Route`](../RouteType.md) instance.
 
-> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file
-> using the `Route` identifier.
+> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file using the `Route` identifier.
 
 ## Examples
 
@@ -2422,15 +2228,11 @@ function IndexComponent() {
 
 # createLazyFileRoute function
 
-The `createLazyFileRoute` function is used for creating a partial file-based route route instance that is lazily loaded
-when matched. This route instance can only be used to configure
-the [non-critical properties](../../../guide/code-splitting.md#how-does-tanstack-router-split-code) of the route, such
-as `component`, `pendingComponent`, `errorComponent`, and the `notFoundComponent`.
+The `createLazyFileRoute` function is used for creating a partial file-based route route instance that is lazily loaded when matched. This route instance can only be used to configure the [non-critical properties](../../../guide/code-splitting.md#how-does-tanstack-router-split-code) of the route, such as `component`, `pendingComponent`, `errorComponent`, and the `notFoundComponent`.
 
 ## createLazyFileRoute options
 
-The `createLazyFileRoute` function accepts a single argument of type `string` that represents the `path` of the file
-that the route will be generated from.
+The `createLazyFileRoute` function accepts a single argument of type `string` that represents the `path` of the file that the route will be generated from.
 
 ### `path`
 
@@ -2440,8 +2242,7 @@ that the route will be generated from.
 
 ### createLazyFileRoute returns
 
-A new function that accepts a single argument of partial of the type [`RouteOptions`](../RouteOptionsType.md) that will
-be used to configure the file [`Route`](../RouteType.md) instance.
+A new function that accepts a single argument of partial of the type [`RouteOptions`](../RouteOptionsType.md) that will be used to configure the file [`Route`](../RouteType.md) instance.
 
 - Type:
 
@@ -2451,8 +2252,7 @@ Pick<RouteOptions, 'component' | 'pendingComponent' | 'errorComponent' | 'notFou
 
 - [`RouteOptions`](../RouteOptionsType.md)
 
-> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file
-> using the `Route` identifier.
+> ⚠️ Note: For `tsr generate` and `tsr watch` to work properly, the file route instance must be exported from the file using the `Route` identifier.
 
 ### Examples
 
@@ -2471,10 +2271,7 @@ function IndexComponent() {
 
 # createLazyRoute function
 
-The `createLazyRoute` function is used for creating a partial code-based route route instance that is lazily loaded when
-matched. This route instance can only be used to configure
-the [non-critical properties](../../../guide/code-splitting.md#how-does-tanstack-router-split-code) of the route, such
-as `component`, `pendingComponent`, `errorComponent`, and the `notFoundComponent`.
+The `createLazyRoute` function is used for creating a partial code-based route route instance that is lazily loaded when matched. This route instance can only be used to configure the [non-critical properties](../../../guide/code-splitting.md#how-does-tanstack-router-split-code) of the route, such as `component`, `pendingComponent`, `errorComponent`, and the `notFoundComponent`.
 
 ## createLazyRoute options
 
@@ -2488,8 +2285,7 @@ The `createLazyRoute` function accepts a single argument of type `string` that r
 
 ### createLazyRoute returns
 
-A new function that accepts a single argument of partial of the type [`RouteOptions`](../RouteOptionsType.md) that will
-be used to configure the file [`Route`](../RouteType.md) instance.
+A new function that accepts a single argument of partial of the type [`RouteOptions`](../RouteOptionsType.md) that will be used to configure the file [`Route`](../RouteType.md) instance.
 
 - Type:
 
@@ -2499,8 +2295,7 @@ Pick<RouteOptions, 'component' | 'pendingComponent' | 'errorComponent' | 'notFou
 
 - [`RouteOptions`](../RouteOptionsType.md)
 
-> ⚠️ Note: This route instance must be manually lazily loaded against its critical route instance using the `lazy`
-> method returned by the `createRoute` function.
+> ⚠️ Note: This route instance must be manually lazily loaded against its critical route instance using the `lazy` method returned by the `createRoute` function.
 
 ### Examples
 
@@ -2538,8 +2333,7 @@ export const routeTree = rootRoute.addChildren([indexRoute])
 
 # createRootRoute function
 
-The `createRootRoute` function returns a new root route instance. A root route instance can then be used to create a
-route-tree.
+The `createRootRoute` function returns a new root route instance. A root route instance can then be used to create a route-tree.
 
 ## createRootRoute options
 
@@ -2582,8 +2376,7 @@ const router = createRouter({
 
 # createRootRouteWithContext function
 
-The `createRootRouteWithContext` function is a helper function that can be used to create a root route instance that
-requires a context type to be fulfilled when the router is created.
+The `createRootRouteWithContext` function is a helper function that can be used to create a root route instance that requires a context type to be fulfilled when the router is created.
 
 ## createRootRouteWithContext generics
 
@@ -2631,8 +2424,7 @@ const router = createRouter({
 
 # createRoute function
 
-The `createRoute` function implements returns a [`Route`](../RouteType.md) instance. A route instance can then be passed
-to a root route's children to create a route tree, which is then passed to the router.
+The `createRoute` function implements returns a [`Route`](../RouteType.md) instance. A route instance can then be passed to a root route's children to create a route tree, which is then passed to the router.
 
 ## createRoute options
 
@@ -2667,8 +2459,7 @@ function IndexComponent() {
 
 # createRouteMask function
 
-The `createRouteMask` function is a helper function that can be used to create a route mask configuration that can be
-passed to the `RouterOptions.routeMasks` option.
+The `createRouteMask` function is a helper function that can be used to create a route mask configuration that can be passed to the `RouterOptions.routeMasks` option.
 
 ## createRouteMask options
 
@@ -2678,8 +2469,7 @@ passed to the `RouterOptions.routeMasks` option.
 
 ## createRouteMask returns
 
-- A object with the type signature of [`RouteMask`](../RouteMaskType.md) that can be passed to the
-  `RouterOptions.routeMasks` option.
+- A object with the type signature of [`RouteMask`](../RouteMaskType.md) that can be passed to the `RouterOptions.routeMasks` option.
 
 ## Examples
 
@@ -2702,8 +2492,7 @@ const router = createRouter({
 
 # createRouter function
 
-The `createRouter` function accepts a [`RouterOptions`](../RouterOptionsType.md) object and creates a new [
-`Router`](../RouterClass.md) instance.
+The `createRouter` function accepts a [`RouterOptions`](../RouterOptionsType.md) object and creates a new [`Router`](../RouterClass.md) instance.
 
 ## createRouter options
 
@@ -2733,8 +2522,7 @@ export default function App() {
 
 # DefaultGlobalNotFound component
 
-The `DefaultGlobalNotFound` component is a component that renders "Not Found" on the root route when there is no other
-route that matches and a `notFoundComponent` is not provided.
+The `DefaultGlobalNotFound` component is a component that renders "Not Found" on the root route when there is no other route that matches and a `notFoundComponent` is not provided.
 
 ## DefaultGlobalNotFound returns
 
@@ -2747,9 +2535,7 @@ route that matches and a `notFoundComponent` is not provided.
 > [!CAUTION]
 > You don't need to call `defer` manually anymore, Promises are handled automatically now.
 
-The `defer` function wraps a promise with a deferred state object that can be used to inspect the promise's state. This
-deferred promise can then be passed to the [`useAwaited`](../useAwaitedHook.md) hook or the [
-`<Await>`](../awaitComponent.md) component for suspending until the promise is resolved or rejected.
+The `defer` function wraps a promise with a deferred state object that can be used to inspect the promise's state. This deferred promise can then be passed to the [`useAwaited`](../useAwaitedHook.md) hook or the [`<Await>`](../awaitComponent.md) component for suspending until the promise is resolved or rejected.
 
 The `defer` function accepts a single argument, the `promise` to wrap with a deferred state object.
 
@@ -2761,8 +2547,7 @@ The `defer` function accepts a single argument, the `promise` to wrap with a def
 
 ## defer returns
 
-- A promise that can be passed to the [`useAwaited`](../useAwaitedHook.md) hook or the [`<Await>`](../awaitComponent.md)
-  component.
+- A promise that can be passed to the [`useAwaited`](../useAwaitedHook.md) hook or the [`<Await>`](../awaitComponent.md) component.
 
 ## Examples
 
@@ -2820,9 +2605,7 @@ The `ErrorComponent` component accepts the following props:
 
 # getRouteApi function
 
-The `getRouteApi` function provides type-safe version of common hooks like `useParams`, `useSearch`, `useRouteContext`,
-`useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and corresponding
-registered route types.
+The `getRouteApi` function provides type-safe version of common hooks like `useParams`, `useSearch`, `useRouteContext`, `useNavigate`, `useLoaderData`, and `useLoaderDeps` that are pre-bound to a specific route ID and corresponding registered route types.
 
 ## getRouteApi options
 
@@ -2836,8 +2619,7 @@ The `getRouteApi` function accepts a single argument, a `routeId` string literal
 
 ## getRouteApi returns
 
-- An instance of the [`RouteApi`](../RouteApiType.md) that is pre-bound to the route ID that the `getRouteApi` function
-  was called with.
+- An instance of the [`RouteApi`](../RouteApiType.md) that is pre-bound to the route ID that the `getRouteApi` function was called with.
 
 ## Examples
 
@@ -2854,8 +2636,7 @@ export function PostsPage() {
 
 # HistoryState interface
 
-The `HistoryState` interface is an interface exported by the `history` package that describes the shape of the state
-object that can be used in conjunction with the `history` package and the `window.location` API.
+The `HistoryState` interface is an interface exported by the `history` package that describes the shape of the state object that can be used in conjunction with the `history` package and the `window.location` API.
 
 You can extend this interface to add additional properties to the state object across your application.
 
@@ -2940,8 +2721,7 @@ function somewhere(obj: unknown) {
 > [!IMPORTANT]
 > If you are using file-based routing, it's recommended to use the `createLazyFileRoute` function instead.
 
-The `lazyRouteComponent` function can be used to create a one-off code-split route component that can be preloaded using
-a `component.preload()` method.
+The `lazyRouteComponent` function can be used to create a one-off code-split route component that can be preloaded using a `component.preload()` method.
 
 ## lazyRouteComponent options
 
@@ -2986,8 +2766,7 @@ const route = createRoute({
 
 # Link component
 
-The `Link` component is a component that can be used to create a link that can be used to navigate to a new location.
-This includes changes to the pathname, search params, hash, and location state.
+The `Link` component is a component that can be used to create a link that can be used to navigate to a new location. This includes changes to the pathname, search params, hash, and location state.
 
 ## Link props
 
@@ -3022,8 +2801,7 @@ function Component() {
 
 # Link options
 
-`linkOptions` is a function which type checks an object literal with the intention of being used for `Link`, `navigate`
-or `redirect`
+`linkOptions` is a function which type checks an object literal with the intention of being used for `Link`, `navigate` or `redirect`
 
 ## linkOptions props
 
@@ -3059,13 +2837,11 @@ function DashboardComponent() {
 
 # MatchRoute component
 
-A component version of the `useMatchRoute` hook. It accepts the same options as the `useMatchRoute` with additional
-props to aid in conditional rendering.
+A component version of the `useMatchRoute` hook. It accepts the same options as the `useMatchRoute` with additional props to aid in conditional rendering.
 
 ## MatchRoute props
 
-The `MatchRoute` component accepts the same options as the `useMatchRoute` hook with additional props to aid in
-conditional rendering.
+The `MatchRoute` component accepts the same options as the `useMatchRoute` hook with additional props to aid in conditional rendering.
 
 ### `...props` prop
 
@@ -3077,8 +2853,7 @@ conditional rendering.
 - `React.ReactNode`
   - The component that will be rendered if the route is matched.
 - `((params: TParams | false) => React.ReactNode)`
-  - A function that will be called with the matched route's params or `false` if no route was matched. This can be
-    useful for components that need to always render, but render different props based on a route match or not.
+  - A function that will be called with the matched route's params or `false` if no route was matched. This can be useful for components that need to always render, but render different props based on a route match or not.
 
 ## MatchRoute returns
 
@@ -3102,9 +2877,7 @@ function Component() {
 
 # Navigate component
 
-The `Navigate` component is a component that can be used to navigate to a new location when rendered. This includes
-changes to the pathname, search params, hash, and location state. The underlying navigation will happen inside of a
-`useEffect` hook when successfully rendered.
+The `Navigate` component is a component that can be used to navigate to a new location when rendered. This includes changes to the pathname, search params, hash, and location state. The underlying navigation will happen inside of a `useEffect` hook when successfully rendered.
 
 ## Navigate props
 
@@ -3120,8 +2893,7 @@ The `Navigate` component accepts the following props:
 
 # notFound function
 
-The `notFound` function returns a new `NotFoundError` object that can be either returned or thrown from places like a
-Route's `beforeLoad` or `loader` callbacks to trigger the `notFoundComponent`.
+The `notFound` function returns a new `NotFoundError` object that can be either returned or thrown from places like a Route's `beforeLoad` or `loader` callbacks to trigger the `notFoundComponent`.
 
 ## notFound options
 
@@ -3132,8 +2904,7 @@ The `notFound` function accepts a single optional argument, the `options` to cre
 
 ## notFound returns
 
-- If the `throw` property is `true` in the `options` object, the `NotFoundError` object will be thrown from within the
-  function call.
+- If the `throw` property is `true` in the `options` object, the `NotFoundError` object will be thrown from within the function call.
 - If the `throw` property is `false | undefined` in the `options` object, the `NotFoundError` object will be returned.
 
 ## Examples
@@ -3173,8 +2944,7 @@ The `Outlet` component does not accept any props.
 
 # redirect function
 
-The `redirect` function returns a new `Redirect` object that can be either returned or thrown from places like a Route's
-`beforeLoad` or `loader` callbacks to trigger _redirect_ to a new location.
+The `redirect` function returns a new `Redirect` object that can be either returned or thrown from places like a Route's `beforeLoad` or `loader` callbacks to trigger _redirect_ to a new location.
 
 ## redirect options
 
@@ -3185,8 +2955,7 @@ The `redirect` function accepts a single argument, the `options` to determine th
 
 ## redirect returns
 
-- If the `throw` property is `true` in the `options` object, the `Redirect` object will be thrown from within the
-  function call.
+- If the `throw` property is `true` in the `options` object, the `Redirect` object will be thrown from within the function call.
 - If the `throw` property is `false | undefined` in the `options` object, the `Redirect` object will be returned.
 
 ## Examples
@@ -3276,8 +3045,7 @@ export const Route = createFileRoute('/')({
 > This function is deprecated and will be removed in the next major version of TanStack Router.
 > Please use the [`createRootRouteWithContext`](../createRootRouteWithContextFunction.md) function instead.
 
-The `rootRouteWithContext` function is a helper function that can be used to create a root route instance that requires
-a context type to be fulfilled when the router is created.
+The `rootRouteWithContext` function is a helper function that can be used to create a root route instance that requires a context type to be fulfilled when the router is created.
 
 ## rootRouteWithContext generics
 
@@ -3333,9 +3101,7 @@ const router = createRouter({
 
 - `true`: if the search schema has no required params, `true` can be used to strip all search params
 - a list of keys of those search params that shall be removed; only keys of optional search params are allowed.
-- an object that conforms to the partial input search schema. The search params are compared against the values of this
-  object; if the value is deeply equal, it will be removed. This is especially useful to strip out default search
-  params.
+- an object that conforms to the partial input search schema. The search params are compared against the values of this object; if the value is deeply equal, it will be removed. This is especially useful to strip out default search params.
 
 ## Examples
 
@@ -3436,8 +3202,7 @@ function Component() {
 
 # useBlocker hook
 
-The `useBlocker` method is a hook that [blocks navigation](../../../guide/navigation-blocking.md) when a condition is
-met.
+The `useBlocker` method is a hook that [blocks navigation](../../../guide/navigation-blocking.md) when a condition is met.
 
 > ⚠️ The following new `useBlocker` API is currently _experimental_.
 
@@ -3449,12 +3214,9 @@ The `useBlocker` hook accepts a single _required_ argument, an option object:
 
 - Required
 - Type: `ShouldBlockFn`
-- This function should return a `boolean` or a `Promise<boolean>` that tells the blocker if it should block the current
-  navigation
-- The function has the argument of type `ShouldBlockFnArgs` passed to it, which tells you information about the current
-  and next route and the action performed
-- Think of this function as telling the router if it should block the navigation, so returning `true` mean that it
-  should block the navigation and `false` meaning that it should be allowed
+- This function should return a `boolean` or a `Promise<boolean>` that tells the blocker if it should block the current navigation
+- The function has the argument of type `ShouldBlockFnArgs` passed to it, which tells you information about the current and next route and the action performed
+- Think of this function as telling the router if it should block the navigation, so returning `true` mean that it should block the navigation and `false` meaning that it should be allowed
 
 ```ts
 interface ShouldBlockFnLocation<...> {
@@ -3488,8 +3250,7 @@ type ShouldBlockFnArgs = {
 
 - Optional - defaults to `false`
 - Type: `boolean`
-- Specify if the resolver returned by the hook should be used or whether your `shouldBlockFn` function itself resolves
-  the blocking
+- Specify if the resolver returned by the hook should be used or whether your `shouldBlockFn` function itself resolves the blocking
 
 ### `options.blockerFn` option (⚠️ deprecated)
 
@@ -3652,8 +3413,7 @@ function MyComponent() {
 
 # useCanGoBack hook
 
-The `useCanGoBack` hook returns a boolean representing if the router history can safely go back without exiting the
-application.
+The `useCanGoBack` hook returns a boolean representing if the router history can safely go back without exiting the application.
 
 > ⚠️ The following new `useCanGoBack` API is currently _experimental_.
 
@@ -3664,9 +3424,7 @@ application.
 
 ## Limitations
 
-The router history index is reset after a navigation with [`reloadDocument`](../NavigateOptionsType.md#reloaddocument)
-set as `true`. This causes the router history to consider the new location as the initial one and will cause
-`useCanGoBack` to return `false`.
+The router history index is reset after a navigation with [`reloadDocument`](../NavigateOptionsType.md#reloaddocument) set as `true`. This causes the router history to consider the new location as the initial one and will cause `useCanGoBack` to return `false`.
 
 ## Examples
 
@@ -3691,12 +3449,10 @@ function Component() {
 
 # useChildMatches hook
 
-The `useChildMatches` hook returns all of the child [`RouteMatch`](../RouteMatchType.md) objects from the closest match
-down to the leaf-most match. **It does not include the current match, which can be obtained using the `useMatch` hook.**
+The `useChildMatches` hook returns all of the child [`RouteMatch`](../RouteMatchType.md) objects from the closest match down to the leaf-most match. **It does not include the current match, which can be obtained using the `useMatch` hook.**
 
 > [!IMPORTANT]
-> If the router has pending matches and they are showing their pending component fallbacks,
-> `router.state.pendingMatches` will used instead of `router.state.matches`.
+> If the router has pending matches and they are showing their pending component fallbacks, `router.state.pendingMatches` will used instead of `router.state.matches`.
 
 ## useChildMatches options
 
@@ -3706,9 +3462,7 @@ The `useChildMatches` hook accepts a single _optional_ argument, an `options` ob
 
 - Optional
 - `(matches: RouteMatch[]) => TSelected`
-- If supplied, this function will be called with the route matches and the return value will be returned from
-  `useChildMatches`. This value will also be used to determine if the hook should re-render its parent component using
-  shallow equality checks.
+- If supplied, this function will be called with the route matches and the return value will be returned from `useChildMatches`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -3735,10 +3489,7 @@ function Component() {
 
 # useLinkProps hook
 
-The `useLinkProps` hook that takes an object as its argument and returns a
-`React.AnchorHTMLAttributes<HTMLAnchorElement>` props object. These props can then be safely applied to an anchor
-element to create a link that can be used to navigate to the new location. This includes changes to the pathname, search
-params, hash, and location state.
+The `useLinkProps` hook that takes an object as its argument and returns a `React.AnchorHTMLAttributes<HTMLAnchorElement>` props object. These props can then be safely applied to an anchor element to create a link that can be used to navigate to the new location. This includes changes to the pathname, search params, hash, and location state.
 
 ## useLinkProps options
 
@@ -3748,18 +3499,15 @@ type UseLinkPropsOptions = ActiveLinkOptions & React.AnchorHTMLAttributes<HTMLAn
 
 - [`ActiveLinkOptions`](../ActiveLinkOptionsType.md)
 - The `useLinkProps` options are used to build a [`LinkProps`](../LinkPropsType.md) object.
-- It also extends the `React.AnchorHTMLAttributes<HTMLAnchorElement>` type, so that any additional props that are passed
-  to the `useLinkProps` hook will be merged with the [`LinkProps`](../LinkPropsType.md) object.
+- It also extends the `React.AnchorHTMLAttributes<HTMLAnchorElement>` type, so that any additional props that are passed to the `useLinkProps` hook will be merged with the [`LinkProps`](../LinkPropsType.md) object.
 
 ## useLinkProps returns
 
-- A `React.AnchorHTMLAttributes<HTMLAnchorElement>` object that can be applied to an anchor element to create a link
-  that can be used to navigate to the new location
+- A `React.AnchorHTMLAttributes<HTMLAnchorElement>` object that can be applied to an anchor element to create a link that can be used to navigate to the new location
 
 # useLoaderData hook
 
-The `useLoaderData` hook returns the loader data from the closest [`RouteMatch`](../RouteMatchType.md) in the component
-tree.
+The `useLoaderData` hook returns the loader data from the closest [`RouteMatch`](../RouteMatchType.md) in the component tree.
 
 ## useLoaderData options
 
@@ -3777,16 +3525,13 @@ The `useLoaderData` hook accepts an `options` object.
 
 - Type: `boolean`
 - Optional - `default: true`
-- If `false`, the `opts.from` option will be ignored and types will be loosened to to reflect the shared types of all
-  possible loader data.
+- If `false`, the `opts.from` option will be ignored and types will be loosened to to reflect the shared types of all possible loader data.
 
 ### `opts.select` option
 
 - Optional
 - `(loaderData: TLoaderData) => TSelected`
-- If supplied, this function will be called with the loader data and the return value will be returned from
-  `useLoaderData`. This value will also be used to determine if the hook should re-render its parent component using
-  shallow equality checks.
+- If supplied, this function will be called with the loader data and the return value will be returned from `useLoaderData`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -3798,8 +3543,7 @@ The `useLoaderData` hook accepts an `options` object.
 ## useLoaderData returns
 
 - If a `select` function is provided, the return value of the `select` function.
-- If no `select` function is provided, the loader data or a loosened version of the loader data if `opts.strict` is
-  `false`.
+- If no `select` function is provided, the loader data or a loosened version of the loader data if `opts.strict` is `false`.
 
 ## Examples
 
@@ -3815,8 +3559,7 @@ function Component() {
 
 # useLoaderDeps hook
 
-The `useLoaderDeps` hook is a hook that returns an object with the dependencies that are used to trigger the `loader`
-for a given route.
+The `useLoaderDeps` hook is a hook that returns an object with the dependencies that are used to trigger the `loader` for a given route.
 
 ## useLoaderDepsHook options
 
@@ -3832,8 +3575,7 @@ The `useLoaderDepsHook` hook accepts an `options` object.
 
 - Type: `(deps: TLoaderDeps) => TSelected`
 - Optional
-- If supplied, this function will be called with the loader dependencies object and the return value will be returned
-  from `useLoaderDeps`.
+- If supplied, this function will be called with the loader dependencies object and the return value will be returned from `useLoaderDeps`.
 
 ### `opts.structuralSharing` option
 
@@ -3873,8 +3615,7 @@ function Component() {
 
 # useLocation hook
 
-The `useLocation` method is a hook that returns the current [`location`](../ParsedLocationType.md) object. This hook is
-useful for when you want to perform some side effect whenever the current location changes.
+The `useLocation` method is a hook that returns the current [`location`](../ParsedLocationType.md) object. This hook is useful for when you want to perform some side effect whenever the current location changes.
 
 ## useLocation options
 
@@ -3884,8 +3625,7 @@ The `useLocation` hook accepts an optional `options` object.
 
 - Type: `(state: ParsedLocationType) => TSelected`
 - Optional
-- If supplied, this function will be called with the [`location`](../ParsedLocationType.md) object and the return value
-  will be returned from `useLocation`.
+- If supplied, this function will be called with the [`location`](../ParsedLocationType.md) object and the return value will be returned from `useLocation`.
 
 ## useLocation returns
 
@@ -3913,9 +3653,7 @@ function Component() {
 
 # useMatch hook
 
-The `useMatch` hook returns a [`RouteMatch`](../RouteMatchType.md) in the component tree. The raw route match contains
-all of the information about a route match in the router and also powers many other hooks under the hood like
-`useParams`, `useLoaderData`, `useRouteContext`, and `useSearch`.
+The `useMatch` hook returns a [`RouteMatch`](../RouteMatchType.md) in the component tree. The raw route match contains all of the information about a route match in the router and also powers many other hooks under the hood like `useParams`, `useLoaderData`, `useRouteContext`, and `useSearch`.
 
 ## useMatch options
 
@@ -3927,24 +3665,20 @@ The `useMatch` hook accepts a single argument, an `options` object.
 - The route id of a match
 - Optional, but recommended for full type safety.
 - If `opts.strict` is `true`, `from` is required and TypeScript will warn for this option if it is not provided.
-- If `opts.strict` is `false`, `from` must not be set and TypeScript will provided loosened types for the returned [
-  `RouteMatch`](../RouteMatchType.md).
+- If `opts.strict` is `false`, `from` must not be set and TypeScript will provided loosened types for the returned [`RouteMatch`](../RouteMatchType.md).
 
 ### `opts.strict` option
 
 - Type: `boolean`
 - Optional
 - `default: true`
-- If `false`, the `opts.from` must not be set and types will be loosened to `Partial<RouteMatch>` to reflect the shared
-  types of all matches.
+- If `false`, the `opts.from` must not be set and types will be loosened to `Partial<RouteMatch>` to reflect the shared types of all matches.
 
 ### `opts.select` option
 
 - Optional
 - `(match: RouteMatch) => TSelected`
-- If supplied, this function will be called with the route match and the return value will be returned from `useMatch`.
-  This value will also be used to determine if the hook should re-render its parent component using shallow equality
-  checks.
+- If supplied, this function will be called with the route match and the return value will be returned from `useMatch`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -3958,14 +3692,12 @@ The `useMatch` hook accepts a single argument, an `options` object.
 - Type: `boolean`
 - Optional
 - `default: true`
-- If `false`,`useMatch` will not throw an invariant exception in case a match was not found in the currently rendered
-  matches; in this case, it will return `undefined`.
+- If `false`,`useMatch` will not throw an invariant exception in case a match was not found in the currently rendered matches; in this case, it will return `undefined`.
 
 ## useMatch returns
 
 - If a `select` function is provided, the return value of the `select` function.
-- If no `select` function is provided, the [`RouteMatch`](../RouteMatchType.md) object or a loosened version of the
-  `RouteMatch` object if `opts.strict` is `false`.
+- If no `select` function is provided, the [`RouteMatch`](../RouteMatchType.md) object or a loosened version of the `RouteMatch` object if `opts.strict` is `false`.
 
 ## Examples
 
@@ -4012,8 +3744,7 @@ function Component() {
 
 # useMatchRoute hook
 
-The `useMatchRoute` hook is a hook that returns a `matchRoute` function that can be used to match a route against either
-the current or pending location.
+The `useMatchRoute` hook is a hook that returns a `matchRoute` function that can be used to match a route against either the current or pending location.
 
 ## useMatchRoute returns
 
@@ -4021,8 +3752,7 @@ the current or pending location.
 
 ## matchRoute function
 
-The `matchRoute` function is a function that can be used to match a route against either the current or pending
-location.
+The `matchRoute` function is a function that can be used to match a route against either the current or pending location.
 
 ### matchRoute function options
 
@@ -4128,12 +3858,10 @@ function Component() {
 
 # useMatches hook
 
-The `useMatches` hook returns all of the [`RouteMatch`](../RouteMatchType.md) objects from the router **regardless of
-its callers position in the React component tree**.
+The `useMatches` hook returns all of the [`RouteMatch`](../RouteMatchType.md) objects from the router **regardless of its callers position in the React component tree**.
 
 > [!TIP]
-> If you only want the parent or child matches, then you can use the [`useParentMatches`](../useParentMatchesHook.md) or
-> the [`useChildMatches`](../useChildMatchesHook.md) based on the selection you need.
+> If you only want the parent or child matches, then you can use the [`useParentMatches`](../useParentMatchesHook.md) or the [`useChildMatches`](../useChildMatchesHook.md) based on the selection you need.
 
 ## useMatches options
 
@@ -4143,9 +3871,7 @@ The `useMatches` hook accepts a single _optional_ argument, an `options` object.
 
 - Optional
 - `(matches: RouteMatch[]) => TSelected`
-- If supplied, this function will be called with the route matches and the return value will be returned from
-  `useMatches`. This value will also be used to determine if the hook should re-render its parent component using
-  shallow equality checks.
+- If supplied, this function will be called with the route matches and the return value will be returned from `useMatches`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -4173,8 +3899,7 @@ function Component() {
 
 # useNavigate hook
 
-The `useNavigate` hook is a hook that returns a `navigate` function that can be used to navigate to a new location. This
-includes changes to the pathname, search params, hash, and location state.
+The `useNavigate` hook is a hook that returns a `navigate` function that can be used to navigate to a new location. This includes changes to the pathname, search params, hash, and location state.
 
 ## useNavigate options
 
@@ -4184,8 +3909,7 @@ The `useNavigate` hook accepts a single argument, an `options` object.
 
 - Type: `string`
 - Optional
-- Description: The location to navigate from. This is useful when you want to navigate to a new location from a specific
-  location, rather than the current location.
+- Description: The location to navigate from. This is useful when you want to navigate to a new location from a specific location, rather than the current location.
 
 ## useNavigate returns
 
@@ -4266,8 +3990,7 @@ function Component() {
 
 # useParams hook
 
-The `useParams` method returns all of the path parameters that were parsed for the closest match and all of its parent
-matches.
+The `useParams` method returns all of the path parameters that were parsed for the closest match and all of its parent matches.
 
 ## useParams options
 
@@ -4277,24 +4000,20 @@ The `useParams` hook accepts an optional `options` object.
 
 - Type: `boolean`
 - Optional - `default: true`
-- If `false`, the `opts.from` option will be ignored and types will be loosened to `Partial<AllParams>` to reflect the
-  shared types of all params.
+- If `false`, the `opts.from` option will be ignored and types will be loosened to `Partial<AllParams>` to reflect the shared types of all params.
 
 ### `opts.shouldThrow` option
 
 - Type: `boolean`
 - Optional
 - `default: true`
-- If `false`,`useParams` will not throw an invariant exception in case a match was not found in the currently rendered
-  matches; in this case, it will return `undefined`.
+- If `false`,`useParams` will not throw an invariant exception in case a match was not found in the currently rendered matches; in this case, it will return `undefined`.
 
 ### `opts.select` option
 
 - Optional
 - `(params: AllParams) => TSelected`
-- If supplied, this function will be called with the params object and the return value will be returned from
-  `useParams`. This value will also be used to determine if the hook should re-render its parent component using shallow
-  equality checks.
+- If supplied, this function will be called with the params object and the return value will be returned from `useParams`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -4338,13 +4057,10 @@ function Component() {
 
 # useParentMatches hook
 
-The `useParentMatches` hook returns all of the parent [`RouteMatch`](../RouteMatchType.md) objects from the root down to
-the immediate parent of the current match in context. **It does not include the current match, which can be obtained
-using the `useMatch` hook.**
+The `useParentMatches` hook returns all of the parent [`RouteMatch`](../RouteMatchType.md) objects from the root down to the immediate parent of the current match in context. **It does not include the current match, which can be obtained using the `useMatch` hook.**
 
 > [!IMPORTANT]
-> If the router has pending matches and they are showing their pending component fallbacks,
-> `router.state.pendingMatches` will used instead of `router.state.matches`.
+> If the router has pending matches and they are showing their pending component fallbacks, `router.state.pendingMatches` will used instead of `router.state.matches`.
 
 ## useParentMatches options
 
@@ -4354,9 +4070,7 @@ The `useParentMatches` hook accepts an optional `options` object.
 
 - Optional
 - `(matches: RouteMatch[]) => TSelected`
-- If supplied, this function will be called with the route matches and the return value will be returned from
-  `useParentMatches`. This value will also be used to determine if the hook should re-render its parent component using
-  shallow equality checks.
+- If supplied, this function will be called with the route matches and the return value will be returned from `useParentMatches`. This value will also be used to determine if the hook should re-render its parent component using shallow equality checks.
 
 ### `opts.structuralSharing` option
 
@@ -4383,8 +4097,7 @@ function Component() {
 
 # useRouteContext hook
 
-The `useRouteContext` method is a hook that returns the current context for the current route. This hook is useful for
-accessing the current route context in a component.
+The `useRouteContext` method is a hook that returns the current context for the current route. This hook is useful for accessing the current route context in a component.
 
 ## useRouteContext options
 
@@ -4400,8 +4113,7 @@ The `useRouteContext` hook accepts an `options` object.
 
 - Type: `(context: RouteContext) => TSelected`
 - Optional
-- If supplied, this function will be called with the route context object and the return value will be returned from
-  `useRouteContext`.
+- If supplied, this function will be called with the route context object and the return value will be returned from `useRouteContext`.
 
 ## useRouteContext returns
 
@@ -4430,16 +4142,13 @@ function Component() {
 
 # useRouter hook
 
-The `useRouter` method is a hook that returns the current instance of [`Router`](../RouterType.md) from context. This
-hook is useful for accessing the router instance in a component.
+The `useRouter` method is a hook that returns the current instance of [`Router`](../RouterType.md) from context. This hook is useful for accessing the router instance in a component.
 
 ## useRouter returns
 
 - The current [`Router`](../RouterType.md) instance.
 
-> ⚠️⚠️⚠️ **`router.state` is always up to date, but NOT REACTIVE. If you use `router.state` in a component, the
-> component will not re-render when the router state changes. To get a reactive version of the router state, use
-> the [`useRouterState`](../useRouterStateHook.md) hook.**
+> ⚠️⚠️⚠️ **`router.state` is always up to date, but NOT REACTIVE. If you use `router.state` in a component, the component will not re-render when the router state changes. To get a reactive version of the router state, use the [`useRouterState`](../useRouterStateHook.md) hook.**
 
 ## Examples
 
@@ -4456,13 +4165,10 @@ function Component() {
 
 # useRouterState hook
 
-The `useRouterState` method is a hook that returns the current internal state of the router. This hook is useful for
-accessing the current state of the router in a component.
+The `useRouterState` method is a hook that returns the current internal state of the router. This hook is useful for accessing the current state of the router in a component.
 
 > [!TIP]
-> If you want to access the current location or the current matches, you should try out the [
-> `useLocation`](../useLocationHook.md) and [`useMatches`](../useMatchesHook.md) hooks first. These hooks are designed to
-> be more ergonomic and easier to use than accessing the router state directly.
+> If you want to access the current location or the current matches, you should try out the [`useLocation`](../useLocationHook.md) and [`useMatches`](../useMatchesHook.md) hooks first. These hooks are designed to be more ergonomic and easier to use than accessing the router state directly.
 
 ## useRouterState options
 
@@ -4472,8 +4178,7 @@ The `useRouterState` hook accepts an optional `options` object.
 
 - Type: `(state: RouterState) => TSelected`
 - Optional
-- If supplied, this function will be called with the [`RouterState`](../RouterStateType.md) object and the return value
-  will be returned from `useRouterState`.
+- If supplied, this function will be called with the [`RouterState`](../RouterStateType.md) object and the return value will be returned from `useRouterState`.
 
 ### `opts.structuralSharing` option
 
@@ -4508,8 +4213,7 @@ function Component() {
 
 # useSearch hook
 
-The `useSearch` method is a hook that returns the current search query parameters as an object for the current location.
-This hook is useful for accessing the current search string and query parameters in a component.
+The `useSearch` method is a hook that returns the current search query parameters as an object for the current location. This hook is useful for accessing the current search string and query parameters in a component.
 
 ## useSearch options
 
@@ -4526,15 +4230,13 @@ The `useSearch` hook accepts an `options` object.
 - Type: `boolean`
 - Optional
 - `default: true`
-- If `false`,`useSearch` will not throw an invariant exception in case a match was not found in the currently rendered
-  matches; in this case, it will return `undefined`.
+- If `false`,`useSearch` will not throw an invariant exception in case a match was not found in the currently rendered matches; in this case, it will return `undefined`.
 
 ### `opts.select` option
 
 - Type: `(search: SelectedSearchSchema) => TSelected`
 - Optional
-- If supplied, this function will be called with the search object and the return value will be returned from
-  `useSearch`.
+- If supplied, this function will be called with the search object and the return value will be returned from `useSearch`.
 
 ### `opts.structuralSharing` option
 
@@ -4547,15 +4249,12 @@ The `useSearch` hook accepts an `options` object.
 
 - Type: `boolean`
 - Optional - `default: true`
-- If `false`, the `opts.from` option will be ignored and types will be loosened to `Partial<FullSearchSchema>` to
-  reflect the shared types of all search query parameters.
+- If `false`, the `opts.from` option will be ignored and types will be loosened to `Partial<FullSearchSchema>` to reflect the shared types of all search query parameters.
 
 ## useSearch returns
 
-- If `opts.from` is provided, an object of the search query parameters for the current location or `TSelected` if a
-  `select` function is provided.
-- If `opts.strict` is `false`, an object of the search query parameters for the current location or `TSelected` if a
-  `select` function is provided.
+- If `opts.from` is provided, an object of the search query parameters for the current location or `TSelected` if a `select` function is provided.
+- If `opts.strict` is `false`, an object of the search query parameters for the current location or `TSelected` if a `select` function is provided.
 
 ## Examples
 

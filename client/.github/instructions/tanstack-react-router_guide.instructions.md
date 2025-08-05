@@ -8,14 +8,11 @@ applyTo: '**'
 
 # Authenticated Routes
 
-Authentication is an extremely common requirement for web applications. In this guide, we'll walk through how to use
-TanStack Router to build protected routes, and how to redirect users to login if they try to access them.
+Authentication is an extremely common requirement for web applications. In this guide, we'll walk through how to use TanStack Router to build protected routes, and how to redirect users to login if they try to access them.
 
 ## The `route.beforeLoad` Option
 
-The `route.beforeLoad` option allows you to specify a function that will be called before a route is loaded. It receives
-all of the same arguments that the `route.loader` function does. This is a great place to check if a user is
-authenticated, and redirect them to a login page if they are not.
+The `route.beforeLoad` option allows you to specify a function that will be called before a route is loaded. It receives all of the same arguments that the `route.loader` function does. This is a great place to check if a user is authenticated, and redirect them to a login page if they are not.
 
 The `beforeLoad` function runs in relative order to these other route loading functions:
 
@@ -29,16 +26,13 @@ The `beforeLoad` function runs in relative order to these other route loading fu
   - `route.component.preload?`
   - `route.load`
 
-**It's important to know that the `beforeLoad` function for a route is
-called _before any of its child routes' `beforeLoad` functions_.** It is essentially a middleware function for the route
-and all of its children.
+**It's important to know that the `beforeLoad` function for a route is called _before any of its child routes' `beforeLoad` functions_.** It is essentially a middleware function for the route and all of its children.
 
 **If you throw an error in `beforeLoad`, none of its children will attempt to load**.
 
 ## Redirecting
 
-While not required, some authentication flows require redirecting to a login page. To do this, you can **throw
-a `redirect()`** from `beforeLoad`:
+While not required, some authentication flows require redirecting to a login page. To do this, you can **throw a `redirect()`** from `beforeLoad`:
 
 ```tsx
 // src/routes/_authenticated.tsx
@@ -60,12 +54,9 @@ export const Route = createFileRoute('/_authenticated')({
 ```
 
 > [!TIP]
-> The `redirect()` function takes all of the same options as the `navigate` function, so you can pass options like
-> `replace: true` if you want to replace the current history entry instead of adding a new one.
+> The `redirect()` function takes all of the same options as the `navigate` function, so you can pass options like `replace: true` if you want to replace the current history entry instead of adding a new one.
 
-Once you have authenticated a user, it's also common practice to redirect them back to the page they were trying to
-access. To do this, you can utilize the `redirect` search param that we added in our original redirect. Since we'll be
-replacing the entire URL with what it was, `router.history.push` is better suited for this than `router.navigate`:
+Once you have authenticated a user, it's also common practice to redirect them back to the page they were trying to access. To do this, you can utilize the `redirect` search param that we added in our original redirect. Since we'll be replacing the entire URL with what it was, `router.history.push` is better suited for this than `router.navigate`:
 
 ```tsx
 router.history.push(search.redirect)
@@ -73,9 +64,7 @@ router.history.push(search.redirect)
 
 ## Non-Redirected Authentication
 
-Some applications choose to not redirect users to a login page, and instead keep the user on the same page and show a
-login form that either replaces the main content or hides it via a modal. This is also possible with TanStack Router by
-simply short circuiting rendering the `<Outlet />` that would normally render the child routes:
+Some applications choose to not redirect users to a login page, and instead keep the user on the same page and show a login form that either replaces the main content or hides it via a modal. This is also possible with TanStack Router by simply short circuiting rendering the `<Outlet />` that would normally render the child routes:
 
 ```tsx
 // src/routes/_authenticated.tsx
@@ -90,24 +79,18 @@ export const Route = createFileRoute('/_authenticated')({
 })
 ```
 
-This keeps the user on the same page, but still allows you to render a login form. Once the user is authenticated, you
-can simply render the `<Outlet />` and the child routes will be rendered.
+This keeps the user on the same page, but still allows you to render a login form. Once the user is authenticated, you can simply render the `<Outlet />` and the child routes will be rendered.
 
 ## Authentication using React context/hooks
 
-If your authentication flow relies on interactions with React context and/or hooks, you'll need to pass down your
-authentication state to TanStack Router using `router.context` option.
+If your authentication flow relies on interactions with React context and/or hooks, you'll need to pass down your authentication state to TanStack Router using `router.context` option.
 
 > [!IMPORTANT]
-> React hooks are not meant to be consumed outside of React components. If you need to use a hook outside of a React
-> component, you need to extract the returned state from the hook in a component that wraps your `<RouterProvider />` and
-> then pass the returned value down to TanStack Router.
+> React hooks are not meant to be consumed outside of React components. If you need to use a hook outside of a React component, you need to extract the returned state from the hook in a component that wraps your `<RouterProvider />` and then pass the returned value down to TanStack Router.
 
 We'll cover the `router.context` options in-detail in the [Router Context](../router-context.md) section.
 
-Here's an example that uses React context and hooks for protecting authenticated routes in TanStack Router. See the
-entire working setup in
-the [Authenticated Routes example](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes).
+Here's an example that uses React context and hooks for protecting authenticated routes in TanStack Router. See the entire working setup in the [Authenticated Routes example](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes).
 
 - `src/routes/__root.tsx`
 
@@ -164,8 +147,7 @@ function App() {
 }
 ```
 
-Then in the authenticated route, you can check the auth state using the `beforeLoad` function, and **throw
-a `redirect()`** to your **Login route** if the user is not signed-in.
+Then in the authenticated route, you can check the auth state using the `beforeLoad` function, and **throw a `redirect()`** to your **Login route** if the user is not signed-in.
 
 - `src/routes/dashboard.route.tsx`
 
@@ -186,18 +168,15 @@ export const Route = createFileRoute('/dashboard')({
 })
 ```
 
-You can _optionally_, also use the [Non-Redirected Authentication](#non-redirected-authentication) approach to show a
-login form instead of calling a **redirect**.
+You can _optionally_, also use the [Non-Redirected Authentication](#non-redirected-authentication) approach to show a login form instead of calling a **redirect**.
 
-This approach can also be used in conjunction with Pathless or Layout Route to protect all routes under their parent
-route.
+This approach can also be used in conjunction with Pathless or Layout Route to protect all routes under their parent route.
 
 ## Related How-To Guides
 
 For detailed, step-by-step implementation guides, see:
 
-- [How to Set Up Basic Authentication](../../how-to/setup-authentication.md) - Complete setup with React Context and
-  protected routes
+- [How to Set Up Basic Authentication](../../how-to/setup-authentication.md) - Complete setup with React Context and protected routes
 - [How to Integrate Authentication Providers](../../how-to/setup-auth-providers.md) - Use Auth0, Clerk, or Supabase
 - [How to Set Up Role-Based Access Control](../../how-to/setup-rbac.md) - Implement permissions and role-based routing
 
@@ -205,21 +184,15 @@ For detailed, step-by-step implementation guides, see:
 
 Working authentication examples are available in the repository:
 
-- [Basic Authentication Example](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes) -
-  Simple authentication with context
-- [Firebase Authentication](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes-firebase) -
-  Firebase Auth integration
-- [TanStack Start Auth Examples](https://github.com/TanStack/router/tree/main/examples/react) - Various auth
-  implementations with TanStack Start
+- [Basic Authentication Example](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes) - Simple authentication with context
+- [Firebase Authentication](https://github.com/TanStack/router/tree/main/examples/react/authenticated-routes-firebase) - Firebase Auth integration
+- [TanStack Start Auth Examples](https://github.com/TanStack/router/tree/main/examples/react) - Various auth implementations with TanStack Start
 
 # Automatic Code Splitting
 
-The automatic code splitting feature in TanStack Router allows you to optimize your application's bundle size by lazily
-loading route components and their associated data. This is particularly useful for large applications where you want to
-minimize the initial load time by only loading the necessary code for the current route.
+The automatic code splitting feature in TanStack Router allows you to optimize your application's bundle size by lazily loading route components and their associated data. This is particularly useful for large applications where you want to minimize the initial load time by only loading the necessary code for the current route.
 
-To turn this feature on, simply set the `autoCodeSplitting` option to `true` in your bundler plugin configuration. This
-enables the router to automatically handle code splitting for your routes without requiring any additional setup.
+To turn this feature on, simply set the `autoCodeSplitting` option to `true` in your bundler plugin configuration. This enables the router to automatically handle code splitting for your routes without requiring any additional setup.
 
 ```ts
 // vite.config.ts
@@ -235,52 +208,35 @@ export default defineConfig({
 })
 ```
 
-But that's just the beginning! TanStack Router's automatic code splitting is not only easy to enable, but it also
-provides powerful customization options to tailor how your routes are split into chunks. This allows you to optimize
-your application's performance based on your specific needs and usage patterns.
+But that's just the beginning! TanStack Router's automatic code splitting is not only easy to enable, but it also provides powerful customization options to tailor how your routes are split into chunks. This allows you to optimize your application's performance based on your specific needs and usage patterns.
 
 ## How does it work?
 
-TanStack Router's automatic code splitting works by transforming your route files both during 'development' and at '
-build' time. It rewrites the route definitions to use lazy-loading wrappers for components and loaders, which allows the
-bundler to group these properties into separate chunks.
+TanStack Router's automatic code splitting works by transforming your route files both during 'development' and at 'build' time. It rewrites the route definitions to use lazy-loading wrappers for components and loaders, which allows the bundler to group these properties into separate chunks.
 
 > [!TIP]
-> A **chunk** is a file that contains a portion of your application's code, which can be loaded on demand. This helps
-> reduce the initial load time of your application by only loading the code that is needed for the current route.
+> A **chunk** is a file that contains a portion of your application's code, which can be loaded on demand. This helps reduce the initial load time of your application by only loading the code that is needed for the current route.
 
-So when your application loads, it doesn't include all the code for every route. Instead, it only includes the code for
-the routes that are initially needed. As users navigate through your application, additional chunks are loaded on
-demand.
+So when your application loads, it doesn't include all the code for every route. Instead, it only includes the code for the routes that are initially needed. As users navigate through your application, additional chunks are loaded on demand.
 
-This happens seamlessly, without requiring you to manually split your code or manage lazy loading. The TanStack Router
-bundler plugin takes care of everything, ensuring that your routes are optimized for performance right out of the box.
+This happens seamlessly, without requiring you to manually split your code or manage lazy loading. The TanStack Router bundler plugin takes care of everything, ensuring that your routes are optimized for performance right out of the box.
 
 ### The transformation process
 
-When you enable automatic code splitting, the bundler plugin does this by using static code analysis look at your the
-code in your route files to transform them into optimized outputs.
+When you enable automatic code splitting, the bundler plugin does this by using static code analysis look at your the code in your route files to transform them into optimized outputs.
 
 This transformation process produces two key outputs when each of your route files are processed:
 
-1. **Reference File**: The bundler plugin takes your original route file (e.g., `posts.route.tsx`) and modifies the
-   values for properties like `component` or `pendingComponent` to use special lazy-loading wrappers that'll fetch the
-   actual code later. These wrappers point to a "virtual" file that the bundler will resolve later on.
-2. **Virtual File**: When the bundler sees a request for one of these virtual files (e.g.,
-   `posts.route.tsx?tsr-split=component`), it intercepts it to generate a new, minimal on-the-fly file that _only_
-   contains the code for the requested properties (e.g., just the `PostsComponent`).
+1. **Reference File**: The bundler plugin takes your original route file (e.g., `posts.route.tsx`) and modifies the values for properties like `component` or `pendingComponent` to use special lazy-loading wrappers that'll fetch the actual code later. These wrappers point to a "virtual" file that the bundler will resolve later on.
+2. **Virtual File**: When the bundler sees a request for one of these virtual files (e.g., `posts.route.tsx?tsr-split=component`), it intercepts it to generate a new, minimal on-the-fly file that _only_ contains the code for the requested properties (e.g., just the `PostsComponent`).
 
-This process ensures that your original code remains clean and readable, while the actual bundled output is optimized
-for initial bundle size.
+This process ensures that your original code remains clean and readable, while the actual bundled output is optimized for initial bundle size.
 
 ### What gets code split?
 
-The decision of what to split into separate chunks is crucial for optimizing your application's performance. TanStack
-Router uses a concept called "**Split Groupings**" to determine how different parts of your route should be bundled
-together.
+The decision of what to split into separate chunks is crucial for optimizing your application's performance. TanStack Router uses a concept called "**Split Groupings**" to determine how different parts of your route should be bundled together.
 
-Split groupings are arrays of properties that tell TanStack Router how to bundle different parts of your route together.
-Each grouping is an list of property names that you want to bundle together into a single lazy-loaded chunk.
+Split groupings are arrays of properties that tell TanStack Router how to bundle different parts of your route together. Each grouping is an list of property names that you want to bundle together into a single lazy-loaded chunk.
 
 The available properties to split are:
 
@@ -308,14 +264,11 @@ This means that it creates three separate lazy-loaded chunks for each route. Res
 
 ## Granular control
 
-For most applications, the default behavior of using `autoCodeSplitting: true` is sufficient. However, TanStack Router
-provides several options to customize how your routes are split into chunks, allowing you to optimize for specific use
-cases or performance needs.
+For most applications, the default behavior of using `autoCodeSplitting: true` is sufficient. However, TanStack Router provides several options to customize how your routes are split into chunks, allowing you to optimize for specific use cases or performance needs.
 
 ### Global code splitting behavior (`defaultBehavior`)
 
-You can change how TanStack Router splits your routes by changing the `defaultBehavior` option in your bundler plugin
-configuration. This allows you to define how different properties of your routes should be bundled together.
+You can change how TanStack Router splits your routes by changing the `defaultBehavior` option in your bundler plugin configuration. This allows you to define how different properties of your routes should be bundled together.
 
 For example, to bundle all UI-related components into a single chunk, you could configure it like this:
 
@@ -340,9 +293,7 @@ export default defineConfig({
 
 ### Advanced programmatic control (`splitBehavior`)
 
-For complex rulesets, you can use the `splitBehavior` function in your vite config to programmatically define how routes
-should be split into chunks based on their `routeId`. This function allows you to implement custom logic for grouping
-properties together, giving you fine-grained control over the code splitting behavior.
+For complex rulesets, you can use the `splitBehavior` function in your vite config to programmatically define how routes should be split into chunks based on their `routeId`. This function allows you to implement custom logic for grouping properties together, giving you fine-grained control over the code splitting behavior.
 
 ```ts
 // vite.config.ts
@@ -369,8 +320,7 @@ export default defineConfig({
 
 ### Per-route overrides (`codeSplitGroupings`)
 
-For ultimate control, you can override the global configuration directly inside a route file by adding a
-`codeSplitGroupings` property. This is useful for routes that have unique optimization needs.
+For ultimate control, you can override the global configuration directly inside a route file by adding a `codeSplitGroupings` property. This is useful for routes that have unique optimization needs.
 
 ```tsx
 // src/routes/posts.route.tsx
@@ -389,34 +339,24 @@ function PostsComponent() {
 }
 ```
 
-This will create a single chunk that includes both the `loader` and the `component` for this specific route, overriding
-both the default behavior and any programmatic split behavior defined in your bundler config.
+This will create a single chunk that includes both the `loader` and the `component` for this specific route, overriding both the default behavior and any programmatic split behavior defined in your bundler config.
 
 ### Configuration order matters
 
 This guide has so far describe three different ways to configure how TanStack Router splits your routes into chunks.
 
-To make sure that the different configurations do not conflict with each other, TanStack Router uses the following order
-of precedence:
+To make sure that the different configurations do not conflict with each other, TanStack Router uses the following order of precedence:
 
-1. **Per-route overrides**: The `codeSplitGroupings` property inside a route file takes the highest precedence. This
-   allows you to define specific split groupings for individual routes.
-2. **Programmatic split behavior**: The `splitBehavior` function in your bundler config allows you to define custom
-   logic for how routes should be split based on their `routeId`.
-3. **Default behavior**: The `defaultBehavior` option in your bundler config serves as the fallback for any routes that
-   do not have specific overrides or custom logic defined. This is the base configuration that applies to all routes
-   unless overridden.
+1. **Per-route overrides**: The `codeSplitGroupings` property inside a route file takes the highest precedence. This allows you to define specific split groupings for individual routes.
+2. **Programmatic split behavior**: The `splitBehavior` function in your bundler config allows you to define custom logic for how routes should be split based on their `routeId`.
+3. **Default behavior**: The `defaultBehavior` option in your bundler config serves as the fallback for any routes that do not have specific overrides or custom logic defined. This is the base configuration that applies to all routes unless overridden.
 
 ### Splitting the Data Loader
 
-The `loader` function is responsible for fetching data needed by the route. By default, it is bundled with into your "
-reference file" and loaded in the initial bundle. However, you can also split the `loader` into its own chunk if you
-want to optimize further.
+The `loader` function is responsible for fetching data needed by the route. By default, it is bundled with into your "reference file" and loaded in the initial bundle. However, you can also split the `loader` into its own chunk if you want to optimize further.
 
 > [!CAUTION]
-> Moving the `loader` into its own chunk is a **performance trade-off**. It introduces an additional trip to the server
-> before the data can be fetched, which can lead to slower initial page loads. This is because the `loader` **must** be
-> fetched and executed before the route can render its component.
+> Moving the `loader` into its own chunk is a **performance trade-off**. It introduces an additional trip to the server before the data can be fetched, which can lead to slower initial page loads. This is because the `loader` **must** be fetched and executed before the route can render its component.
 > Therefore, we recommend keeping the `loader` in the initial bundle unless you have a specific reason to split it.
 
 ```ts
@@ -440,13 +380,11 @@ export default defineConfig({
 })
 ```
 
-We highly discourage splitting the `loader` unless you have a specific use case that requires it. In most cases, not
-splitting off the `loader` and keep it in the main bundle is the best choice for performance.
+We highly discourage splitting the `loader` unless you have a specific use case that requires it. In most cases, not splitting off the `loader` and keep it in the main bundle is the best choice for performance.
 
 # Code Splitting
 
-Code splitting and lazy loading is a powerful technique for improving the bundle size and load performance of an
-application.
+Code splitting and lazy loading is a powerful technique for improving the bundle size and load performance of an application.
 
 - Reduces the amount of code that needs to be loaded on initial page load
 - Code is loaded on-demand when it is needed
@@ -456,8 +394,7 @@ application.
 
 TanStack Router separates code into two categories:
 
-- **Critical Route Configuration** - The code that is required to render the current route and kick off the data loading
-  process as early as possible.
+- **Critical Route Configuration** - The code that is required to render the current route and kick off the data loading process as early as possible.
   - Path Parsing/Serialization
   - Search Param Validation
   - Loaders, Before Load
@@ -468,8 +405,7 @@ TanStack Router separates code into two categories:
   - Styles
   - All other route configuration not listed below
 
-- **Non-Critical/Lazy Route Configuration** - The code that is not required to match the route, and can be loaded
-  on-demand.
+- **Non-Critical/Lazy Route Configuration** - The code that is not required to match the route, and can be loaded on-demand.
   - Route Component
   - Error Component
   - Pending Component
@@ -477,29 +413,19 @@ TanStack Router separates code into two categories:
 
 > 🧠 **Why is the loader not split?**
 >
-> - The loader is already an asynchronous boundary, so you pay double to both get the chunk _and_ wait for the loader to
-
-    execute.
-
+> - The loader is already an asynchronous boundary, so you pay double to both get the chunk _and_ wait for the loader to execute.
 > - Categorically, it is less likely to contribute to a large bundle size than a component.
-> - The loader is one of the most important preloadable assets for a route, especially if you're using a default preload
-
-    intent, like hovering over a link, so it's important for the loader to be available without any additional async
-    overhead.
-    >
-    >   Knowing the disadvantages of splitting the loader, if you still want to go ahead with it, head over to
-    the [Data Loader Splitting](#data-loader-splitting) section.
+> - The loader is one of the most important preloadable assets for a route, especially if you're using a default preload intent, like hovering over a link, so it's important for the loader to be available without any additional async overhead.
+>
+>   Knowing the disadvantages of splitting the loader, if you still want to go ahead with it, head over to the [Data Loader Splitting](#data-loader-splitting) section.
 
 ## Encapsulating a route's files into a directory
 
-Since TanStack Router's file-based routing system is designed to support both flat and nested file structures, it's
-possible to encapsulate a route's files into a single directory without any additional configuration.
+Since TanStack Router's file-based routing system is designed to support both flat and nested file structures, it's possible to encapsulate a route's files into a single directory without any additional configuration.
 
-To encapsulate a route's files into a directory, move the route file itself into a `.route` file within a directory with
-the same name as the route file.
+To encapsulate a route's files into a directory, move the route file itself into a `.route` file within a directory with the same name as the route file.
 
-For example, if you have a route file named `posts.tsx`, you would create a new directory named `posts` and move the
-`posts.tsx` file into that directory, renaming it to `route.tsx`.
+For example, if you have a route file named `posts.tsx`, you would create a new directory named `posts` and move the `posts.tsx` file into that directory, renaming it to `route.tsx`.
 
 **Before**
 
@@ -512,8 +438,7 @@ For example, if you have a route file named `posts.tsx`, you would create a new 
 
 ## Approaches to code splitting
 
-TanStack Router supports multiple approaches to code splitting. If you are using code-based routing, skip to
-the [Code-Based Splitting](#code-based-splitting) section.
+TanStack Router supports multiple approaches to code splitting. If you are using code-based routing, skip to the [Code-Based Splitting](#code-based-splitting) section.
 
 When you are using file-based routing, you can use the following approaches to code splitting:
 
@@ -525,16 +450,13 @@ When you are using file-based routing, you can use the following approaches to c
 
 This is the easiest and most powerful way to code split your route files.
 
-When using the `autoCodeSplitting` feature, TanStack Router will automatically code split your route files based on the
-non-critical route configuration mentioned above.
+When using the `autoCodeSplitting` feature, TanStack Router will automatically code split your route files based on the non-critical route configuration mentioned above.
 
 > [!IMPORTANT]
-> The automatic code-splitting feature is **ONLY** available when you are using file-based routing with one of
-> our [supported bundlers](../../routing/file-based-routing.md#getting-started-with-file-based-routing).
+> The automatic code-splitting feature is **ONLY** available when you are using file-based routing with one of our [supported bundlers](../../routing/file-based-routing.md#getting-started-with-file-based-routing).
 > This will **NOT** work if you are **only** using the CLI (`@tanstack/router-cli`).
 
-To enable automatic code-splitting, you just need to add the following to the configuration of your TanStack Router
-Bundler Plugin:
+To enable automatic code-splitting, you just need to add the following to the configuration of your TanStack Router Bundler Plugin:
 
 ```ts
 // vite.config.ts
@@ -553,21 +475,16 @@ export default defineConfig({
 })
 ```
 
-That's it! TanStack Router will automatically code-split all your route files by their critical and non-critical route
-configurations.
+That's it! TanStack Router will automatically code-split all your route files by their critical and non-critical route configurations.
 
-If you want more control over the code-splitting process, head over to
-the [Automatic Code Splitting](../automatic-code-splitting.md) guide to learn more about the options available.
+If you want more control over the code-splitting process, head over to the [Automatic Code Splitting](../automatic-code-splitting.md) guide to learn more about the options available.
 
 ## Using the `.lazy.tsx` suffix
 
-If you are not able to use the automatic code-splitting feature, you can still code-split your route files using the
-`.lazy.tsx` suffix. It is **as easy as moving your code into a separate file with a `.lazy.tsx` suffix** and using the
-`createLazyFileRoute` function instead of `createFileRoute`.
+If you are not able to use the automatic code-splitting feature, you can still code-split your route files using the `.lazy.tsx` suffix. It is **as easy as moving your code into a separate file with a `.lazy.tsx` suffix** and using the `createLazyFileRoute` function instead of `createFileRoute`.
 
 > [!IMPORTANT]
-> The `__root.tsx` route file, using either `createRootRoute` or `createRootRouteWithContext`, does not support code
-> splitting, since it's always rendered regardless of the current route.
+> The `__root.tsx` route file, using either `createRootRoute` or `createRootRouteWithContext`, does not support code splitting, since it's always rendered regardless of the current route.
 
 These are the only options that `createLazyFileRoute` support:
 
@@ -631,9 +548,7 @@ function Posts() {
 
 ## Using Virtual Routes
 
-You might run into a situation where you end up splitting out everything from a route file, leaving it empty! In this
-case, simply **delete the route file entirely**! A virtual route will automatically be generated for you to serve as an
-anchor for your code split files. This virtual route will live directly in the generated route tree file.
+You might run into a situation where you end up splitting out everything from a route file, leaving it empty! In this case, simply **delete the route file entirely**! A virtual route will automatically be generated for you to serve as an anchor for your code split files. This virtual route will live directly in the generated route tree file.
 
 **Before (Virtual Routes)**
 
@@ -678,8 +593,7 @@ Tada! 🎉
 
 ## Code-Based Splitting
 
-If you are using code-based routing, you can still code-split your routes using the `Route.lazy()` method and the
-`createLazyRoute` function. You'll need to split your route configuration into two parts:
+If you are using code-based routing, you can still code-split your routes using the `Route.lazy()` method and the `createLazyRoute` function. You'll need to split your route configuration into two parts:
 
 Create a lazy route using the `createLazyRoute` function.
 
@@ -694,8 +608,7 @@ function MyComponent() {
 }
 ```
 
-Then, call the `.lazy` method on the route definition in your `app.tsx` to import the lazy/code-split route with the
-non-critical route configuration.
+Then, call the `.lazy` method on the route definition in your `app.tsx` to import the lazy/code-split route with the non-critical route configuration.
 
 ```tsx
 // src/app.tsx
@@ -709,12 +622,9 @@ const postsRoute = createRoute({
 
 **Be warned!!!** Splitting a route loader is a dangerous game.
 
-It can be a powerful tool to reduce bundle size, but it comes with a cost as mentioned in
-the [How does TanStack Router split code?](#how-does-tanstack-router-split-code) section.
+It can be a powerful tool to reduce bundle size, but it comes with a cost as mentioned in the [How does TanStack Router split code?](#how-does-tanstack-router-split-code) section.
 
-You can code split your data loading logic using the Route's `loader` option. While this process makes it difficult to
-maintain type-safety with the parameters passed to your loader, you can always use the generic `LoaderContext` type to
-get you most of the way there:
+You can code split your data loading logic using the Route's `loader` option. While this process makes it difficult to maintain type-safety with the parameters passed to your loader, you can always use the generic `LoaderContext` type to get you most of the way there:
 
 ```tsx
 import { lazyFn } from '@tanstack/react-router'
@@ -731,14 +641,11 @@ export const loader = async (context: LoaderContext) => {
 }
 ```
 
-If you are using file-based routing, you'll only be able to split your `loader` if you are
-using [Automatic Code Splitting](#using-automatic-code-splitting) with customized bundling options.
+If you are using file-based routing, you'll only be able to split your `loader` if you are using [Automatic Code Splitting](#using-automatic-code-splitting) with customized bundling options.
 
 ## Manually accessing Route APIs in other files with the `getRouteApi` helper
 
-As you might have guessed, placing your component code in a separate file than your route can make it difficult to
-consume the route itself. To help with this, TanStack Router exports a handy `getRouteApi` function that you can use to
-access a route's type-safe APIs in a file without importing the route itself.
+As you might have guessed, placing your component code in a separate file than your route can make it difficult to consume the route itself. To help with this, TanStack Router exports a handy `getRouteApi` function that you can use to access a route's type-safe APIs in a file without importing the route itself.
 
 - `my-route.tsx`
 
@@ -783,9 +690,7 @@ The `getRouteApi` function is useful for accessing other type-safe APIs:
 
 ## The `Router` Class
 
-When you're ready to start using your router, you'll need to create a new `Router` instance. The router instance is the
-core brains of TanStack Router and is responsible for managing the route tree, matching routes, and coordinating
-navigations and route transitions. It also serves as a place to configure router-wide settings.
+When you're ready to start using your router, you'll need to create a new `Router` instance. The router instance is the core brains of TanStack Router and is responsible for managing the route tree, matching routes, and coordinating navigations and route transitions. It also serves as a place to configure router-wide settings.
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -797,18 +702,13 @@ const router = createRouter({
 
 ## Route Tree
 
-You'll probably notice quickly that the `Router` constructor requires a `routeTree` option. This is the route tree that
-the router will use to match routes and render components.
+You'll probably notice quickly that the `Router` constructor requires a `routeTree` option. This is the route tree that the router will use to match routes and render components.
 
-Whether you used [file-based routing](../../routing/file-based-routing.md)
-or [code-based routing](../../routing/code-based-routing.md), you'll need to pass your route tree to the `createRouter`
-function:
+Whether you used [file-based routing](../../routing/file-based-routing.md) or [code-based routing](../../routing/code-based-routing.md), you'll need to pass your route tree to the `createRouter` function:
 
 ### Filesystem Route Tree
 
-If you used our recommended file-based routing, then it's likely your generated route tree file was created at the
-default `src/routeTree.gen.ts` location. If you used a custom location, then you'll need to import your route tree from
-that location.
+If you used our recommended file-based routing, then it's likely your generated route tree file was created at the default `src/routeTree.gen.ts` location. If you used a custom location, then you'll need to import your route tree from that location.
 
 ```tsx
 import { routeTree } from './routeTree.gen'
@@ -816,8 +716,7 @@ import { routeTree } from './routeTree.gen'
 
 ### Code-Based Route Tree
 
-If you used code-based routing, then you likely created your route tree manually using the root route's `addChildren`
-method:
+If you used code-based routing, then you likely created your route tree manually using the root route's `addChildren` method:
 
 ```tsx
 const routeTree = rootRoute.addChildren([
@@ -830,11 +729,7 @@ const routeTree = rootRoute.addChildren([
 > [!IMPORTANT]
 > DO NOT SKIP THIS SECTION! ⚠️
 
-TanStack Router provides amazing support for TypeScript, even for things you wouldn't expect like bare imports straight
-from the library! To make this possible, you must register your router's types using
-TypeScripts' [Declaration Merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) feature. This
-is done by extending the `Register` interface on `@tanstack/react-router` with a `router` property that has the type of
-your `router` instance:
+TanStack Router provides amazing support for TypeScript, even for things you wouldn't expect like bare imports straight from the library! To make this possible, you must register your router's types using TypeScripts' [Declaration Merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) feature. This is done by extending the `Register` interface on `@tanstack/react-router` with a `router` property that has the type of your `router` instance:
 
 ```tsx
 declare module '@tanstack/react-router' {
@@ -849,12 +744,9 @@ With your router registered, you'll now get type-safety across your entire proje
 
 ## 404 Not Found Route
 
-As promised in earlier guides, we'll now cover the `notFoundRoute` option. This option is used to configure a route that
-will render when no other suitable match is found. This is useful for rendering a 404 page or redirecting to a default
-route.
+As promised in earlier guides, we'll now cover the `notFoundRoute` option. This option is used to configure a route that will render when no other suitable match is found. This is useful for rendering a 404 page or redirecting to a default route.
 
-If you are using either file-based or code-based routing, then you'll need to add a `notFoundComponent` key to
-`createRootRoute`:
+If you are using either file-based or code-based routing, then you'll need to add a `notFoundComponent` key to `createRootRoute`:
 
 ```tsx
 export const Route = createRootRoute({
@@ -867,19 +759,15 @@ export const Route = createRootRoute({
 
 ## Other Options
 
-There are many other options that can be passed to the `Router` constructor. You can find a full list of them in
-the [API Reference](../../api/router/RouterOptionsType.md).
+There are many other options that can be passed to the `Router` constructor. You can find a full list of them in the [API Reference](../../api/router/RouterOptionsType.md).
 
 # Custom Link
 
-While repeating yourself can be acceptable in many situations, you might find that you do it too often. At times, you
-may want to create cross-cutting components with additional behavior or styles. You might also consider using
-third-party libraries in combination with TanStack Router's type safety.
+While repeating yourself can be acceptable in many situations, you might find that you do it too often. At times, you may want to create cross-cutting components with additional behavior or styles. You might also consider using third-party libraries in combination with TanStack Router's type safety.
 
 ## `createLink` for cross-cutting concerns
 
-`createLink` creates a custom `Link` component with the same type parameters as `Link`. This means you can create your
-own component which provides the same type safety and typescript performance as `Link`.
+`createLink` creates a custom `Link` component with the same type parameters as `Link`. This means you can create your own component which provides the same type safety and typescript performance as `Link`.
 
 ### Basic example
 
@@ -922,8 +810,7 @@ Here are some examples of how you can use `createLink` with third-party librarie
 
 ### React Aria Components example
 
-React Aria Components v1.11.0 and later works with TanStack Router's `preload (intent)` prop. Use `createLink` to wrap
-each React Aria component that you use as a link.
+React Aria Components v1.11.0 and later works with TanStack Router's `preload (intent)` prop. Use `createLink` to wrap each React Aria component that you use as a link.
 
 ```tsx
 import { createLink } from '@tanstack/react-router'
@@ -933,8 +820,7 @@ export const Link = createLink(RACLink)
 export const MenuItemLink = createLink(MenuItem)
 ```
 
-To use React Aria's render props, including the `className`, `style`, and `children` functions, create a wrapper
-component and pass that to `createLink`.
+To use React Aria's render props, including the `className`, `style`, and `children` functions, create a wrapper component and pass that to `createLink`.
 
 ```tsx
 import { createLink } from '@tanstack/react-router'
@@ -990,8 +876,7 @@ export const CustomLink: LinkComponent<typeof ChakraLinkComponent> = (props) => 
 
 ### MUI example
 
-There is an [example](https://github.com/TanStack/router/tree/main/examples/react/start-material-ui) available which
-uses these patterns.
+There is an [example](https://github.com/TanStack/router/tree/main/examples/react/start-material-ui) available which uses these patterns.
 
 #### `Link`
 
@@ -1099,9 +984,7 @@ export const CustomLink: LinkComponent<typeof MantineLinkComponent> = (props) =>
 
 # Custom Search Param Serialization
 
-By default, TanStack Router parses and serializes your URL Search Params automatically using `JSON.stringify` and
-`JSON.parse`. This process involves escaping and unescaping the search string, which is a common practice for URL search
-params, in addition to the serialization and deserialization of the search object.
+By default, TanStack Router parses and serializes your URL Search Params automatically using `JSON.stringify` and `JSON.parse`. This process involves escaping and unescaping the search string, which is a common practice for URL search params, in addition to the serialization and deserialization of the search object.
 
 For instance, using the default configuration, if you have the following search object:
 
@@ -1131,22 +1014,12 @@ const router = createRouter({
 })
 ```
 
-However, this default behavior may not be suitable for all use cases. For example, you may want to use a different
-serialization format, such as base64 encoding, or you may want to use a purpose-built serialization/deserialization
-library,
-like [query-string](https://github.com/sindresorhus/query-string), [JSURL2](https://github.com/wmertens/jsurl2),
-or [Zipson](https://jgranstrom.github.io/zipson/).
+However, this default behavior may not be suitable for all use cases. For example, you may want to use a different serialization format, such as base64 encoding, or you may want to use a purpose-built serialization/deserialization library, like [query-string](https://github.com/sindresorhus/query-string), [JSURL2](https://github.com/wmertens/jsurl2), or [Zipson](https://jgranstrom.github.io/zipson/).
 
-This can be achieved by providing your own serialization and deserialization functions to the `parseSearch` and
-`stringifySearch` options in the [`Router`](../../api/router/RouterOptionsType.md#stringifysearch-method) configuration.
-When doing this, you can utilize TanStack Router's built-in helper functions, `parseSearchWith` and
-`stringifySearchWith`, to simplify the process.
+This can be achieved by providing your own serialization and deserialization functions to the `parseSearch` and `stringifySearch` options in the [`Router`](../../api/router/RouterOptionsType.md#stringifysearch-method) configuration. When doing this, you can utilize TanStack Router's built-in helper functions, `parseSearchWith` and `stringifySearchWith`, to simplify the process.
 
 > [!TIP]
-> An important aspect of serialization and deserialization, is that you are able to get the same object back after
-> deserialization. This is important because if the serialization and deserialization process is not done correctly, you
-> may lose some information. For example, if you are using a library that does not support nested objects, you may lose
-> the nested object when deserializing the search string.
+> An important aspect of serialization and deserialization, is that you are able to get the same object back after deserialization. This is important because if the serialization and deserialization process is not done correctly, you may lose some information. For example, if you are using a library that does not support nested objects, you may lose the nested object when deserializing the search string.
 
 ![Diagram showing idempotent nature of URL search param serialization and deserialization](https://raw.githubusercontent.com/TanStack/router/main/docs/router/assets/search-serialization-deserialization-idempotency.jpg)
 
@@ -1154,8 +1027,7 @@ Here are some examples of how you can customize the search param serialization i
 
 ## Using Base64
 
-It's common to base64 encode your search params to achieve maximum compatibility across browsers and URL unfurlers, etc.
-This can be done with the following code:
+It's common to base64 encode your search params to achieve maximum compatibility across browsers and URL unfurlers, etc. This can be done with the following code:
 
 ```tsx
 import { Router, parseSearchWith, stringifySearchWith } from '@tanstack/react-router'
@@ -1193,15 +1065,11 @@ So, if we were to turn the previous object into a search string using this confi
 ```
 
 > [!WARNING]
-> If you are serializing user input into Base64, you run the risk of causing a collision with the URL deserialization.
-> This can lead to unexpected behavior, such as the URL not being parsed correctly or being interpreted as a different
-> value. To avoid this, you should encode the search params using a safe binary encoding/decoding method (see below).
+> If you are serializing user input into Base64, you run the risk of causing a collision with the URL deserialization. This can lead to unexpected behavior, such as the URL not being parsed correctly or being interpreted as a different value. To avoid this, you should encode the search params using a safe binary encoding/decoding method (see below).
 
 ## Using the query-string library
 
-The [query-string](https://github.com/sindresorhus/query-string) library is a popular for being able to reliably parse
-and stringify query strings. You can use it to customize the serialization format of your search params. This can be
-done with the following code:
+The [query-string](https://github.com/sindresorhus/query-string) library is a popular for being able to reliably parse and stringify query strings. You can use it to customize the serialization format of your search params. This can be done with the following code:
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -1230,8 +1098,7 @@ So, if we were to turn the previous object into a search string using this confi
 
 ## Using the JSURL2 library
 
-[JSURL2](https://github.com/wmertens/jsurl2) is a non-standard library that can compress URLs while still maintaining
-readability. This can be done with the following code:
+[JSURL2](https://github.com/wmertens/jsurl2) is a non-standard library that can compress URLs while still maintaining readability. This can be done with the following code:
 
 ```tsx
 import { Router, parseSearchWith, stringifySearchWith } from '@tanstack/react-router'
@@ -1252,9 +1119,7 @@ So, if we were to turn the previous object into a search string using this confi
 
 ## Using the Zipson library
 
-[Zipson](https://jgranstrom.github.io/zipson/) is a very user-friendly and performant JSON compression library (both in
-runtime performance and the resulting compression performance). To compress your search params with it (which requires
-escaping/unescaping and base64 encoding/decoding them as well), you can use the following code:
+[Zipson](https://jgranstrom.github.io/zipson/) is a very user-friendly and performant JSON compression library (both in runtime performance and the resulting compression performance). To compress your search params with it (which requires escaping/unescaping and base64 encoding/decoding them as well), you can use the following code:
 
 ```tsx
 import { Router, parseSearchWith, stringifySearchWith } from '@tanstack/react-router'
@@ -1296,8 +1161,7 @@ So, if we were to turn the previous object into a search string using this confi
 
 ### Safe Binary Encoding/Decoding
 
-In the browser, the `atob` and `btoa` functions are not guaranteed to work properly with non-UTF8 characters. We
-recommend using these encoding/decoding utilities instead:
+In the browser, the `atob` and `btoa` functions are not guaranteed to work properly with non-UTF8 characters. We recommend using these encoding/decoding utilities instead:
 
 To encode from a string to a binary string:
 
@@ -1327,19 +1191,11 @@ export function decodeFromBinary(str: string): string {
 
 # Data Loading
 
-Data loading is a common concern for web applications and is related to routing. When loading a page for your app, it's
-ideal if all of the page's async requirements are fetched and fulfilled as early as possible, in parallel. The router is
-the best place to coordinate these async dependencies as it's usually the only place in your app that knows where users
-are headed before content is rendered.
+Data loading is a common concern for web applications and is related to routing. When loading a page for your app, it's ideal if all of the page's async requirements are fetched and fulfilled as early as possible, in parallel. The router is the best place to coordinate these async dependencies as it's usually the only place in your app that knows where users are headed before content is rendered.
 
-You may be familiar with `getServerSideProps` from Next.js or `loader`s from Remix/React-Router. TanStack Router has
-similar functionality to preload/load assets on a per-route basis in parallel allowing it to render as quickly as
-possible as it fetches via suspense.
+You may be familiar with `getServerSideProps` from Next.js or `loader`s from Remix/React-Router. TanStack Router has similar functionality to preload/load assets on a per-route basis in parallel allowing it to render as quickly as possible as it fetches via suspense.
 
-Beyond these normal expectations of a router, TanStack Router goes above and beyond and provides **built-in SWR Caching
-**, a long-term in-memory caching layer for route loaders. This means that you can use TanStack Router to both preload
-data for your routes so they load instantaneously or temporarily cache route data for previously visited routes to use
-again later.
+Beyond these normal expectations of a router, TanStack Router goes above and beyond and provides **built-in SWR Caching**, a long-term in-memory caching layer for route loaders. This means that you can use TanStack Router to both preload data for your routes so they load instantaneously or temporarily cache route data for previously visited routes to use again later.
 
 ## The route loading lifecycle
 
@@ -1362,9 +1218,7 @@ Every time a URL/history update is detected, the router executes the following s
 
 ## To Router Cache or not to Router Cache?
 
-There is a high possibility that TanStack's router cache will be a good fit for most smaller to medium size
-applications, but it's important to understand the tradeoffs of using it vs a more robust caching solution like TanStack
-Query:
+There is a high possibility that TanStack's router cache will be a good fit for most smaller to medium size applications, but it's important to understand the tradeoffs of using it vs a more robust caching solution like TanStack Query:
 
 TanStack Router Cache Pros:
 
@@ -1379,14 +1233,11 @@ TanStack Router Cache Cons:
 
 - No persistence adapters/model
 - No shared caching/deduping between routes
-- No built-in mutation APIs (a basic `useMutation` hook is provided in many examples that may be sufficient for many use
-  cases)
-- No built-in cache-level optimistic update APIs (you can still use ephemeral state from something like a `useMutation`
-  hook to achieve this at the component level)
+- No built-in mutation APIs (a basic `useMutation` hook is provided in many examples that may be sufficient for many use cases)
+- No built-in cache-level optimistic update APIs (you can still use ephemeral state from something like a `useMutation` hook to achieve this at the component level)
 
 > [!TIP]
-> If you know right away that you'd like to or need to use something more robust like TanStack Query, skip to
-> the [External Data Loading](../external-data-loading.md) guide.
+> If you know right away that you'd like to or need to use something more robust like TanStack Query, skip to the [External Data Loading](../external-data-loading.md) guide.
 
 ## Using the Router Cache
 
@@ -1394,9 +1245,7 @@ The router cache is built-in and is as easy as returning data from any route's `
 
 ## Route `loader`s
 
-Route `loader` functions are called when a route match is loaded. They are called with a single parameter which is an
-object containing many helpful properties. We'll go over those in a bit, but first, let's look at an example of a route
-`loader` function:
+Route `loader` functions are called when a route match is loaded. They are called with a single parameter which is an object containing many helpful properties. We'll go over those in a bit, but first, let's look at an example of a route `loader` function:
 
 ```tsx
 // routes/posts.tsx
@@ -1409,8 +1258,7 @@ export const Route = createFileRoute('/posts')({
 
 The `loader` function receives a single object with the following properties:
 
-- `abortController` - The route's abortController. Its signal is cancelled when the route is unloaded or when the Route
-  is no longer relevant and the current invocation of the `loader` function becomes outdated.
+- `abortController` - The route's abortController. Its signal is cancelled when the route is unloaded or when the Route is no longer relevant and the current invocation of the `loader` function becomes outdated.
 - `cause` - The cause of the current route match. Can be either one of the following:
   - `enter` - When the route is matched and loaded after not being matched in the previous location.
   - `preload` - When the route is being preloaded.
@@ -1418,16 +1266,14 @@ The `loader` function receives a single object with the following properties:
 - `context` - The route's context object, which is a merged union of:
   - Parent route context
   - This route's context as provided by the `beforeLoad` option
-- `deps` - The object value returned from the `Route.loaderDeps` function. If `Route.loaderDeps` is not defined, an
-  empty object will be provided instead.
+- `deps` - The object value returned from the `Route.loaderDeps` function. If `Route.loaderDeps` is not defined, an empty object will be provided instead.
 - `location` - The current location
 - `params` - The route's path params
 - `parentMatchPromise` - `Promise<RouteMatch>` (`undefined` for the root route)
 - `preload` - Boolean which is `true` when the route is being preloaded instead of loaded
 - `route` - The route itself
 
-Using these parameters, we can do a lot of cool things, but first, let's take a look at how we can control it and when
-the `loader` function is called.
+Using these parameters, we can do a lot of cool things, but first, let's take a look at how we can control it and when the `loader` function is called.
 
 ## Consuming data from `loader`s
 
@@ -1437,9 +1283,7 @@ To consume data from a `loader`, use the `useLoaderData` hook defined on your Ro
 const posts = Route.useLoaderData()
 ```
 
-If you don't have ready access to your route object (i.e. you're deep in the component tree for the current route), you
-can use `getRouteApi` to access the same hook (as well as the other hooks on the Route object). This should be preferred
-over importing the Route object, which is likely to create circular dependencies.
+If you don't have ready access to your route object (i.e. you're deep in the component tree for the current route), you can use `getRouteApi` to access the same hook (as well as the other hooks on the Route object). This should be preferred over importing the Route object, which is likely to create circular dependencies.
 
 ```tsx
 import { getRouteApi } from '@tanstack/react-router'
@@ -1452,28 +1296,21 @@ const data = routeApi.useLoaderData()
 
 ## Dependency-based Stale-While-Revalidate Caching
 
-TanStack Router provides a built-in Stale-While-Revalidate caching layer for route loaders that is keyed on the
-dependencies of a route:
+TanStack Router provides a built-in Stale-While-Revalidate caching layer for route loaders that is keyed on the dependencies of a route:
 
 - The route's fully parsed pathname
   - e.g. `/posts/1` vs `/posts/2`
 - Any additional dependencies provided by the `loaderDeps` option
   - e.g. `loaderDeps: ({ search: { pageIndex, pageSize } }) => ({ pageIndex, pageSize })`
 
-Using these dependencies as keys, TanStack Router will cache the data returned from a route's `loader` function and use
-it to fulfill subsequent requests for the same route match. This means that if a route's data is already in the cache,
-it will be returned immediately, then **potentially** be refetched in the background depending on the "freshness" of the
-data.
+Using these dependencies as keys, TanStack Router will cache the data returned from a route's `loader` function and use it to fulfill subsequent requests for the same route match. This means that if a route's data is already in the cache, it will be returned immediately, then **potentially** be refetched in the background depending on the "freshness" of the data.
 
 ### Key options
 
-To control router dependencies and "freshness", TanStack Router provides a plethora of options to control the keying and
-caching behavior of your route loaders. Let's take a look at them in the order that you are most likely to use them:
+To control router dependencies and "freshness", TanStack Router provides a plethora of options to control the keying and caching behavior of your route loaders. Let's take a look at them in the order that you are most likely to use them:
 
 - `routeOptions.loaderDeps`
-  - A function that supplies you the search params for a router and returns an object of dependencies for use in your
-    `loader` function. When these deps changed from navigation to navigation, it will cause the route to reload
-    regardless of `staleTime`s. The deps are compared using a deep equality check.
+  - A function that supplies you the search params for a router and returns an object of dependencies for use in your `loader` function. When these deps changed from navigation to navigation, it will cause the route to reload regardless of `staleTime`s. The deps are compared using a deep equality check.
 - `routeOptions.staleTime`
 - `routerOptions.defaultStaleTime`
   - The number of milliseconds that a route's data should be considered fresh when attempting to load.
@@ -1484,27 +1321,18 @@ caching behavior of your route loaders. Let's take a look at them in the order t
 - `routerOptions.defaultGcTime`
   - The number of milliseconds that a route's data should be kept in the cache before being garbage collected.
 - `routeOptions.shouldReload`
-  - A function that receives the same `beforeLoad` and `loaderContext` parameters and returns a boolean indicating if
-    the route should reload. This offers one more level of control over when a route should reload beyond `staleTime`
-    and `loaderDeps` and can be used to implement patterns similar to Remix's `shouldLoad` option.
+  - A function that receives the same `beforeLoad` and `loaderContext` parameters and returns a boolean indicating if the route should reload. This offers one more level of control over when a route should reload beyond `staleTime` and `loaderDeps` and can be used to implement patterns similar to Remix's `shouldLoad` option.
 
 ### ⚠️ Some Important Defaults
 
-- By default, the `staleTime` is set to `0`, meaning that the route's data will always be considered stale and will
-  always be reloaded in the background when the route is rematched.
-- By default, a previously preloaded route is considered fresh for **30 seconds**. This means if a route is preloaded,
-  then preloaded again within 30 seconds, the second preload will be ignored. This prevents unnecessary preloads from
-  happening too frequently. **When a route is loaded normally, the standard `staleTime` is used.**
-- By default, the `gcTime` is set to **30 minutes**, meaning that any route data that has not been accessed in 30
-  minutes will be garbage collected and removed from the cache.
-- `router.invalidate()` will force all active routes to reload their loaders immediately and mark every cached route's
-  data as stale.
+- By default, the `staleTime` is set to `0`, meaning that the route's data will always be considered stale and will always be reloaded in the background when the route is rematched.
+- By default, a previously preloaded route is considered fresh for **30 seconds**. This means if a route is preloaded, then preloaded again within 30 seconds, the second preload will be ignored. This prevents unnecessary preloads from happening too frequently. **When a route is loaded normally, the standard `staleTime` is used.**
+- By default, the `gcTime` is set to **30 minutes**, meaning that any route data that has not been accessed in 30 minutes will be garbage collected and removed from the cache.
+- `router.invalidate()` will force all active routes to reload their loaders immediately and mark every cached route's data as stale.
 
 ### Using `loaderDeps` to access search params
 
-Imagine a `/posts` route supports some pagination via search params `offset` and `limit`. For the cache to uniquely
-store this data, we need to access these search params via the `loaderDeps` function. By explicitly identifying them,
-each route match for `/posts` with different `offset` and `limit` won't get mixed up!
+Imagine a `/posts` route supports some pagination via search params `offset` and `limit`. For the cache to uniquely store this data, we need to access these search params via the `loaderDeps` function. By explicitly identifying them, each route match for `/posts` with different `offset` and `limit` won't get mixed up!
 
 Once we have these deps in place, the route will always reload when the deps change.
 
@@ -1522,13 +1350,9 @@ export const Route = createFileRoute('/posts')({
 
 ### Using `staleTime` to control how long data is considered fresh
 
-By default, `staleTime` for navigations is set to `0`ms (and 30 seconds for preloads) which means that the route's data
-will always be considered stale and will always be reloaded in the background when the route is matched and navigated
-to.
+By default, `staleTime` for navigations is set to `0`ms (and 30 seconds for preloads) which means that the route's data will always be considered stale and will always be reloaded in the background when the route is matched and navigated to.
 
-**This is a good default for most use cases, but you may find that some route data is more static or potentially
-expensive to load.** In these cases, you can use the `staleTime` option to control how long the route's data is
-considered fresh for navigations. Let's take a look at an example:
+**This is a good default for most use cases, but you may find that some route data is more static or potentially expensive to load.** In these cases, you can use the `staleTime` option to control how long the route's data is considered fresh for navigations. Let's take a look at an example:
 
 ```tsx
 // /routes/posts.tsx
@@ -1539,10 +1363,7 @@ export const Route = createFileRoute('/posts')({
 })
 ```
 
-By passing `10_000` to the `staleTime` option, we are telling the router to consider the route's data fresh for 10
-seconds. This means that if the user navigates to `/posts` from `/about` within 10 seconds of the last loader result,
-the route's data will not be reloaded. If the user then navigates to `/posts` from `/about` after 10 seconds, the
-route's data will be reloaded **in the background**.
+By passing `10_000` to the `staleTime` option, we are telling the router to consider the route's data fresh for 10 seconds. This means that if the user navigates to `/posts` from `/about` within 10 seconds of the last loader result, the route's data will not be reloaded. If the user then navigates to `/posts` from `/about` after 10 seconds, the route's data will be reloaded **in the background**.
 
 ## Turning off stale-while-revalidate caching
 
@@ -1567,10 +1388,7 @@ const router = createRouter({
 
 ## Using `shouldReload` and `gcTime` to opt-out of caching
 
-Similar to Remix's default functionality, you may want to configure a route to only load on entry or when critical
-loader deps change. You can do this by using the `gcTime` option combined with the `shouldReload` option, which accepts
-either a `boolean` or a function that receives the same `beforeLoad` and `loaderContext` parameters and returns a
-boolean indicating if the route should reload.
+Similar to Remix's default functionality, you may want to configure a route to only load on entry or when critical loader deps change. You can do this by using the `gcTime` option combined with the `shouldReload` option, which accepts either a `boolean` or a function that receives the same `beforeLoad` and `loaderContext` parameters and returns a boolean indicating if the route should reload.
 
 ```tsx
 // /routes/posts.tsx
@@ -1586,18 +1404,13 @@ export const Route = createFileRoute('/posts')({
 
 ### Opting out of caching while still preloading
 
-Even though you may opt-out of short-term caching for your route data, you can still get the benefits of preloading!
-With the above configuration, preloading will still "just work" with the default `preloadGcTime`. This means that if a
-route is preloaded, then navigated to, the route's data will be considered fresh and will not be reloaded.
+Even though you may opt-out of short-term caching for your route data, you can still get the benefits of preloading! With the above configuration, preloading will still "just work" with the default `preloadGcTime`. This means that if a route is preloaded, then navigated to, the route's data will be considered fresh and will not be reloaded.
 
 To opt out of preloading, don't turn it on via the `routerOptions.defaultPreload` or `routeOptions.preload` options.
 
 ## Passing all loader events to an external cache
 
-We break down this use case in the [External Data Loading](../external-data-loading.md) page, but if you'd like to use
-an external cache like TanStack Query, you can do so by passing all loader events to your external cache. As long as you
-are using the defaults, the only change you'll need to make is to set the `defaultPreloadStaleTime` option on the router
-to `0`:
+We break down this use case in the [External Data Loading](../external-data-loading.md) page, but if you'd like to use an external cache like TanStack Query, you can do so by passing all loader events to your external cache. As long as you are using the defaults, the only change you'll need to make is to set the `defaultPreloadStaleTime` option on the router to `0`:
 
 ```tsx
 const router = createRouter({
@@ -1606,8 +1419,7 @@ const router = createRouter({
 })
 ```
 
-This will ensure that every preload, load, and reload event will trigger your `loader` functions, which can then be
-handled and deduped by your external cache.
+This will ensure that every preload, load, and reload event will trigger your `loader` functions, which can then be handled and deduped by your external cache.
 
 ## Using Router Context
 
@@ -1616,16 +1428,11 @@ The `context` argument passed to the `loader` function is an object containing a
 - Parent route context
 - This route's context as provided by the `beforeLoad` option
 
-Starting at the very top of the router, you can pass an initial context to the router via the `context` option. This
-context will be available to all routes in the router and get copied and extended by each route as they are matched.
-This happens by passing a context to a route via the `beforeLoad` option. This context will be available to all the
-route's child routes. The resulting context will be available to the route's `loader` function.
+Starting at the very top of the router, you can pass an initial context to the router via the `context` option. This context will be available to all routes in the router and get copied and extended by each route as they are matched. This happens by passing a context to a route via the `beforeLoad` option. This context will be available to all the route's child routes. The resulting context will be available to the route's `loader` function.
 
 In this example, we'll create a function in our route context to fetch posts, then use it in our `loader` function.
 
-> 🧠 Context is a powerful tool for dependency injection. You can use it to inject services, hooks, and other objects
-> into your router and routes. You can also additively pass data down the route tree at every route using a route's
-> `beforeLoad` option.
+> 🧠 Context is a powerful tool for dependency injection. You can use it to inject services, hooks, and other objects into your router and routes. You can also additively pass data down the route tree at every route using a route's `beforeLoad` option.
 
 - `/utils/fetchPosts.tsx`
 
@@ -1679,8 +1486,7 @@ const router = createRouter({
 
 ## Using Path Params
 
-To use path params in your `loader` function, access them via the `params` property on the function's parameters. Here's
-an example:
+To use path params in your `loader` function, access them via the `params` property on the function's parameters. Here's an example:
 
 ```tsx
 // routes/posts.$postId.tsx
@@ -1691,11 +1497,7 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ## Using Route Context
 
-Passing down global context to your router is great, but what if you want to provide context that is specific to a
-route? This is where the `beforeLoad` option comes in. The `beforeLoad` option is a function that runs right before
-attempting to load a route and receives the same parameters as `loader`. Beyond its ability to redirect potential
-matches, block loader requests, etc, it can also return an object that will be merged into the route's context. Let's
-take a look at an example where we inject some data into our route context via the `beforeLoad` option:
+Passing down global context to your router is great, but what if you want to provide context that is specific to a route? This is where the `beforeLoad` option comes in. The `beforeLoad` option is a function that runs right before attempting to load a route and receives the same parameters as `loader`. Beyond its ability to redirect potential matches, block loader requests, etc, it can also return an object that will be merged into the route's context. Let's take a look at an example where we inject some data into our route context via the `beforeLoad` option:
 
 ```tsx
 // /routes/posts.tsx
@@ -1718,20 +1520,11 @@ export const Route = createFileRoute('/posts')({
 
 > ❓ But wait Tanner... where the heck are my search params?!
 
-You might be here wondering why `search` isn't directly available in the `loader` function's parameters. We've
-purposefully designed it this way to help you succeed. Let's take a look at why:
+You might be here wondering why `search` isn't directly available in the `loader` function's parameters. We've purposefully designed it this way to help you succeed. Let's take a look at why:
 
-- Search Parameters being used in a loader function are a very good indicator that those search params should also be
-  used to uniquely identify the data being loaded. For example, you may have a route that uses a search param like
-  `pageIndex` that uniquely identifies the data held inside of the route match. Or, imagine a `/users/user` route that
-  uses the search param `userId` to identify a specific user in your application, you might model your url like this:
-  `/users/user?userId=123`. This means that your `user` route would need some extra help to identify a specific user.
-- Directly accessing search params in a loader function can lead to bugs in caching and preloading where the data being
-  loaded is not unique to the current URL pathname and search params. For example, you might ask your `/posts` route to
-  preload page 2's results, but without the distinction of pages in your route configuration, you will end up fetching,
-  storing and displaying page 2's data on your `/posts` or `?page=1` screen instead of it preloading in the background!
-- Placing a threshold between search parameters and the loader function allows the router to understand your
-  dependencies and reactivity.
+- Search Parameters being used in a loader function are a very good indicator that those search params should also be used to uniquely identify the data being loaded. For example, you may have a route that uses a search param like `pageIndex` that uniquely identifies the data held inside of the route match. Or, imagine a `/users/user` route that uses the search param `userId` to identify a specific user in your application, you might model your url like this: `/users/user?userId=123`. This means that your `user` route would need some extra help to identify a specific user.
+- Directly accessing search params in a loader function can lead to bugs in caching and preloading where the data being loaded is not unique to the current URL pathname and search params. For example, you might ask your `/posts` route to preload page 2's results, but without the distinction of pages in your route configuration, you will end up fetching, storing and displaying page 2's data on your `/posts` or `?page=1` screen instead of it preloading in the background!
+- Placing a threshold between search parameters and the loader function allows the router to understand your dependencies and reactivity.
 
 ```tsx
 // /routes/users.user.tsx
@@ -1768,10 +1561,7 @@ export const Route = createFileRoute('/posts')({
 
 ## Using the Abort Signal
 
-The `abortController` property of the `loader` function is
-an [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). Its signal is cancelled when the
-route is unloaded or when the `loader` call becomes outdated. This is useful for cancelling network requests when the
-route is unloaded or when the route's params change. Here is an example using it with a fetch call:
+The `abortController` property of the `loader` function is an [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). Its signal is cancelled when the route is unloaded or when the `loader` call becomes outdated. This is useful for cancelling network requests when the route is unloaded or when the route's params change. Here is an example using it with a fetch call:
 
 ```tsx
 // routes/posts.tsx
@@ -1786,9 +1576,7 @@ export const Route = createFileRoute('/posts')({
 
 ## Using the `preload` flag
 
-The `preload` property of the `loader` function is a boolean which is `true` when the route is being preloaded instead
-of loaded. Some data loading libraries may handle preloading differently than a standard fetch, so you may want to pass
-`preload` to your data loading library, or use it to execute the appropriate data loading logic:
+The `preload` property of the `loader` function is a boolean which is `true` when the route is being preloaded instead of loaded. Some data loading libraries may handle preloading differently than a standard fetch, so you may want to pass `preload` to your data loading library, or use it to execute the appropriate data loading logic:
 
 ```tsx
 // routes/posts.tsx
@@ -1802,39 +1590,30 @@ export const Route = createFileRoute('/posts')({
 
 ## Handling Slow Loaders
 
-Ideally most route loaders can resolve their data within a short moment, removing the need to render a placeholder
-spinner and simply rely on suspense to render the next route when it's completely ready. When critical data that is
-required to render a route's component is slow though, you have 2 options:
+Ideally most route loaders can resolve their data within a short moment, removing the need to render a placeholder spinner and simply rely on suspense to render the next route when it's completely ready. When critical data that is required to render a route's component is slow though, you have 2 options:
 
-- Split up your fast and slow data into separate promises and `defer` the slow data until after the fast data is
-  loaded (see the [Deferred Data Loading](../deferred-data-loading.md) guide).
+- Split up your fast and slow data into separate promises and `defer` the slow data until after the fast data is loaded (see the [Deferred Data Loading](../deferred-data-loading.md) guide).
 - Show a pending component after an optimistic suspense threshold until all of the data is ready (See below).
 
 ## Showing a pending component
 
-**By default, TanStack Router will show a pending component for loaders that take longer than 1 second to resolve.**
-This is an optimistic threshold that can be configured via:
+**By default, TanStack Router will show a pending component for loaders that take longer than 1 second to resolve.** This is an optimistic threshold that can be configured via:
 
 - `routeOptions.pendingMs` or
 - `routerOptions.defaultPendingMs`
 
-When the pending time threshold is exceeded, the router will render the `pendingComponent` option of the route, if
-configured.
+When the pending time threshold is exceeded, the router will render the `pendingComponent` option of the route, if configured.
 
 ## Avoiding Pending Component Flash
 
-If you're using a pending component, the last thing you want is for your pending time threshold to be met, then have
-your data resolve immediately after, resulting in a jarring flash of your pending component. To avoid this, **TanStack
-Router by default will show your pending component for at least 500ms**. This is an optimistic threshold that can be
-configured via:
+If you're using a pending component, the last thing you want is for your pending time threshold to be met, then have your data resolve immediately after, resulting in a jarring flash of your pending component. To avoid this, **TanStack Router by default will show your pending component for at least 500ms**. This is an optimistic threshold that can be configured via:
 
 - `routeOptions.pendingMinMs` or
 - `routerOptions.defaultPendingMinMs`
 
 ## Handling Errors
 
-TanStack Router provides a few ways to handle errors that occur during the route loading lifecycle. Let's take a look at
-them.
+TanStack Router provides a few ways to handle errors that occur during the route loading lifecycle. Let's take a look at them.
 
 ### Handling Errors with `routeOptions.onError`
 
@@ -1853,8 +1632,7 @@ export const Route = createFileRoute('/posts')({
 
 ### Handling Errors with `routeOptions.onCatch`
 
-The `routeOptions.onCatch` option is a function that is called whenever an error was caught by the router's
-CatchBoundary.
+The `routeOptions.onCatch` option is a function that is called whenever an error was caught by the router's CatchBoundary.
 
 ```tsx
 // routes/posts.tsx
@@ -1868,8 +1646,7 @@ export const Route = createFileRoute('/posts')({
 
 ### Handling Errors with `routeOptions.errorComponent`
 
-The `routeOptions.errorComponent` option is a component that is rendered when an error occurs during the route loading
-or rendering lifecycle. It is rendered with the following props:
+The `routeOptions.errorComponent` option is a component that is rendered when an error occurs during the route loading or rendering lifecycle. It is rendered with the following props:
 
 - `error` - The error that occurred
 - `reset` - A function to reset the internal `CatchBoundary`
@@ -1909,8 +1686,7 @@ export const Route = createFileRoute('/posts')({
 })
 ```
 
-If the error was the result of a route load, you should instead call `router.invalidate()`, which will coordinate both a
-router reload and an error boundary reset:
+If the error was the result of a route load, you should instead call `router.invalidate()`, which will coordinate both a router reload and an error boundary reset:
 
 ```tsx
 // routes/posts.tsx
@@ -1938,9 +1714,7 @@ export const Route = createFileRoute('/posts')({
 
 ### Using the default `ErrorComponent`
 
-TanStack Router provides a default `ErrorComponent` that is rendered when an error occurs during the route loading or
-rendering lifecycle. If you choose to override your routes' error components, it's still wise to always fall back to
-rendering any uncaught errors with the default `ErrorComponent`:
+TanStack Router provides a default `ErrorComponent` that is rendered when an error occurs during the route loading or rendering lifecycle. If you choose to override your routes' error components, it's still wise to always fall back to rendering any uncaught errors with the default `ErrorComponent`:
 
 ```tsx
 // routes/posts.tsx
@@ -1962,9 +1736,7 @@ export const Route = createFileRoute('/posts')({
 
 # Data Mutations
 
-Since TanStack router does not store or cache data, it's role in data mutation is slim to none outside of reacting to
-potential URL side-effects from external mutation events. That said, we've compiled a list of mutation-related features
-you might find useful and libraries that implement them.
+Since TanStack router does not store or cache data, it's role in data mutation is slim to none outside of reacting to potential URL side-effects from external mutation events. That said, we've compiled a list of mutation-related features you might find useful and libraries that implement them.
 
 Look for and use mutation utilities that support:
 
@@ -1991,21 +1763,15 @@ Or, even...
 - [Recoil](https://recoiljs.org/)
 - [Redux](https://redux.js.org/)
 
-Similar to data fetching, mutation state isn't a one-size-fits-all solution, so you'll need to pick a solution that fits
-your needs and your team's needs. We recommend trying out a few different solutions and seeing what works best for you.
+Similar to data fetching, mutation state isn't a one-size-fits-all solution, so you'll need to pick a solution that fits your needs and your team's needs. We recommend trying out a few different solutions and seeing what works best for you.
 
-> ⚠️ Still here? Submission state is an interesting topic when it comes to persistence. Do you keep every mutation
-> around forever? How do you know when to get rid of it? What if the user navigates away from the screen and then back?
-> Let's dig in!
+> ⚠️ Still here? Submission state is an interesting topic when it comes to persistence. Do you keep every mutation around forever? How do you know when to get rid of it? What if the user navigates away from the screen and then back? Let's dig in!
 
 ## Invalidating TanStack Router after a mutation
 
-TanStack Router comes with short-term caching built-in. So even though we're not storing any data after a route match is
-unmounted, there is a high probability that if any mutations are made related to the data stored in the Router, the
-current route matches' data could become stale.
+TanStack Router comes with short-term caching built-in. So even though we're not storing any data after a route match is unmounted, there is a high probability that if any mutations are made related to the data stored in the Router, the current route matches' data could become stale.
 
-When mutations related to loader data are made, we can use `router.invalidate` to force the router to reload all of the
-current route matches:
+When mutations related to loader data are made, we can use `router.invalidate` to force the router to reload all of the current route matches:
 
 ```tsx
 const router = useRouter()
@@ -2020,8 +1786,7 @@ const addTodo = async (todo: Todo) => {
 }
 ```
 
-Invalidating all of the current route matches happens in the background, so existing data will continue to be served
-until the new data is ready, just as if you were navigating to a new route.
+Invalidating all of the current route matches happens in the background, so existing data will continue to be served until the new data is ready, just as if you were navigating to a new route.
 
 If you want to await the invalidation until all loaders have finished, pass `{sync: true}` into `router.invalidate`:
 
@@ -2040,10 +1805,7 @@ const addTodo = async (todo: Todo) => {
 
 ## Long-term mutation State
 
-Regardless of the mutation library used, mutations often create state related to their submission. While most mutations
-are set-and-forget, some mutation states are more long-lived, either to support optimistic UI or to provide feedback to
-the user about the status of their submissions. Most state managers will correctly keep this submission state around and
-expose it to make it possible to show UI elements like loading spinners, success messages, error messages, etc.
+Regardless of the mutation library used, mutations often create state related to their submission. While most mutations are set-and-forget, some mutation states are more long-lived, either to support optimistic UI or to provide feedback to the user about the status of their submissions. Most state managers will correctly keep this submission state around and expose it to make it possible to show UI elements like loading spinners, success messages, error messages, etc.
 
 Let's consider the following interactions:
 
@@ -2052,14 +1814,11 @@ Let's consider the following interactions:
 - User navigates to the `/posts` screen
 - User navigates back to the `/posts/123/edit` screen again
 
-Without notifying your mutation management library about the route change, it's possible that your submission state
-could still be around and your user would still see the **"Post updated successfully"** message when they return to the
-previous screen. This is not ideal. Obviously, our intent wasn't to keep this mutation state around forever, right?!
+Without notifying your mutation management library about the route change, it's possible that your submission state could still be around and your user would still see the **"Post updated successfully"** message when they return to the previous screen. This is not ideal. Obviously, our intent wasn't to keep this mutation state around forever, right?!
 
 ## Using mutation keys
 
-Hopefully and hypothetically, the easiest way is for your mutation library to support a keying mechanism that will allow
-your mutations's state to be reset when the key changes:
+Hopefully and hypothetically, the easiest way is for your mutation library to support a keying mechanism that will allow your mutations's state to be reset when the key changes:
 
 ```tsx
 const routeApi = getRouteApi('/room/$roomId/chat')
@@ -2098,13 +1857,9 @@ function ChatRoom() {
 
 ## Using the `router.subscribe` method
 
-For libraries that don't have a keying mechanism, we'll likely need to manually reset the mutation state when the user
-navigates away from the screen. To solve this, we can use TanStack Router's `invalidate` and `subscribe` method to clear
-mutation states when the user is no longer in need of them.
+For libraries that don't have a keying mechanism, we'll likely need to manually reset the mutation state when the user navigates away from the screen. To solve this, we can use TanStack Router's `invalidate` and `subscribe` method to clear mutation states when the user is no longer in need of them.
 
-The `router.subscribe` method is a function that subscribes a callback to various router events. The event in particular
-that we'll use here is the `onResolved` event. It's important to understand that this event is fired when the location
-path is _changed (not just reloaded) and has finally resolved_.
+The `router.subscribe` method is a function that subscribes a callback to various router events. The event in particular that we'll use here is the `onResolved` event. It's important to understand that this event is fired when the location path is _changed (not just reloaded) and has finally resolved_.
 
 This is a great place to reset your old mutation states. Here's an example:
 
@@ -2120,18 +1875,11 @@ const unsubscribeFn = router.subscribe('onResolved', () => {
 
 # Deferred Data Loading
 
-TanStack Router is designed to run loaders in parallel and wait for all of them to resolve before rendering the next
-route. This is great most of the time, but occasionally, you may want to show the user something sooner while the rest
-of the data loads in the background.
+TanStack Router is designed to run loaders in parallel and wait for all of them to resolve before rendering the next route. This is great most of the time, but occasionally, you may want to show the user something sooner while the rest of the data loads in the background.
 
-Deferred data loading is a pattern that allows the router to render the next location's critical data/markup while
-slower, non-critical route data is resolved in the background. This process works on both the client and server (via
-streaming) and is a great way to improve the perceived performance of your application.
+Deferred data loading is a pattern that allows the router to render the next location's critical data/markup while slower, non-critical route data is resolved in the background. This process works on both the client and server (via streaming) and is a great way to improve the perceived performance of your application.
 
-If you are using a library like [TanStack Query](https://tanstack.com/query/latest) or any other data fetching library,
-then deferred data loading works a bit differently. Skip ahead to
-the [Deferred Data Loading with External Libraries](#deferred-data-loading-with-external-libraries) section for more
-information.
+If you are using a library like [TanStack Query](https://tanstack.com/query/latest) or any other data fetching library, then deferred data loading works a bit differently. Skip ahead to the [Deferred Data Loading with External Libraries](#deferred-data-loading-with-external-libraries) section for more information.
 
 ## Deferred Data Loading with `Await`
 
@@ -2157,8 +1905,7 @@ export const Route = createFileRoute('/posts/$postId')({
 })
 ```
 
-As soon as any awaited promises are resolved, the next route will begin rendering while the deferred promises continue
-to resolve.
+As soon as any awaited promises are resolved, the next route will begin rendering while the deferred promises continue to resolve.
 
 In the component, deferred promises can be resolved and utilized using the `Await` component:
 
@@ -2187,15 +1934,11 @@ function PostIdComponent() {
 ```
 
 > [!TIP]
-> If your component is code-split, you can use
-> the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper)
-> to avoid having to import the `Route` configuration to get access to the typed `useLoaderData()` hook.
+> If your component is code-split, you can use the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper) to avoid having to import the `Route` configuration to get access to the typed `useLoaderData()` hook.
 
-The `Await` component resolves the promise by triggering the nearest suspense boundary until it is resolved, after which
-it renders the component's `children` as a function with the resolved data.
+The `Await` component resolves the promise by triggering the nearest suspense boundary until it is resolved, after which it renders the component's `children` as a function with the resolved data.
 
-If the promise is rejected, the `Await` component will throw the serialized error, which can be caught by the nearest
-error boundary.
+If the promise is rejected, the `Await` component will throw the serialized error, which can be caught by the nearest error boundary.
 
 [//]: # 'DeferredWithAwaitFinalTip'
 
@@ -2206,12 +1949,9 @@ error boundary.
 
 ## Deferred Data Loading with External libraries
 
-When your strategy for fetching information for the route relies on [External Data Loading](../external-data-loading.md)
-with an external library like [TanStack Query](https://tanstack.com/query), deferred data loading works a bit
-differently, as the library handles the data fetching and caching for you outside of TanStack Router.
+When your strategy for fetching information for the route relies on [External Data Loading](../external-data-loading.md) with an external library like [TanStack Query](https://tanstack.com/query), deferred data loading works a bit differently, as the library handles the data fetching and caching for you outside of TanStack Router.
 
-So, instead of using `defer` and `Await`, you'll instead want to use the Route's `loader` to kick off the data fetching
-and then use the library's hooks to access the data in your components.
+So, instead of using `defer` and `Await`, you'll instead want to use the Route's `loader` to kick off the data fetching and then use the library's hooks to access the data in your components.
 
 ```tsx
 // src/routes/posts.$postId.tsx
@@ -2271,8 +2011,7 @@ Streamed promises follow the same lifecycle as the loader data they are associat
 
 **Streaming requires a server that supports it and for TanStack Router to be configured to use it properly.**
 
-Please read the entire [Streaming SSR Guide](../ssr.md#streaming-ssr) for step by step instructions on how to set up
-your server for streaming.
+Please read the entire [Streaming SSR Guide](../ssr.md#streaming-ssr) for step by step instructions on how to set up your server for streaming.
 
 ## SSR Streaming Lifecycle
 
@@ -2282,43 +2021,34 @@ The following is a high-level overview of how deferred data streaming works with
   - Promises are marked and tracked as they are returned from route loaders
   - All loaders resolve and any deferred promises are serialized and embedded into the html
   - The route begins to render
-  - Deferred promises rendered with the `<Await>` component trigger suspense boundaries, allowing the server to stream
-    html up to that point
+  - Deferred promises rendered with the `<Await>` component trigger suspense boundaries, allowing the server to stream html up to that point
 - Client
   - The client receives the initial html from the server
   - `<Await>` components suspend with placeholder promises while they wait for their data to resolve on the server
 - Server
-  - As deferred promises resolve, their results (or errors) are serialized and streamed to the client via an inline
-    script tag
-  - The resolved `<Await>` components and their suspense boundaries are resolved and their resulting HTML is streamed to
-    the client along with their dehydrated data
+  - As deferred promises resolve, their results (or errors) are serialized and streamed to the client via an inline script tag
+  - The resolved `<Await>` components and their suspense boundaries are resolved and their resulting HTML is streamed to the client along with their dehydrated data
 - Client
-  - The suspended placeholder promises within `<Await>` are resolved with the streamed data/error responses and either
-    render the result or throw the error to the nearest error boundary
+  - The suspended placeholder promises within `<Await>` are resolved with the streamed data/error responses and either render the result or throw the error to the nearest error boundary
 
 [//]: # 'SSRContent'
 
 # Document Head Management
 
-Document head management is the process of managing the head, title, meta, link, and script tags of a document and
-TanStack Router provides a robust way to manage the document head for full-stack applications that use Start and for
-single-page applications that use `@tanstack/react-router`. It provides:
+Document head management is the process of managing the head, title, meta, link, and script tags of a document and TanStack Router provides a robust way to manage the document head for full-stack applications that use Start and for single-page applications that use `@tanstack/react-router`. It provides:
 
 - Automatic deduping of `title` and `meta` tags
 - Automatic loading/unloading of tags based on route visibility
 - A composable way to merge `title` and `meta` tags from nested routes
 
-For full-stack applications that use Start, and even for single-page applications that use `@tanstack/react-router`,
-managing the document head is a crucial part of any application for the following reasons:
+For full-stack applications that use Start, and even for single-page applications that use `@tanstack/react-router`, managing the document head is a crucial part of any application for the following reasons:
 
 - SEO
 - Social media sharing
 - Analytics
 - CSS and JS loading/unloading
 
-To manage the document head, it's required that you render both the `<HeadContent />` and `<Scripts />` components and
-use the `routeOptions.head` property to manage the head of a route, which returns an object with `title`, `meta`,
-`links`, `styles`, and `scripts` properties.
+To manage the document head, it's required that you render both the `<HeadContent />` and `<Scripts />` components and use the `routeOptions.head` property to manage the head of a route, which returns an object with `title`, `meta`, `links`, `styles`, and `scripts` properties.
 
 ## Managing the Document Head
 
@@ -2360,21 +2090,16 @@ export const Route = createRootRoute({
 
 ### Deduping
 
-Out of the box, TanStack Router will dedupe `title` and `meta` tags, preferring the **last** occurrence of each tag
-found in nested routes.
+Out of the box, TanStack Router will dedupe `title` and `meta` tags, preferring the **last** occurrence of each tag found in nested routes.
 
-- `title` tags defined in nested routes will override a `title` tag defined in a parent route (but you can compose them
-  together, which is covered in a future section of this guide)
-- `meta` tags with the same `name` or `property` will be overridden by the last occurrence of that tag found in nested
-  routes
+- `title` tags defined in nested routes will override a `title` tag defined in a parent route (but you can compose them together, which is covered in a future section of this guide)
+- `meta` tags with the same `name` or `property` will be overridden by the last occurrence of that tag found in nested routes
 
 ### `<HeadContent />`
 
-The `<HeadContent />` component is **required** to render the head, title, meta, link, and head-related script tags of a
-document.
+The `<HeadContent />` component is **required** to render the head, title, meta, link, and head-related script tags of a document.
 
-It should be **rendered either in the `<head>` tag of your root layout or as high up in the component tree as possible**
-if your application doesn't or can't manage the `<head>` tag.
+It should be **rendered either in the `<head>` tag of your root layout or as high up in the component tree as possible** if your application doesn't or can't manage the `<head>` tag.
 
 ### Start/Full-Stack Applications
 
@@ -2414,10 +2139,7 @@ const rootRoute = createRootRoute({
 
 ## Managing Body Scripts
 
-In addition to scripts that can be rendered in the `<head>` tag, you can also render scripts in the `<body>` tag using
-the `routeOptions.scripts` property. This is useful for loading scripts (even inline scripts) that require the DOM to be
-loaded, but before the main entry point of your application (which includes hydration if you're using Start or a
-full-stack implementation of TanStack Router).
+In addition to scripts that can be rendered in the `<head>` tag, you can also render scripts in the `<body>` tag using the `routeOptions.scripts` property. This is useful for loading scripts (even inline scripts) that require the DOM to be loaded, but before the main entry point of your application (which includes hydration if you're using Start or a full-stack implementation of TanStack Router).
 
 To do this, you must:
 
@@ -2436,9 +2158,7 @@ export const Route = createRootRoute({
 
 ### `<Scripts />`
 
-The `<Scripts />` component is **required** to render the body scripts of a document. It should be rendered either in
-the `<body>` tag of your root layout or as high up in the component tree as possible if your application doesn't or can'
-t manage the `<body>` tag.
+The `<Scripts />` component is **required** to render the body scripts of a document. It should be rendered either in the `<body>` tag of your root layout or as high up in the component tree as possible if your application doesn't or can't manage the `<body>` tag.
 
 ### Example
 
@@ -2473,18 +2193,13 @@ export const Route = createRootRoute({
 # External Data Loading
 
 > [!IMPORTANT]
-> This guide is geared towards external state management libraries and their integration with TanStack Router for data
-> fetching, ssr, hydration/dehydration and streaming. If you haven't read the standard [Data Loading](../data-loading.md)
-> guide, please do so first.
+> This guide is geared towards external state management libraries and their integration with TanStack Router for data fetching, ssr, hydration/dehydration and streaming. If you haven't read the standard [Data Loading](../data-loading.md) guide, please do so first.
 
 ## To **Store** or to **Coordinate**?
 
-While Router is very capable of storing and managing most data needs out of the box, sometimes you just might want
-something more robust!
+While Router is very capable of storing and managing most data needs out of the box, sometimes you just might want something more robust!
 
-Router is designed to be a perfect **coordinator** for external data fetching and caching libraries. This means that you
-can use any data fetching/caching library you want, and the router will coordinate the loading of your data in a way
-that aligns with your users' navigation and expectations of freshness.
+Router is designed to be a perfect **coordinator** for external data fetching and caching libraries. This means that you can use any data fetching/caching library you want, and the router will coordinate the loading of your data in a way that aligns with your users' navigation and expectations of freshness.
 
 ## What data fetching libraries are supported?
 
@@ -2508,8 +2223,7 @@ Literally any library that **can return a promise and read/write data** can be i
 
 ## Using Loaders to ensure data is loaded
 
-The easiest way to use integrate and external caching/data library into Router is to use `route.loader`s to ensure that
-the data required inside of a route has been loaded and is ready to be displayed.
+The easiest way to use integrate and external caching/data library into Router is to use `route.loader`s to ensure that the data required inside of a route has been loaded and is ready to be displayed.
 
 > ⚠️ BUT WHY? It's very important to preload your critical render data in the loader for a few reasons:
 >
@@ -2539,8 +2253,7 @@ export const Route = createFileRoute('/posts')({
 })
 ```
 
-This example is **obviously flawed**, but illustrates the point that you can use a route's `loader` option to seed your
-cache with data. Let's take a look at a more realistic example using TanStack Query.
+This example is **obviously flawed**, but illustrates the point that you can use a route's `loader` option to seed your cache with data. Let's take a look at a more realistic example using TanStack Query.
 
 - Replace `fetchPosts` with your preferred data fetching library's prefetching API
 - Replace `postsCache` with your preferred data fetching library's read-or-fetch API or hook
@@ -2578,11 +2291,7 @@ export const Route = createFileRoute('/posts')({
 
 ### Error handling with TanStack Query
 
-When an error occurs while using `suspense` with `TanStack Query`, you'll need to let queries know that you want to try
-again when re-rendering. This can be done by using the `reset` function provided by the `useQueryErrorResetBoundary`
-hook. We can invoke this function in an effect as soon as the error component mounts. This will make sure that the query
-is reset and will try to fetch data again when the route component is rendered again. This will also cover cases where
-users navigate away from our route instead of clicking the `retry` button.
+When an error occurs while using `suspense` with `TanStack Query`, you'll need to let queries know that you want to try again when re-rendering. This can be done by using the `reset` function provided by the `useQueryErrorResetBoundary` hook. We can invoke this function in an effect as soon as the error component mounts. This will make sure that the query is reset and will try to fetch data again when the route component is rendered again. This will also cover cases where users navigate away from our route instead of clicking the `retry` button.
 
 ```tsx
 export const Route = createFileRoute('/')({
@@ -2615,21 +2324,15 @@ export const Route = createFileRoute('/')({
 
 ## SSR Dehydration/Hydration
 
-Tools that are able can integrate with TanStack Router's convenient Dehydration/Hydration APIs to shuttle dehydrated
-data between the server and client and rehydrate it where needed. Let's go over how to do this with both 3rd party
-critical data and 3rd party deferred data.
+Tools that are able can integrate with TanStack Router's convenient Dehydration/Hydration APIs to shuttle dehydrated data between the server and client and rehydrate it where needed. Let's go over how to do this with both 3rd party critical data and 3rd party deferred data.
 
 ## Critical Dehydration/Hydration
 
-**For critical data needed for the first render/paint**, TanStack Router supports **`dehydrate` and `hydrate`** options
-when configuring the `Router`. These callbacks are functions that are automatically called on the server and client when
-the router dehydrates and hydrates normally and allow you to augment the dehydrated data with your own data.
+**For critical data needed for the first render/paint**, TanStack Router supports **`dehydrate` and `hydrate`** options when configuring the `Router`. These callbacks are functions that are automatically called on the server and client when the router dehydrates and hydrates normally and allow you to augment the dehydrated data with your own data.
 
-The `dehydrate` function can return any serializable JSON data which will get merged and injected into the dehydrated
-payload that is sent to the client.
+The `dehydrate` function can return any serializable JSON data which will get merged and injected into the dehydrated payload that is sent to the client.
 
-For example, let's dehydrate and hydrate a TanStack Query `QueryClient` so that our data we fetched on the server will
-be available for hydration on the client.
+For example, let's dehydrate and hydrate a TanStack Query `QueryClient` so that our data we fetched on the server will be available for hydration on the client.
 
 ```tsx
 // src/router.tsx
@@ -2671,12 +2374,9 @@ export function createRouter() {
 
 # History Types
 
-While it's not required to know the `@tanstack/history` API itself to use TanStack Router, it's a good idea to
-understand how it works. Under the hood, TanStack Router requires and uses a `history` abstraction to manage the routing
-history.
+While it's not required to know the `@tanstack/history` API itself to use TanStack Router, it's a good idea to understand how it works. Under the hood, TanStack Router requires and uses a `history` abstraction to manage the routing history.
 
-If you don't create a history instance, a browser-oriented instance of this API is created for you when the router is
-initialized. If you need a special history API type, You can use the `@tanstack/history` package to create your own:
+If you don't create a history instance, a browser-oriented instance of this API is created for you when the router is initialized. If you need a special history API type, You can use the `@tanstack/history` package to create your own:
 
 - `createBrowserHistory`: The default history type.
 - `createHashHistory`: A history type that uses a hash to track history.
@@ -2700,8 +2400,7 @@ The `createBrowserHistory` is the default history type. It uses the browser's hi
 
 ## Hash Routing
 
-Hash routing can be helpful if your server doesn't support rewrites to index.html for HTTP requests (among other
-environments that don't have a server).
+Hash routing can be helpful if your server doesn't support rewrites to index.html for HTTP requests (among other environments that don't have a server).
 
 ```ts
 import { createHashHistory, createRouter } from '@tanstack/react-router'
@@ -2713,8 +2412,7 @@ const router = createRouter({ routeTree, history: hashHistory })
 
 ## Memory Routing
 
-Memory routing is useful in environments that are not a browser or when you do not want components to interact with the
-URL.
+Memory routing is useful in environments that are not a browser or when you do not want components to interact with the URL.
 
 ```ts
 import { createMemoryHistory, createRouter } from '@tanstack/react-router'
@@ -2730,8 +2428,7 @@ Refer to the [SSR Guide](../ssr.md#server-history) for usage on the server for s
 
 # Link Options
 
-You may want to reuse options that are intended to be passed to `Link`, `redirect` or `navigate`. In which case you may
-decide an object literal is a good way to represent options passed to `Link`.
+You may want to reuse options that are intended to be passed to `Link`, `redirect` or `navigate`. In which case you may decide an object literal is a good way to represent options passed to `Link`.
 
 ```tsx
 const dashboardLinkOptions = {
@@ -2744,17 +2441,11 @@ function DashboardComponent() {
 }
 ```
 
-There are a few problems here. `dashboardLinkOptions.to` is inferred as `string` which by default will resolve to every
-route when passed to `Link`, `navigate` or `redirect` (this particular issue could be fixed by `as const`). The other
-issue here is we do not know `dashboardLinkOptions` even passes the type checker until it is spread into `Link`. We
-could very easily create incorrect navigation options and only when the options are spread into `Link` do we know there
-is a type error.
+There are a few problems here. `dashboardLinkOptions.to` is inferred as `string` which by default will resolve to every route when passed to `Link`, `navigate` or `redirect` (this particular issue could be fixed by `as const`). The other issue here is we do not know `dashboardLinkOptions` even passes the type checker until it is spread into `Link`. We could very easily create incorrect navigation options and only when the options are spread into `Link` do we know there is a type error.
 
 ### Using `linkOptions` function to create re-usable options
 
-`linkOptions` is a function which type checks an object literal and returns the inferred input as is. This provides type
-safety on options exactly like `Link` before it is used allowing for easier maintenance and re-usability. Our above
-example using `linkOptions` looks like this:
+`linkOptions` is a function which type checks an object literal and returns the inferred input as is. This provides type safety on options exactly like `Link` before it is used allowing for easier maintenance and re-usability. Our above example using `linkOptions` looks like this:
 
 ```tsx
 const dashboardLinkOptions = linkOptions({
@@ -2801,8 +2492,7 @@ function DashboardComponent() {
 
 ### An array of `linkOptions`
 
-When creating navigation you might loop over an array to construct a navigation bar. In which case `linkOptions` can be
-used to type check an array of object literals which are intended for `Link` props
+When creating navigation you might loop over an array to construct a navigation bar. In which case `linkOptions` can be used to type check an array of object literals which are intended for `Link` props
 
 ```tsx
 const options = linkOptions([
@@ -2850,13 +2540,11 @@ function DashboardComponent() {
 }
 ```
 
-The input of `linkOptions` is inferred and returned, as shown with the use of `label` as this does not exist on `Link`
-props
+The input of `linkOptions` is inferred and returned, as shown with the use of `label` as this does not exist on `Link` props
 
 # Navigation Blocking
 
-Navigation blocking is a way to prevent navigation from happening. This is typical if a user attempts to navigate while
-they:
+Navigation blocking is a way to prevent navigation from happening. This is typical if a user attempts to navigate while they:
 
 - Have unsaved changes
 - Are in the middle of a form
@@ -2869,21 +2557,12 @@ In these situations, a prompt or custom UI should be shown to the user to confir
 
 ## How does navigation blocking work?
 
-Navigation blocking adds one or more layers of "blockers" to the entire underlying history API. If any blockers are
-present, navigation will be paused via one of the following ways:
+Navigation blocking adds one or more layers of "blockers" to the entire underlying history API. If any blockers are present, navigation will be paused via one of the following ways:
 
 - Custom UI
-  - If the navigation is triggered by something we control at the router level, we can allow you to perform any task or
-    show any UI you'd like to the user to confirm the action. Each blocker's `blocker` function will be asynchronously
-    and sequentially executed. If any blocker function resolves or returns `true`, the navigation will be allowed and
-    all other blockers will continue to do the same until all blockers have been allowed to proceed. If any single
-    blocker resolves or returns `false`, the navigation will be canceled and the rest of the `blocker` functions will be
-    ignored.
+  - If the navigation is triggered by something we control at the router level, we can allow you to perform any task or show any UI you'd like to the user to confirm the action. Each blocker's `blocker` function will be asynchronously and sequentially executed. If any blocker function resolves or returns `true`, the navigation will be allowed and all other blockers will continue to do the same until all blockers have been allowed to proceed. If any single blocker resolves or returns `false`, the navigation will be canceled and the rest of the `blocker` functions will be ignored.
 - The `onbeforeunload` event
-  - For page events that we cannot control directly, we rely on the browser's `onbeforeunload` event. If the user
-    attempts to close the tab or window, refresh, or "unload" the page assets in any way, the browser's generic "Are you
-    sure you want to leave?" dialog will be shown. If the user confirms, all blockers will be bypassed and the page will
-    unload. If the user cancels, the unload will be cancelled, and the page will remain as is.
+  - For page events that we cannot control directly, we rely on the browser's `onbeforeunload` event. If the user attempts to close the tab or window, refresh, or "unload" the page assets in any way, the browser's generic "Are you sure you want to leave?" dialog will be shown. If the user confirms, all blockers will be bypassed and the page will unload. If the user cancels, the unload will be cancelled, and the page will remain as is.
 
 ## How do I use navigation blocking?
 
@@ -2942,9 +2621,7 @@ function MyComponent() {
 }
 ```
 
-Note that even if `shouldBlockFn` returns `false`, the browser's `beforeunload` event may still be triggered on page
-reloads or tab closing. To gain control over this, you can use the `enableBeforeUnload` option to conditionally register
-the `beforeunload` handler:
+Note that even if `shouldBlockFn` returns `false`, the browser's `beforeunload` event may still be triggered on page reloads or tab closing. To gain control over this, you can use the `enableBeforeUnload` option to conditionally register the `beforeunload` handler:
 
 [//]: # 'HookBasedBlockingExample'
 
@@ -3003,12 +2680,9 @@ function MyComponent() {
 
 ## How can I show a custom UI?
 
-In most cases, using `window.confirm` in the `shouldBlockFn` function with `withResolver: false` in the hook is enough
-since it will clearly show the user that the navigation is being blocked and resolve the blocking based on their
-response.
+In most cases, using `window.confirm` in the `shouldBlockFn` function with `withResolver: false` in the hook is enough since it will clearly show the user that the navigation is being blocked and resolve the blocking based on their response.
 
-However, in some situations, you might want to show a custom UI that is intentionally less disruptive and more
-integrated with your app's design.
+However, in some situations, you might want to show a custom UI that is intentionally less disruptive and more integrated with your app's design.
 
 **Note:** The return value of `shouldBlockFn` does not resolve the blocking if `withResolver` is `true`.
 
@@ -3127,24 +2801,18 @@ function MyComponent() {
 
 ## Everything is Relative
 
-Believe it or not, every navigation within an app is **relative**, even if you aren't using explicit relative path
-syntax (`../../somewhere`). Any time a link is clicked or an imperative navigation call is made, you will always have an
-**origin** path and a **destination** path which means you are navigating **from** one route **to** another route.
+Believe it or not, every navigation within an app is **relative**, even if you aren't using explicit relative path syntax (`../../somewhere`). Any time a link is clicked or an imperative navigation call is made, you will always have an **origin** path and a **destination** path which means you are navigating **from** one route **to** another route.
 
-TanStack Router keeps this constant concept of relative navigation in mind for every navigation, so you'll constantly
-see two properties in the API:
+TanStack Router keeps this constant concept of relative navigation in mind for every navigation, so you'll constantly see two properties in the API:
 
 - `from` - The origin route path
 - `to` - The destination route path
 
-> ⚠️ If a `from` route path isn't provided the router will assume you are navigating from the root `/` route and only
-> auto-complete absolute paths. After all, you need to know where you are from in order to know where you're going 😉.
+> ⚠️ If a `from` route path isn't provided the router will assume you are navigating from the root `/` route and only auto-complete absolute paths. After all, you need to know where you are from in order to know where you're going 😉.
 
 ## Shared Navigation API
 
-Every navigation and route matching API in TanStack Router uses the same core interface with minor differences depending
-on the API. This means that you can learn navigation and route matching once and use the same syntax and concepts across
-the library.
+Every navigation and route matching API in TanStack Router uses the same core interface with minor differences depending on the API. This means that you can learn navigation and route matching once and use the same syntax and concepts across the library.
 
 ### `ToOptions` Interface
 
@@ -3175,8 +2843,7 @@ type ToOptions<
 }
 ```
 
-> 🧠 Every route object has a `to` property, which can be used as the `to` for any navigation or route matching API.
-> Where possible, this will allow you to avoid plain strings and use type-safe route references instead:
+> 🧠 Every route object has a `to` property, which can be used as the `to` for any navigation or route matching API. Where possible, this will allow you to avoid plain strings and use type-safe route references instead:
 
 ```tsx
 import { Route as aboutRoute } from './routes/about.tsx'
@@ -3188,8 +2855,7 @@ function Comp() {
 
 ### `NavigateOptions` Interface
 
-This is the core `NavigateOptions` interface that extends `ToOptions`. Any API that is actually performing a navigation
-will use this interface:
+This is the core `NavigateOptions` interface that extends `ToOptions`. Any API that is actually performing a navigation will use this interface:
 
 ```ts
 export type NavigateOptions<
@@ -3244,32 +2910,24 @@ export type LinkOptions<
 
 ## Navigation API
 
-With relative navigation and all of the interfaces in mind now, let's talk about the different flavors of navigation API
-at your disposal:
+With relative navigation and all of the interfaces in mind now, let's talk about the different flavors of navigation API at your disposal:
 
 - The `<Link>` component
   - Generates an actual `<a>` tag with a valid `href` which can be click or even cmd/ctrl + clicked to open in a new tab
 - The `useNavigate()` hook
-  - When possible, `Link` component should be used for navigation, but sometimes you need to navigate imperatively as a
-    result of a side-effect. `useNavigate` returns a function that can be called to perform an immediate client-side
-    navigation.
+  - When possible, `Link` component should be used for navigation, but sometimes you need to navigate imperatively as a result of a side-effect. `useNavigate` returns a function that can be called to perform an immediate client-side navigation.
 - The `<Navigate>` component
   - Renders nothing and performs an immediate client-side navigation.
 - The `Router.navigate()` method
-  - This is the most powerful navigation API in TanStack Router. Similar to `useNavigate`, it imperatively navigates,
-    but is available everywhere you have access to your router.
+  - This is the most powerful navigation API in TanStack Router. Similar to `useNavigate`, it imperatively navigates, but is available everywhere you have access to your router.
 
-⚠️ None of these APIs are a replacement for server-side redirects. If you need to redirect a user immediately from one
-route to another before mounting your application, use a server-side redirect instead of a client-side navigation.
+⚠️ None of these APIs are a replacement for server-side redirects. If you need to redirect a user immediately from one route to another before mounting your application, use a server-side redirect instead of a client-side navigation.
 
 ## `<Link>` Component
 
-The `Link` component is the most common way to navigate within an app. It renders an actual `<a>` tag with a valid
-`href` attribute which can be clicked or even cmd/ctrl + clicked to open in a new tab. It also supports any normal `<a>`
-attributes including `target` to open links in new windows, etc.
+The `Link` component is the most common way to navigate within an app. It renders an actual `<a>` tag with a valid `href` attribute which can be clicked or even cmd/ctrl + clicked to open in a new tab. It also supports any normal `<a>` attributes including `target` to open links in new windows, etc.
 
-In addition to the [`LinkOptions`](#linkoptions-interface) interface, the `Link` component also supports the following
-props:
+In addition to the [`LinkOptions`](#linkoptions-interface) interface, the `Link` component also supports the following props:
 
 ```tsx
 export type LinkProps<
@@ -3310,14 +2968,11 @@ const link = (
 )
 ```
 
-Keep in mind that normally dynamic segment params are `string` values, but they can also be any other type that you
-parse them to in your route options. Either way, the type will be checked at compile time to ensure that you are passing
-the correct type.
+Keep in mind that normally dynamic segment params are `string` values, but they can also be any other type that you parse them to in your route options. Either way, the type will be checked at compile time to ensure that you are passing the correct type.
 
 ### Relative Links
 
-By default, all links are absolute unless a `from` route path is provided. This means that the above link will always
-navigate to the `/about` route regardless of what route you are currently on.
+By default, all links are absolute unless a `from` route path is provided. This means that the above link will always navigate to the `/about` route regardless of what route you are currently on.
 
 If you want to make a link that is relative to the current route, you can provide a `from` route path:
 
@@ -3333,21 +2988,13 @@ const link = (
 )
 ```
 
-As seen above, it's common to provide the `route.fullPath` as the `from` route path. This is because the
-`route.fullPath` is a reference that will update if you refactor your application. However, sometimes it's not possible
-to import the route directly, in which case it's fine to provide the route path directly as a string. It will still get
-type-checked as per usual!
+As seen above, it's common to provide the `route.fullPath` as the `from` route path. This is because the `route.fullPath` is a reference that will update if you refactor your application. However, sometimes it's not possible to import the route directly, in which case it's fine to provide the route path directly as a string. It will still get type-checked as per usual!
 
 ### Special relative paths: `"."` and `".."`
 
-Quite often you might want to reload the current location, for example, to rerun the loaders on the current and/or
-parent routes, or maybe there was a change in search parameters. This can be achieved by specifying a `to` route path of
-`"."` which will reload the current location. This is only applicable to the current location, and hence any `from`
-route path specified is ignored.
+Quite often you might want to reload the current location, for example, to rerun the loaders on the current and/or parent routes, or maybe there was a change in search parameters. This can be achieved by specifying a `to` route path of `"."` which will reload the current location. This is only applicable to the current location, and hence any `from` route path specified is ignored.
 
-Another common need is to navigate one route back relative to the current location or some other matched route in the
-current tree. By specifying a `to` route path of `".."` navigation will be resolved to either the first parent route
-preceding the current location or, if specified, preceding the `"from"` route path.
+Another common need is to navigate one route back relative to the current location or some other matched route in the current tree. By specifying a `to` route path of `".."` navigation will be resolved to either the first parent route preceding the current location or, if specified, preceding the `"from"` route path.
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId')({
@@ -3369,8 +3016,7 @@ function PostComponent() {
 
 ### Search Param Links
 
-Search params are a great way to provide additional context to a route. For example, you might want to provide a search
-query to a search page:
+Search params are a great way to provide additional context to a route. For example, you might want to provide a search query to a search page:
 
 ```tsx
 const link = (
@@ -3385,8 +3031,7 @@ const link = (
 )
 ```
 
-It's also common to want to update a single search param without supplying any other information about the existing
-route. For example, you might want to update the page number of a search result:
+It's also common to want to update a single search param without supplying any other information about the existing route. For example, you might want to update the page number of a search result:
 
 ```tsx
 const link = (
@@ -3404,14 +3049,11 @@ const link = (
 
 ### Search Param Type Safety
 
-Search params are a highly dynamic state management mechanism, so it's important to ensure that you are passing the
-correct types to your search params. We'll see in a later section in detail how to validate and ensure search params
-typesafety, among other great features!
+Search params are a highly dynamic state management mechanism, so it's important to ensure that you are passing the correct types to your search params. We'll see in a later section in detail how to validate and ensure search params typesafety, among other great features!
 
 ### Hash Links
 
-Hash links are a great way to link to a specific section of a page. For example, you might want to link to a specific
-section of a blog post:
+Hash links are a great way to link to a specific section of a page. For example, you might want to link to a specific section of a blog post:
 
 ```tsx
 const link = (
@@ -3429,8 +3071,7 @@ const link = (
 
 ### Navigating with Optional Parameters
 
-Optional path parameters provide flexible navigation patterns where you can include or omit parameters as needed.
-Optional parameters use the `{-$paramName}` syntax and offer fine-grained control over URL structure.
+Optional path parameters provide flexible navigation patterns where you can include or omit parameters as needed. Optional parameters use the `{-$paramName}` syntax and offer fine-grained control over URL structure.
 
 #### Parameter Inheritance vs Removal
 
@@ -3686,9 +3327,7 @@ function Component() {
 
 ### Active & Inactive Props
 
-The `Link` component supports two additional props: `activeProps` and `inactiveProps`. These props are functions that
-return additional props for the `active` and `inactive` states of the link. All props other than styles and classes
-passed here will override the original props passed to `Link`. Any styles or classes passed are merged together.
+The `Link` component supports two additional props: `activeProps` and `inactiveProps`. These props are functions that return additional props for the `active` and `inactive` states of the link. All props other than styles and classes passed here will override the original props passed to `Link`. Any styles or classes passed are merged together.
 
 Here's an example:
 
@@ -3712,15 +3351,11 @@ const link = (
 
 ### The `data-status` attribute
 
-In addition to the `activeProps` and `inactiveProps` props, the `Link` component also adds a `data-status` attribute to
-the rendered element when it is in an active state. This attribute will be `active` or `undefined` depending on the
-current state of the link. This can come in handy if you prefer to use data-attributes to style your links instead of
-props.
+In addition to the `activeProps` and `inactiveProps` props, the `Link` component also adds a `data-status` attribute to the rendered element when it is in an active state. This attribute will be `active` or `undefined` depending on the current state of the link. This can come in handy if you prefer to use data-attributes to style your links instead of props.
 
 ### Active Options
 
-The `Link` component comes with an `activeOptions` property that offers a few options of determining if a link is active
-or not. The following interface describes those options:
+The `Link` component comes with an `activeOptions` property that offers a few options of determining if a link is active or not. The following interface describes those options:
 
 ```tsx
 export interface ActiveOptions {
@@ -3740,8 +3375,7 @@ export interface ActiveOptions {
 }
 ```
 
-By default, it will check if the resulting **pathname** is a prefix of the current route. If any search params are
-provided, it will check that they _inclusively_ match those in the current location. Hashes are not checked by default.
+By default, it will check if the resulting **pathname** is a prefix of the current route. If any search params are provided, it will check that they _inclusively_ match those in the current location. Hashes are not checked by default.
 
 For example, if you are on the `/blog/post/my-first-blog-post` route, the following links will be active:
 
@@ -3765,8 +3399,7 @@ const link4 = (
 )
 ```
 
-It's common for some links to only be active if they are an exact match. A good example of this would be a link to the
-home page. In scenarios like these, you can pass the `exact: true` option:
+It's common for some links to only be active if they are an exact match. A good example of this would be a link to the home page. In scenarios like these, you can pass the `exact: true` option:
 
 ```tsx
 const link = (
@@ -3785,8 +3418,7 @@ A few more options to be aware of:
 
 ### Passing `isActive` to children
 
-The `Link` component accepts a function for its children, allowing you to propagate its `isActive` property to children.
-For example, you could style a child component based on whether the parent link is active:
+The `Link` component accepts a function for its children, allowing you to propagate its `isActive` property to children. For example, you could style a child component based on whether the parent link is active:
 
 ```tsx
 const link = (
@@ -3805,9 +3437,7 @@ const link = (
 
 ### Link Preloading
 
-The `Link` component supports automatically preloading routes on intent (hovering or touchstart for now). This can be
-configured as a default in the router options (which we'll talk more about soon) or by passing a `preload='intent'` prop
-to the `Link` component. Here's an example:
+The `Link` component supports automatically preloading routes on intent (hovering or touchstart for now). This can be configured as a default in the router options (which we'll talk more about soon) or by passing a `preload='intent'` prop to the `Link` component. Here's an example:
 
 ```tsx
 const link = (
@@ -3817,17 +3447,13 @@ const link = (
 )
 ```
 
-With preloading enabled and relatively quick asynchronous route dependencies (if any), this simple trick can increase
-the perceived performance of your application with very little effort.
+With preloading enabled and relatively quick asynchronous route dependencies (if any), this simple trick can increase the perceived performance of your application with very little effort.
 
-What's even better is that by using a cache-first library like `@tanstack/query`, preloaded routes will stick around and
-be ready for a stale-while-revalidate experience if the user decides to navigate to the route later on.
+What's even better is that by using a cache-first library like `@tanstack/query`, preloaded routes will stick around and be ready for a stale-while-revalidate experience if the user decides to navigate to the route later on.
 
 ### Link Preloading Timeout
 
-Along with preloading is a configurable timeout which determines how long a user must hover over a link to trigger the
-intent-based preloading. The default timeout is 50 milliseconds, but you can change this by passing a `preloadTimeout`
-prop to the `Link` component with the number of milliseconds you'd like to wait:
+Along with preloading is a configurable timeout which determines how long a user must hover over a link to trigger the intent-based preloading. The default timeout is 50 milliseconds, but you can change this by passing a `preloadTimeout` prop to the `Link` component with the number of milliseconds you'd like to wait:
 
 ```tsx
 const link = (
@@ -3839,13 +3465,9 @@ const link = (
 
 ## `useNavigate`
 
-> ⚠️ Because of the `Link` component's built-in affordances around `href`, cmd/ctrl + click-ability, and active/inactive
-> capabilities, it's recommended to use the `Link` component instead of `useNavigate` for anything the user can interact
-> with (e.g. links, buttons). However, there are some cases where `useNavigate` is necessary to handle side-effect
-> navigations (e.g. a successful async action that results in a navigation).
+> ⚠️ Because of the `Link` component's built-in affordances around `href`, cmd/ctrl + click-ability, and active/inactive capabilities, it's recommended to use the `Link` component instead of `useNavigate` for anything the user can interact with (e.g. links, buttons). However, there are some cases where `useNavigate` is necessary to handle side-effect navigations (e.g. a successful async action that results in a navigation).
 
-The `useNavigate` hook returns a `navigate` function that can be called to imperatively navigate. It's a great way to
-navigate to a route from a side-effect (e.g. a successful async action). Here's an example:
+The `useNavigate` hook returns a `navigate` function that can be called to imperatively navigate. It's a great way to navigate to a route from a side-effect (e.g. a successful async action). Here's an example:
 
 ```tsx
 function Component() {
@@ -3868,9 +3490,7 @@ function Component() {
 }
 ```
 
-> 🧠 As shown above, you can pass the `from` option to specify the route to navigate from in the hook call. While this is
-> also possible to pass in the resulting `navigate` function each time you call it, it's recommended to pass it here to
-> reduce on potential error and also not type as much!
+> 🧠 As shown above, you can pass the `from` option to specify the route to navigate from in the hook call. While this is also possible to pass in the resulting `navigate` function each time you call it, it's recommended to pass it here to reduce on potential error and also not type as much!
 
 ### `navigate` Options
 
@@ -3878,9 +3498,7 @@ The `navigate` function returned by `useNavigate` accepts the [`NavigateOptions`
 
 ## `Navigate` Component
 
-Occasionally, you may find yourself needing to navigate immediately when a component mounts. Your first instinct might
-be to reach for `useNavigate` and an immediate side-effect (e.g. useEffect), but this is unnecessary. Instead, you can
-render the `Navigate` component to achieve the same result:
+Occasionally, you may find yourself needing to navigate immediately when a component mounts. Your first instinct might be to reach for `useNavigate` and an immediate side-effect (e.g. useEffect), but this is unnecessary. Instead, you can render the `Navigate` component to achieve the same result:
 
 ```tsx
 function Component() {
@@ -3888,24 +3506,15 @@ function Component() {
 }
 ```
 
-Think of the `Navigate` component as a way to navigate to a route immediately when a component mounts. It's a great way
-to handle client-only redirects. It is _definitely not_ a substitute for handling server-aware redirects responsibly on
-the server.
+Think of the `Navigate` component as a way to navigate to a route immediately when a component mounts. It's a great way to handle client-only redirects. It is _definitely not_ a substitute for handling server-aware redirects responsibly on the server.
 
 ## `router.navigate`
 
-The `router.navigate` method is the same as the `navigate` function returned by `useNavigate` and accepts the same [
-`NavigateOptions` interface](#navigateoptions-interface). Unlike the `useNavigate` hook, it is available anywhere your
-`router` instance is available and is thus a great way to navigate imperatively from anywhere in your application,
-including outside of your framework.
+The `router.navigate` method is the same as the `navigate` function returned by `useNavigate` and accepts the same [`NavigateOptions` interface](#navigateoptions-interface). Unlike the `useNavigate` hook, it is available anywhere your `router` instance is available and is thus a great way to navigate imperatively from anywhere in your application, including outside of your framework.
 
 ## `useMatchRoute` and `<MatchRoute>`
 
-The `useMatchRoute` hook and `<MatchRoute>` component are the same thing, but the hook is a bit more flexible. They both
-accept the standard navigation `ToOptions` interface either as options or props and return `true/false` if that route is
-currently matched. It also has a handy `pending` option that will return `true` if the route is currently pending (e.g.
-a route is currently transitioning to that route). This can be extremely useful for showing optimistic UI around where a
-user is navigating:
+The `useMatchRoute` hook and `<MatchRoute>` component are the same thing, but the hook is a bit more flexible. They both accept the standard navigation `ToOptions` interface either as options or props and return `true/false` if that route is currently matched. It also has a handy `pending` option that will return `true` if the route is currently pending (e.g. a route is currently transitioning to that route). This can be extremely useful for showing optimistic UI around where a user is navigating:
 
 ```tsx
 function Component() {
@@ -3922,8 +3531,7 @@ function Component() {
 }
 ```
 
-The component version `<MatchRoute>` can also be used with a function as children to render something when the route is
-matched:
+The component version `<MatchRoute>` can also be used with a function as children to render something when the route is matched:
 
 ```tsx
 function Component() {
@@ -3964,34 +3572,25 @@ function Component() {
 
 ---
 
-Phew! That's a lot of navigating! That said, hopefully you're feeling pretty good about getting around your application
-now. Let's move on!
+Phew! That's a lot of navigating! That said, hopefully you're feeling pretty good about getting around your application now. Let's move on!
 
 # Not Found Errors
 
-> ⚠️ This page covers the newer `notFound` function and `notFoundComponent` API for handling not found errors. The
-> `NotFoundRoute` route is deprecated and will be removed in a future release. See [Migrating from
-> `NotFoundRoute`](#migrating-from-notfoundroute) for more information.
+> ⚠️ This page covers the newer `notFound` function and `notFoundComponent` API for handling not found errors. The `NotFoundRoute` route is deprecated and will be removed in a future release. See [Migrating from `NotFoundRoute`](#migrating-from-notfoundroute) for more information.
 
 ## Overview
 
 There are 2 uses for not-found errors in TanStack Router:
 
-- **Non-matching route paths**: When a path does not match any known route matching pattern **OR** when it partially
-  matches a route, but with extra path segments
-  - The **router** will automatically throw a not-found error when a path does not match any known route matching
-    pattern
-  - If the router's `notFoundMode` is set to `fuzzy`, the nearest parent route with a `notFoundComponent` will handle
-    the error. If the router's `notFoundMode` is set to `root`, the root route will handle the error.
+- **Non-matching route paths**: When a path does not match any known route matching pattern **OR** when it partially matches a route, but with extra path segments
+  - The **router** will automatically throw a not-found error when a path does not match any known route matching pattern
+  - If the router's `notFoundMode` is set to `fuzzy`, the nearest parent route with a `notFoundComponent` will handle the error. If the router's `notFoundMode` is set to `root`, the root route will handle the error.
   - Examples:
     - Attempting to access `/users` when there is no `/users` route
     - Attempting to access `/posts/1/edit` when the route tree only handles `/posts/$postId`
-- **Missing resources**: When a resource cannot be found, such as a post with a given ID or any asynchronous data that
-  is not available or does not exist
-  - **You, the developer** must throw a not-found error when a resource cannot be found. This can be done in the
-    `beforeLoad` or `loader` functions using the `notFound` utility.
-  - Will be handled by the nearest parent route with a `notFoundComponent` (when `notFound` is called within `loader`)
-    or the root route.
+- **Missing resources**: When a resource cannot be found, such as a post with a given ID or any asynchronous data that is not available or does not exist
+  - **You, the developer** must throw a not-found error when a resource cannot be found. This can be done in the `beforeLoad` or `loader` functions using the `notFound` utility.
+  - Will be handled by the nearest parent route with a `notFoundComponent` (when `notFound` is called within `loader`) or the root route.
   - Examples:
     - Attempting to access `/posts/1` when the post with ID 1 does not exist
     - Attempting to access `/docs/path/to/document` when the document does not exist
@@ -4000,24 +3599,18 @@ Under the hood, both of these cases are implemented using the same `notFound` fu
 
 ## The `notFoundMode` option
 
-When TanStack Router encounters a **pathname** that doesn't match any known route pattern **OR** partially matches a
-route pattern but with extra trailing pathname segments, it will automatically throw a not-found error.
+When TanStack Router encounters a **pathname** that doesn't match any known route pattern **OR** partially matches a route pattern but with extra trailing pathname segments, it will automatically throw a not-found error.
 
 Depending on the `notFoundMode` option, the router will handle these automatic errors differently::
 
-- ["fuzzy" mode](#notfoundmode-fuzzy) (default): The router will intelligently find the closest matching suitable route
-  and display the `notFoundComponent`.
-- ["root" mode](#notfoundmode-root): All not-found errors will be handled by the root route's `notFoundComponent`,
-  regardless of the nearest matching route.
+- ["fuzzy" mode](#notfoundmode-fuzzy) (default): The router will intelligently find the closest matching suitable route and display the `notFoundComponent`.
+- ["root" mode](#notfoundmode-root): All not-found errors will be handled by the root route's `notFoundComponent`, regardless of the nearest matching route.
 
 ### `notFoundMode: 'fuzzy'`
 
-By default, the router's `notFoundMode` is set to `fuzzy`, which indicates that if a pathname doesn't match any known
-route, the router will attempt to use the closest matching route with children/(an outlet) and a configured not found
-component.
+By default, the router's `notFoundMode` is set to `fuzzy`, which indicates that if a pathname doesn't match any known route, the router will attempt to use the closest matching route with children/(an outlet) and a configured not found component.
 
-> **❓ Why is this the default?** Fuzzy matching to preserve as much parent layout as possible for the user gives them
-> more context to navigate to a useful location based on where they thought they would arrive.
+> **❓ Why is this the default?** Fuzzy matching to preserve as much parent layout as possible for the user gives them more context to navigate to a useful location based on where they thought they would arrive.
 
 The nearest suitable route is found using the following criteria:
 
@@ -4036,13 +3629,11 @@ If provided the path of `/posts/1/edit`, the following component structure will 
   - `<Posts>`
     - `<Posts.notFoundComponent>`
 
-The `notFoundComponent` of the `posts` route will be rendered because it is the **nearest suitable parent route with
-children (and therefore an outlet) and a `notFoundComponent` configured**.
+The `notFoundComponent` of the `posts` route will be rendered because it is the **nearest suitable parent route with children (and therefore an outlet) and a `notFoundComponent` configured**.
 
 ### `notFoundMode: 'root'`
 
-When `notFoundMode` is set to `root`, all not-found errors will be handled by the root route's `notFoundComponent`
-instead of bubbling up from the nearest fuzzy-matched route.
+When `notFoundMode` is set to `root`, all not-found errors will be handled by the root route's `notFoundComponent` instead of bubbling up from the nearest fuzzy-matched route.
 
 For example, consider the following route tree:
 
@@ -4059,8 +3650,7 @@ The `notFoundComponent` of the `__root__` route will be rendered because the `no
 
 ## Configuring a route's `notFoundComponent`
 
-To handle both types of not-found errors, you can attach a `notFoundComponent` to a route. This component will be
-rendered when a not-found error is thrown.
+To handle both types of not-found errors, you can attach a `notFoundComponent` to a route. This component will be rendered when a not-found error is thrown.
 
 For example, configuring a `notFoundComponent` for a `/settings` route to handle non-existing settings pages:
 
@@ -4107,8 +3697,7 @@ export const Route = createFileRoute('/posts/$postId')({
 
 You may want to provide a default not-found component for every route in your app with child routes.
 
-> Why only routes with children? **Leaf-node routes (routes without children) will never render an `Outlet` and
-> therefore are not able to handle not-found errors.**
+> Why only routes with children? **Leaf-node routes (routes without children) will never render an `Outlet` and therefore are not able to handle not-found errors.**
 
 To do this, pass a `defaultNotFoundComponent` to the `createRouter` function:
 
@@ -4127,11 +3716,9 @@ const router = createRouter({
 
 ## Throwing your own `notFound` errors
 
-You can manually throw not-found errors in loader methods and components using the `notFound` function. This is useful
-when you need to signal that a resource cannot be found.
+You can manually throw not-found errors in loader methods and components using the `notFound` function. This is useful when you need to signal that a resource cannot be found.
 
-The `notFound` function works in a similar fashion to the `redirect` function. To cause a not-found error, you can \*
-\*throw a `notFound()`\*\*.
+The `notFound` function works in a similar fashion to the `redirect` function. To cause a not-found error, you can **throw a `notFound()`**.
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId')({
@@ -4149,18 +3736,13 @@ export const Route = createFileRoute('/posts/$postId')({
 })
 ```
 
-The not-found error above will be handled by the same route or nearest parent route that has either a
-`notFoundComponent` route option or the `defaultNotFoundComponent` router option configured.
+The not-found error above will be handled by the same route or nearest parent route that has either a `notFoundComponent` route option or the `defaultNotFoundComponent` router option configured.
 
-If neither the route nor any suitable parent route is found to handle the error, the root route will handle it using
-TanStack Router's **extremely basic (and purposefully undesirable)** default not-found component that simply renders
-`<div>Not Found</div>`. It's highly recommended to either attach at least one `notFoundComponent` to the root route or
-configure a router-wide `defaultNotFoundComponent` to handle not-found errors.
+If neither the route nor any suitable parent route is found to handle the error, the root route will handle it using TanStack Router's **extremely basic (and purposefully undesirable)** default not-found component that simply renders `<div>Not Found</div>`. It's highly recommended to either attach at least one `notFoundComponent` to the root route or configure a router-wide `defaultNotFoundComponent` to handle not-found errors.
 
 ## Specifying Which Routes Handle Not Found Errors
 
-Sometimes you may want to trigger a not-found on a specific parent route and bypass the normal not-found component
-propagation. To do this, pass in a route id to the `route` option in the `notFound` function.
+Sometimes you may want to trigger a not-found on a specific parent route and bypass the normal not-found component propagation. To do this, pass in a route id to the `route` option in the `notFound` function.
 
 ```tsx
 // _pathlessLayout.tsx
@@ -4195,8 +3777,7 @@ export const Route = createFileRoute('/_pathless/route-a')({
 
 ### Manually targeting the root route
 
-You can also target the root route by passing the exported `rootRouteId` variable to the `notFound` function's `route`
-property:
+You can also target the root route by passing the exported `rootRouteId` variable to the `notFound` function's `route` property:
 
 ```tsx
 import { rootRouteId } from '@tanstack/react-router'
@@ -4212,20 +3793,15 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ### Throwing Not Found Errors in Components
 
-You can also throw not-found errors in components. However, **it is recommended to throw not-found errors in loader
-methods instead of components in order to correctly type loader data and prevent flickering.**
+You can also throw not-found errors in components. However, **it is recommended to throw not-found errors in loader methods instead of components in order to correctly type loader data and prevent flickering.**
 
-TanStack Router exposes a `CatchNotFound` component similar to `CatchBoundary` that can be used to catch not-found
-errors in components and display UI accordingly.
+TanStack Router exposes a `CatchNotFound` component similar to `CatchBoundary` that can be used to catch not-found errors in components and display UI accordingly.
 
 ### Data Loading Inside `notFoundComponent`
 
-`notFoundComponent` is a special case when it comes to data loading. **`SomeRoute.useLoaderData` may not be defined
-depending on which route you are trying to access and where the not-found error gets thrown**. However,
-`Route.useParams`, `Route.useSearch`, `Route.useRouteContext`, etc. will return a defined value.
+`notFoundComponent` is a special case when it comes to data loading. **`SomeRoute.useLoaderData` may not be defined depending on which route you are trying to access and where the not-found error gets thrown**. However, `Route.useParams`, `Route.useSearch`, `Route.useRouteContext`, etc. will return a defined value.
 
-**If you need to pass incomplete loader data to `notFoundComponent`,** pass the data via the `data` option in the
-`notFound` function and validate it in `notFoundComponent`.
+**If you need to pass incomplete loader data to `notFoundComponent`,** pass the data via the `data` option in the `notFound` function and validate it in `notFoundComponent`.
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId')({
@@ -4258,19 +3834,15 @@ See [SSR guide](../ssr.md) for more information.
 
 ## Migrating from `NotFoundRoute`
 
-The `NotFoundRoute` API is deprecated in favor of `notFoundComponent`. The `NotFoundRoute` API will be removed in a
-future release.
+The `NotFoundRoute` API is deprecated in favor of `notFoundComponent`. The `NotFoundRoute` API will be removed in a future release.
 
 **The `notFound` function and `notFoundComponent` will not work when using `NotFoundRoute`.**
 
 The main differences are:
 
-- `NotFoundRoute` is a route that requires an `<Outlet>` on its parent route to render. `notFoundComponent` is a
-  component that can be attached to any route.
+- `NotFoundRoute` is a route that requires an `<Outlet>` on its parent route to render. `notFoundComponent` is a component that can be attached to any route.
 - When using `NotFoundRoute`, you can't use layouts. `notFoundComponent` can be used with layouts.
-- When using `notFoundComponent`, path matching is strict. This means that if you have a route at `/post/$postId`, a
-  not-found error will be thrown if you try to access `/post/1/2/3`. With `NotFoundRoute`, `/post/1/2/3` would match the
-  `NotFoundRoute` and only render it if there is an `<Outlet>`.
+- When using `notFoundComponent`, path matching is strict. This means that if you have a route at `/post/$postId`, a not-found error will be thrown if you try to access `/post/1/2/3`. With `NotFoundRoute`, `/post/1/2/3` would match the `NotFoundRoute` and only render it if there is an `<Outlet>`.
 
 To migrate from `NotFoundRoute` to `notFoundComponent`, you'll just need to make a few changes:
 
@@ -4299,26 +3871,21 @@ export const Route = createRootRoute({
 Important changes:
 
 - A `notFoundComponent` is added to the root route for global not-found handling.
-  - You can also add a `notFoundComponent` to any other route in your route tree to handle not-found errors for that
-    specific route.
+  - You can also add a `notFoundComponent` to any other route in your route tree to handle not-found errors for that specific route.
 - The `notFoundComponent` does not support rendering an `<Outlet>`.
 
 # Outlets
 
-Nested routing means that routes can be nested within other routes, including the way they render. So how do we tell our
-routes where to render this nested content?
+Nested routing means that routes can be nested within other routes, including the way they render. So how do we tell our routes where to render this nested content?
 
 ## The `Outlet` Component
 
-The `Outlet` component is used to render the next potentially matching child route. `<Outlet />` doesn't take any props
-and can be rendered anywhere within a route's component tree. If there is no matching child route, `<Outlet />` will
-render `null`.
+The `Outlet` component is used to render the next potentially matching child route. `<Outlet />` doesn't take any props and can be rendered anywhere within a route's component tree. If there is no matching child route, `<Outlet />` will render `null`.
 
 > [!TIP]
 > If a route's `component` is left undefined, it will render an `<Outlet />` automatically.
 
-A great example is configuring the root route of your application. Let's give our root route a component that renders a
-title, then an `<Outlet />` for our top-level routes to render.
+A great example is configuring the root route of your application. Let's give our root route a component that renders a title, then an `<Outlet />` for our top-level routes to render.
 
 ```tsx
 import { createRootRoute, Outlet } from '@tanstack/react-router'
@@ -4343,9 +3910,7 @@ We haven't covered this yet. Stay tuned!
 
 # Path Params
 
-Path params are used to match a single segment (the text until the next `/`) and provide its value back to you as a \*
-\*named\*\* variable. They are defined by using the `$` character prefix in the path, followed by the key variable to
-assign it to. The following are valid path param paths:
+Path params are used to match a single segment (the text until the next `/`) and provide its value back to you as a **named** variable. They are defined by using the `$` character prefix in the path, followed by the key variable to assign it to. The following are valid path param paths:
 
 - `$postId`
 - `$name`
@@ -4372,14 +3937,11 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ## Path Params can be used by child routes
 
-Once a path param has been parsed, it is available to all child routes. This means that if we define a child route to
-our `postRoute`, we can use the `postId` variable from the URL in the child route's path!
+Once a path param has been parsed, it is available to all child routes. This means that if we define a child route to our `postRoute`, we can use the `postId` variable from the URL in the child route's path!
 
 ## Path Params in Loaders
 
-Path params are passed to the loader as a `params` object. The keys of this object are the names of the path params, and
-the values are the values that were parsed out of the actual URL path. For example, if we were to visit the `/blog/123`
-URL, the `params` object would be `{ postId: '123' }`:
+Path params are passed to the loader as a `params` object. The keys of this object are the names of the path params, and the values are the values that were parsed out of the actual URL path. For example, if we were to visit the `/blog/123` URL, the `params` object would be `{ postId: '123' }`:
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId')({
@@ -4401,8 +3963,7 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ## Path Params in Components
 
-If we add a component to our `postRoute`, we can access the `postId` variable from the URL by using the route's
-`useParams` hook:
+If we add a component to our `postRoute`, we can access the `postId` variable from the URL by using the route's `useParams` hook:
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId')({
@@ -4415,15 +3976,11 @@ function PostComponent() {
 }
 ```
 
-> 🧠 Quick tip: If your component is code-split, you can use
-> the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper)
-> to avoid having to import the `Route` configuration to get access to the typed `useParams()` hook.
+> 🧠 Quick tip: If your component is code-split, you can use the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper) to avoid having to import the `Route` configuration to get access to the typed `useParams()` hook.
 
 ## Path Params outside of Routes
 
-You can also use the globally exported `useParams` hook to access any parsed path params from any component in your app.
-You'll need to pass the `strict: false` option to `useParams`, denoting that you want to access the params from an
-ambiguous location:
+You can also use the globally exported `useParams` hook to access any parsed path params from any component in your app. You'll need to pass the `strict: false` option to `useParams`, denoting that you want to access the params from an ambiguous location:
 
 ```tsx
 function PostComponent() {
@@ -4434,8 +3991,7 @@ function PostComponent() {
 
 ## Navigating with Path Params
 
-When navigating to a route with path params, TypeScript will require you to pass the params either as an object or as a
-function that returns an object of params.
+When navigating to a route with path params, TypeScript will require you to pass the params either as an object or as a function that returns an object of params.
 
 Let's see what an object style looks like:
 
@@ -4461,22 +4017,17 @@ function Component() {
 }
 ```
 
-Notice that the function style is useful when you need to persist params that are already in the URL for other routes.
-This is because the function style will receive the current params as an argument, allowing you to modify them as needed
-and return the final params object.
+Notice that the function style is useful when you need to persist params that are already in the URL for other routes. This is because the function style will receive the current params as an argument, allowing you to modify them as needed and return the final params object.
 
 ## Prefixes and Suffixes for Path Params
 
-You can also use **prefixes** and **suffixes** with path params to create more complex routing patterns. This allows you
-to match specific URL structures while still capturing the dynamic segments.
+You can also use **prefixes** and **suffixes** with path params to create more complex routing patterns. This allows you to match specific URL structures while still capturing the dynamic segments.
 
-When using either prefixes or suffixes, you can define them by wrapping the path param in curly braces `{}` and placing
-the prefix or suffix before or after the variable name.
+When using either prefixes or suffixes, you can define them by wrapping the path param in curly braces `{}` and placing the prefix or suffix before or after the variable name.
 
 ### Defining Prefixes
 
-Prefixes are defined by placing the prefix text outside the curly braces before the variable name. For example, if you
-want to match a URL that starts with `post-` followed by a post ID, you can define it like this:
+Prefixes are defined by placing the prefix text outside the curly braces before the variable name. For example, if you want to match a URL that starts with `post-` followed by a post ID, you can define it like this:
 
 ```tsx
 // src/routes/posts/post-{$postId}.tsx
@@ -4509,8 +4060,7 @@ function StorageComponent() {
 
 ### Defining Suffixes
 
-Suffixes are defined by placing the suffix text outside the curly braces after the variable name. For example, if you
-want to match a URL a filename that ends with `txt`, you can define it like this:
+Suffixes are defined by placing the suffix text outside the curly braces after the variable name. For example, if you want to match a URL a filename that ends with `txt`, you can define it like this:
 
 ```tsx
 // src/routes/files/{$fileName}txt
@@ -4542,8 +4092,7 @@ function FileComponent() {
 
 ### Combining Prefixes and Suffixes
 
-You can combine both prefixes and suffixes to create very specific routing patterns. For example, if you want to match a
-URL that starts with `user-` and ends with `.json`, you can define it like this:
+You can combine both prefixes and suffixes to create very specific routing patterns. For example, if you want to match a URL that starts with `user-` and ends with `.json`, you can define it like this:
 
 ```tsx
 // src/routes/users/user-{$userId}person
@@ -4562,8 +4111,7 @@ Similar to the previous examples, you can also use wildcards with prefixes and s
 
 ## Optional Path Parameters
 
-Optional path parameters allow you to define route segments that may or may not be present in the URL. They use the
-`{-$paramName}` syntax and provide flexible routing patterns where certain parameters are optional.
+Optional path parameters allow you to define route segments that may or may not be present in the URL. They use the `{-$paramName}` syntax and provide flexible routing patterns where certain parameters are optional.
 
 ### Defining Optional Parameters
 
@@ -4597,8 +4145,7 @@ Optional parameters create flexible URL patterns:
 - `/posts/{-$category}/{-$slug}` matches `/posts`, `/posts/tech`, and `/posts/tech/hello-world`
 - `/users/$id/{-$tab}` matches `/users/123` and `/users/123/settings`
 
-When an optional parameter is not present in the URL, its value will be `undefined` in your route handlers and
-components.
+When an optional parameter is not present in the URL, its value will be `undefined` in your route handlers and components.
 
 ### Accessing Optional Parameters
 
@@ -4774,8 +4321,7 @@ function PostsComponent() {
 
 ## Internationalization (i18n) with Optional Path Parameters
 
-Optional path parameters are excellent for implementing internationalization (i18n) routing patterns. You can use prefix
-patterns to handle multiple languages while maintaining clean, SEO-friendly URLs.
+Optional path parameters are excellent for implementing internationalization (i18n) routing patterns. You can use prefix patterns to handle multiple languages while maintaining clean, SEO-friendly URLs.
 
 ### Prefix-based i18n
 
@@ -5086,15 +4632,11 @@ function ShopComponent() {
 }
 ```
 
-Optional path parameters provide a powerful and flexible foundation for implementing internationalization in your
-TanStack Router applications. Whether you prefer prefix-based or combined approaches, you can create clean, SEO-friendly
-URLs while maintaining excellent developer experience and type safety.
+Optional path parameters provide a powerful and flexible foundation for implementing internationalization in your TanStack Router applications. Whether you prefer prefix-based or combined approaches, you can create clean, SEO-friendly URLs while maintaining excellent developer experience and type safety.
 
 ## Allowed Characters
 
-By default, path params are escaped with `encodeURIComponent`. If you want to allow other valid URI characters (e.g. `@`
-or `+`), you can specify that in
-your [RouterOptions](../../api/router/RouterOptionsType.md#pathparamsallowedcharacters-property).
+By default, path params are escaped with `encodeURIComponent`. If you want to allow other valid URI characters (e.g. `@` or `+`), you can specify that in your [RouterOptions](../../api/router/RouterOptionsType.md#pathparamsallowedcharacters-property).
 
 Example usage:
 
@@ -5118,38 +4660,30 @@ The following is the list of accepted allowed characters:
 
 # Preloading
 
-Preloading in TanStack Router is a way to load a route before the user actually navigates to it. This is useful for
-routes that are likely to be visited by the user next. For example, if you have a list of posts and the user is likely
-to click on one of them, you can preload the post route so that it's ready to go when the user clicks on it.
+Preloading in TanStack Router is a way to load a route before the user actually navigates to it. This is useful for routes that are likely to be visited by the user next. For example, if you have a list of posts and the user is likely to click on one of them, you can preload the post route so that it's ready to go when the user clicks on it.
 
 ## Supported Preloading Strategies
 
 - Intent
-  - Preloading by **"intent"** works by using hover and touch start events on `<Link>` components to preload the
-    dependencies for the destination route.
+  - Preloading by **"intent"** works by using hover and touch start events on `<Link>` components to preload the dependencies for the destination route.
   - This strategy is useful for preloading routes that the user is likely to visit next.
 - Viewport Visibility
-  - Preloading by **"viewport**" works by using the Intersection Observer API to preload the dependencies for the
-    destination route when the `<Link>` component is in the viewport.
+  - Preloading by **"viewport**" works by using the Intersection Observer API to preload the dependencies for the destination route when the `<Link>` component is in the viewport.
   - This strategy is useful for preloading routes that are below the fold or off-screen.
 - Render
-  - Preloading by **"render"** works by preloading the dependencies for the destination route as soon as the `<Link>`
-    component is rendered in the DOM.
+  - Preloading by **"render"** works by preloading the dependencies for the destination route as soon as the `<Link>` component is rendered in the DOM.
   - This strategy is useful for preloading routes that are always needed.
 
 ## How long does preloaded data stay in memory?
 
 Preloaded route matches are temporarily cached in memory with a few important caveats:
 
-- **Unused preloaded data is removed after 30 seconds by default.** This can be configured by setting the
-  `defaultPreloadMaxAge` option on your router.
+- **Unused preloaded data is removed after 30 seconds by default.** This can be configured by setting the `defaultPreloadMaxAge` option on your router.
 - **Obviously, when a route is loaded, its preloaded version is promoted to the router's normal pending matches state.**
 
-If you need more control over preloading, caching and/or garbage collection of preloaded data, you should use an
-external caching library like [TanStack Query](https://tanstack.com/query).
+If you need more control over preloading, caching and/or garbage collection of preloaded data, you should use an external caching library like [TanStack Query](https://tanstack.com/query).
 
-The simplest way to preload routes for your application is to set the `defaultPreload` option to `intent` for your
-entire router:
+The simplest way to preload routes for your application is to set the `defaultPreload` option to `intent` for your entire router:
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -5160,13 +4694,11 @@ const router = createRouter({
 })
 ```
 
-This will turn on `intent` preloading by default for all `<Link>` components in your application. You can also set the
-`preload` prop on individual `<Link>` components to override the default behavior.
+This will turn on `intent` preloading by default for all `<Link>` components in your application. You can also set the `preload` prop on individual `<Link>` components to override the default behavior.
 
 ## Preload Delay
 
-By default, preloading will start after **50ms** of the user hovering or touching a `<Link>` component. You can change
-this delay by setting the `defaultPreloadDelay` option on your router:
+By default, preloading will start after **50ms** of the user hovering or touching a `<Link>` component. You can change this delay by setting the `defaultPreloadDelay` option on your router:
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -5177,14 +4709,11 @@ const router = createRouter({
 })
 ```
 
-You can also set the `preloadDelay` prop on individual `<Link>` components to override the default behavior on a
-per-link basis.
+You can also set the `preloadDelay` prop on individual `<Link>` components to override the default behavior on a per-link basis.
 
 ## Built-in Preloading & `preloadStaleTime`
 
-If you're using the built-in loaders, you can control how long preloaded data is considered fresh until another preload
-is triggered by setting either `routerOptions.defaultPreloadStaleTime` or `routeOptions.preloadStaleTime` to a number of
-milliseconds. **By default, preloaded data is considered fresh for 30 seconds.**.
+If you're using the built-in loaders, you can control how long preloaded data is considered fresh until another preload is triggered by setting either `routerOptions.defaultPreloadStaleTime` or `routeOptions.preloadStaleTime` to a number of milliseconds. **By default, preloaded data is considered fresh for 30 seconds.**.
 
 To change this, you can set the `defaultPreloadStaleTime` option on your router:
 
@@ -5210,14 +4739,9 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ## Preloading with External Libraries
 
-When integrating external caching libraries like React Query, which have their own mechanisms for determining stale
-data, you may want to override the default preloading and stale-while-revalidate logic of TanStack Router. These
-libraries often use options like staleTime to control the freshness of data.
+When integrating external caching libraries like React Query, which have their own mechanisms for determining stale data, you may want to override the default preloading and stale-while-revalidate logic of TanStack Router. These libraries often use options like staleTime to control the freshness of data.
 
-To customize the preloading behavior in TanStack Router and fully leverage your external library's caching strategy, you
-can bypass the built-in caching by setting routerOptions.defaultPreloadStaleTime or routeOptions.preloadStaleTime to 0.
-This ensures that all preloads are marked as stale internally, and loaders are always invoked, allowing your external
-library, such as React Query, to manage data loading and caching.
+To customize the preloading behavior in TanStack Router and fully leverage your external library's caching strategy, you can bypass the built-in caching by setting routerOptions.defaultPreloadStaleTime or routeOptions.preloadStaleTime to 0. This ensures that all preloads are marked as stale internally, and loaders are always invoked, allowing your external library, such as React Query, to manage data loading and caching.
 
 For example:
 
@@ -5230,13 +4754,11 @@ const router = createRouter({
 })
 ```
 
-This would then allow you, for instance, to use an option like React Query's `staleTime` to control the freshness of
-your preloads.
+This would then allow you, for instance, to use an option like React Query's `staleTime` to control the freshness of your preloads.
 
 ## Preloading Manually
 
-If you need to manually preload a route, you can use the router's `preloadRoute` method. It accepts a standard TanStack
-`NavigateOptions` object and returns a promise that resolves when the route is preloaded.
+If you need to manually preload a route, you can use the router's `preloadRoute` method. It accepts a standard TanStack `NavigateOptions` object and returns a promise that resolves when the route is preloaded.
 
 ```tsx
 function Component() {
@@ -5261,8 +4783,7 @@ function Component() {
 }
 ```
 
-If you need to preload only the JS chunk of a route, you can use the router's `loadRouteChunk` method. It accepts a
-route object and returns a promise that resolves when the route chunk is loaded.
+If you need to preload only the JS chunk of a route, you can use the router's `loadRouteChunk` method. It accepts a route object and returns a promise that resolves when the route chunk is loaded.
 
 ```tsx
 function Component() {
@@ -5291,13 +4812,11 @@ function Component() {
 
 # Render Optimizations
 
-TanStack Router includes several optimizations to ensure your components only re-render when necessary. These
-optimizations include:
+TanStack Router includes several optimizations to ensure your components only re-render when necessary. These optimizations include:
 
 ## structural sharing
 
-TanStack Router uses a technique called "structural sharing" to preserve as many references as possible between
-re-renders, which is particularly useful for state stored in the URL, such as search parameters.
+TanStack Router uses a technique called "structural sharing" to preserve as many references as possible between re-renders, which is particularly useful for state stored in the URL, such as search parameters.
 
 For example, consider a `details` route with two search parameters, `foo` and `bar`, accessed like this:
 
@@ -5305,14 +4824,11 @@ For example, consider a `details` route with two search parameters, `foo` and `b
 const search = Route.useSearch()
 ```
 
-When only `bar` is changed by navigating from `/details?foo=f1&bar=b1` to `/details?foo=f1&bar=b2`, `search.foo` will be
-referentially stable and only `search.bar` will be replaced.
+When only `bar` is changed by navigating from `/details?foo=f1&bar=b1` to `/details?foo=f1&bar=b2`, `search.foo` will be referentially stable and only `search.bar` will be replaced.
 
 ## fine-grained selectors
 
-You can access and subscribe to the router state using various hooks like `useRouterState`, `useSearch`, and others. If
-you only want a specific component to re-render when a particular subset of the router state such as a subset of the
-search parameters changes, you can use partial subscriptions with the `select` property.
+You can access and subscribe to the router state using various hooks like `useRouterState`, `useSearch`, and others. If you only want a specific component to re-render when a particular subset of the router state such as a subset of the search parameters changes, you can use partial subscriptions with the `select` property.
 
 ```tsx
 // component won't re-render when `bar` changes
@@ -5321,8 +4837,7 @@ const foo = Route.useSearch({ select: ({ foo }) => foo })
 
 ### structural sharing with fine-grained selectors
 
-The `select` function can perform various calculations on the router state, allowing you to return different types of
-values, such as objects. For example:
+The `select` function can perform various calculations on the router state, allowing you to return different types of values, such as objects. For example:
 
 ```tsx
 const result = Route.useSearch({
@@ -5335,11 +4850,9 @@ const result = Route.useSearch({
 })
 ```
 
-Although this works, it will cause your component to re-render each time, since `select` is now returning a new object
-each time it’s called.
+Although this works, it will cause your component to re-render each time, since `select` is now returning a new object each time it’s called.
 
-You can avoid this re-rendering issue by using "structural sharing" as described above. By default, structural sharing
-is turned off to maintain backward compatibility, but this may change in v2.
+You can avoid this re-rendering issue by using "structural sharing" as described above. By default, structural sharing is turned off to maintain backward compatibility, but this may change in v2.
 
 To enable structural sharing for fine grained selectors, you have two options:
 
@@ -5367,8 +4880,7 @@ const result = Route.useSearch({
 ```
 
 > [!IMPORTANT]
-> Structural sharing only works with JSON-compatible data. This means you cannot use `select` to return items like class
-> instances if structural sharing is enabled.
+> Structural sharing only works with JSON-compatible data. This means you cannot use `select` to return items like class instances if structural sharing is enabled.
 
 In line with TanStack Router's type-safe design, TypeScript will raise an error if you attempt the following:
 
@@ -5383,32 +4895,25 @@ const result = Route.useSearch({
 })
 ```
 
-If structural sharing is enabled by default in the router options, you can prevent this error by setting
-`structuralSharing: false`.
+If structural sharing is enabled by default in the router options, you can prevent this error by setting `structuralSharing: false`.
 
 # Route Masking
 
-Route masking is a way to mask the actual URL of a route that gets persisted to the browser's history and URL bar. This
-is useful for scenarios where you want to show a different URL than the one that is actually being navigated to and then
-falling back to the displayed URL when it is shared and (optionally) when the page is reloaded. Here's a few examples:
+Route masking is a way to mask the actual URL of a route that gets persisted to the browser's history and URL bar. This is useful for scenarios where you want to show a different URL than the one that is actually being navigated to and then falling back to the displayed URL when it is shared and (optionally) when the page is reloaded. Here's a few examples:
 
 - Navigating to a modal route like `/photo/5/modal`, but masking the actual URL as `/photos/5`
 - Navigating to a modal route like `/post/5/comments`, but masking the actual URL as `/posts/5`
 - Navigating to a route with the search param `?showLogin=true`, but masking the URL to _not_ contain the search param
 - Navigating to a route with the search param `?modal=settings`, but masking the URL as `/settings'
 
-Each of these scenarios can be achieved with route masking and even extended to support more advanced patterns
-like [parallel routes](../parallel-routes.md).
+Each of these scenarios can be achieved with route masking and even extended to support more advanced patterns like [parallel routes](../parallel-routes.md).
 
 ## How does route masking work?
 
 > [!IMPORTANT]
-> You **do not** need to understand how route masking works in order to use it. This section is for those who are
-> curious about how it works under the hood. Skip to [How do I use route masking?](#how-do-i-use-route-masking) to learn
-> how to use it!.
+> You **do not** need to understand how route masking works in order to use it. This section is for those who are curious about how it works under the hood. Skip to [How do I use route masking?](#how-do-i-use-route-masking) to learn how to use it!.
 
-Route masking utilizes the `location.state` API to store the desired runtime location inside of the location that will
-get written to the URL. It stores this runtime location under the `__tempLocation` state property:
+Route masking utilizes the `location.state` API to store the desired runtime location inside of the location that will get written to the URL. It stores this runtime location under the `__tempLocation` state property:
 
 ```tsx
 const location = {
@@ -5428,12 +4933,7 @@ const location = {
 }
 ```
 
-When the router parses a location from history with the `location.state.__tempLocation` property, it will use that
-location instead of the one that was parsed from the URL. This allows you to navigate to a route like `/photos/5` and
-have the router actually navigate to `/photo/5/modal` instead. When this happens, the history location is saved back
-into the `location.maskedLocation` property, just in case we need to know what the **actual URL** is. One example of
-where this is used is in the Devtools where we detect if a route is masked and show the actual URL instead of the masked
-one!
+When the router parses a location from history with the `location.state.__tempLocation` property, it will use that location instead of the one that was parsed from the URL. This allows you to navigate to a route like `/photos/5` and have the router actually navigate to `/photo/5/modal` instead. When this happens, the history location is saved back into the `location.maskedLocation` property, just in case we need to know what the **actual URL** is. One example of where this is used is in the Devtools where we detect if a route is masked and show the actual URL instead of the masked one!
 
 Remember, you don't need to worry about any of this. It's all handled for you automatically under the hood!
 
@@ -5444,18 +4944,13 @@ Route masking is a simple API that can be used in 2 ways:
 - Imperatively via the `mask` option available on the `<Link>` and `navigate()` APIs
 - Declaratively via the Router's `routeMasks` option
 
-When using either route masking APIs, the `mask` option accepts the same navigation object that the `<Link>` and
-`navigate()` APIs accept. This means you can use the same `to`, `replace`, `state`, and `search` options that you're
-already familiar with. The only difference is that the `mask` option will be used to mask the URL of the route being
-navigated to.
+When using either route masking APIs, the `mask` option accepts the same navigation object that the `<Link>` and `navigate()` APIs accept. This means you can use the same `to`, `replace`, `state`, and `search` options that you're already familiar with. The only difference is that the `mask` option will be used to mask the URL of the route being navigated to.
 
-> 🧠 The mask option is also **type-safe**! This means that if you're using TypeScript, you'll get type errors if you try
-> to pass an invalid navigation object to the `mask` option. Booyah!
+> 🧠 The mask option is also **type-safe**! This means that if you're using TypeScript, you'll get type errors if you try to pass an invalid navigation object to the `mask` option. Booyah!
 
 ### Imperative route masking
 
-The `<Link>` and `navigate()` APIs both accept a `mask` option that can be used to mask the URL of the route being
-navigated to. Here's an example of using it with the `<Link>` component:
+The `<Link>` and `navigate()` APIs both accept a `mask` option that can be used to mask the URL of the route being navigated to. Here's an example of using it with the `<Link>` component:
 
 ```tsx
 <Link
@@ -5493,10 +4988,7 @@ function onOpenPhoto() {
 
 ### Declarative route masking
 
-In addition to the imperative API, you can also use the Router's `routeMasks` option to declaratively mask routes.
-Instead of needing to pass the `mask` option to every `<Link>` or `navigate()` call, you can instead create a route mask
-on the Router to mask routes that match a certain pattern. Here's an example of the same route mask from above, but
-using the `routeMasks` option instead:
+In addition to the imperative API, you can also use the Router's `routeMasks` option to declaratively mask routes. Instead of needing to pass the `mask` option to every `<Link>` or `navigate()` call, you can instead create a route mask on the Router to mask routes that match a certain pattern. Here's an example of the same route mask from above, but using the `routeMasks` option instead:
 
 // Use the following for the example below
 
@@ -5522,30 +5014,23 @@ When creating a route mask, you'll need to pass 1 argument with at least:
 
 - `routeTree` - The route tree that the route mask will be applied to
 - `from` - The route ID that the route mask will be applied to
-- `...navigateOptions` - The standard `to`, `search`, `params`, `replace`, etc options that the `<Link>` and
-  `navigate()` APIs accept
+- `...navigateOptions` - The standard `to`, `search`, `params`, `replace`, etc options that the `<Link>` and `navigate()` APIs accept
 
-> 🧠 The `createRouteMask` option is also **type-safe**! This means that if you're using TypeScript, you'll get type
-> errors if you try to pass an invalid route mask to the `routeMasks` option.
+> 🧠 The `createRouteMask` option is also **type-safe**! This means that if you're using TypeScript, you'll get type errors if you try to pass an invalid route mask to the `routeMasks` option.
 
 ## Unmasking when sharing the URL
 
-URLs are automatically unmasked when they are shared since as soon as a URL is detached from your browsers local history
-stack, the URL masking data is no longer available. Essentially, as soon as you copy and paste a URL out of your
-history, its masking data is lost... after all, that's the point of masking a URL!
+URLs are automatically unmasked when they are shared since as soon as a URL is detached from your browsers local history stack, the URL masking data is no longer available. Essentially, as soon as you copy and paste a URL out of your history, its masking data is lost... after all, that's the point of masking a URL!
 
 ## Local Unmasking Defaults
 
-**By default, URLs are not unmasked when the page is reloaded locally**. Masking data is stored in the `location.state`
-property of the history location, so as long as the history location is still in memory in your history stack, the
-masking data will be available and the URL will continue to be masked.
+**By default, URLs are not unmasked when the page is reloaded locally**. Masking data is stored in the `location.state` property of the history location, so as long as the history location is still in memory in your history stack, the masking data will be available and the URL will continue to be masked.
 
 ## Unmasking on page reload
 
 **As stated above, URLs are not unmasked when the page is reloaded by default**.
 
-If you want to unmask a URL locally when the page is reloaded, you have 3 options, each overriding the previous one in
-priority if passed:
+If you want to unmask a URL locally when the page is reloaded, you have 3 options, each overriding the previous one in priority if passed:
 
 - Set the Router's default `unmaskOnReload` option to `true`
 - Return the `unmaskOnReload: true` option from the masking function when creating a route mask with `createRouteMask()`
@@ -5553,29 +5038,20 @@ priority if passed:
 
 # Router Context
 
-TanStack Router's router context is a very powerful tool that can be used for dependency injection among many other
-things. Aptly named, the router context is passed through the router and down through each matching route. At each route
-in the hierarchy, the context can be modified or added to. Here's a few ways you might use the router context
-practically:
+TanStack Router's router context is a very powerful tool that can be used for dependency injection among many other things. Aptly named, the router context is passed through the router and down through each matching route. At each route in the hierarchy, the context can be modified or added to. Here's a few ways you might use the router context practically:
 
 - Dependency Injection
-  - You can supply dependencies (e.g. a loader function, a data fetching client, a mutation service) which the route and
-    all child routes can access and use without importing or creating directly.
+  - You can supply dependencies (e.g. a loader function, a data fetching client, a mutation service) which the route and all child routes can access and use without importing or creating directly.
 - Breadcrumbs
-  - While the main context object for each route is merged as it descends, each route's unique context is also stored
-    making it possible to attach breadcrumbs or methods to each route's context.
+  - While the main context object for each route is merged as it descends, each route's unique context is also stored making it possible to attach breadcrumbs or methods to each route's context.
 - Dynamic meta tag management
-  - You can attach meta tags to each route's context and then use a meta tag manager to dynamically update the meta tags
-    on the page as the user navigates the site.
+  - You can attach meta tags to each route's context and then use a meta tag manager to dynamically update the meta tags on the page as the user navigates the site.
 
 These are just suggested uses of the router context. You can use it for whatever you want!
 
 ## Typed Router Context
 
-Like everything else, the root router context is strictly typed. This type can be augmented via any route's `beforeLoad`
-option as it is merged down the route match tree. To constrain the type of the root router context, you must use the
-`createRootRouteWithContext<YourContextTypeHere>()(routeOptions)` function to create a new router context instead of the
-`createRootRoute()` function to create your root route. Here's an example:
+Like everything else, the root router context is strictly typed. This type can be augmented via any route's `beforeLoad` option as it is merged down the route match tree. To constrain the type of the root router context, you must use the `createRootRouteWithContext<YourContextTypeHere>()(routeOptions)` function to create a new router context instead of the `createRootRoute()` function to create your root route. Here's an example:
 
 ```tsx
 import { createRootRouteWithContext, createRouter } from '@tanstack/react-router'
@@ -5601,13 +5077,10 @@ const router = createRouter({
 
 ## Passing the initial Router Context
 
-The router context is passed to the router at instantiation time. You can pass the initial router context to the router
-via the `context` option:
+The router context is passed to the router at instantiation time. You can pass the initial router context to the router via the `context` option:
 
 > [!TIP]
-> If your context has any required properties, you will see a TypeScript error if you don't pass them in the initial
-> router context. If all of your context properties are optional, you will not see a TypeScript error and passing the
-> context will be optional. If you don't pass a router context, it defaults to `{}`.
+> If your context has any required properties, you will see a TypeScript error if you don't pass them in the initial router context. If all of your context properties are optional, you will not see a TypeScript error and passing the context will be optional. If you don't pass a router context, it defaults to `{}`.
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -5626,9 +5099,7 @@ const router = createRouter({
 
 ### Invalidating the Router Context
 
-If you need to invalidate the context state you are passing into the router, you can call the `invalidate` method to
-tell the router to recompute the context. This is useful when you need to update the context state and have the router
-recompute the context for all routes.
+If you need to invalidate the context state you are passing into the router, you can call the `invalidate` method to tell the router to recompute the context. This is useful when you need to update the context state and have the router recompute the context for all routes.
 
 ```tsx
 function useAuth() {
@@ -5730,12 +5201,9 @@ export const Route = createFileRoute('/todos')({
 
 ## How about using React Context/Hooks?
 
-When trying to use React Context or Hooks in your route's `beforeLoad` or `loader` functions, it's important to remember
-React's [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks). You can't use hooks in a non-React function,
-so you can't use hooks in your `beforeLoad` or `loader` functions.
+When trying to use React Context or Hooks in your route's `beforeLoad` or `loader` functions, it's important to remember React's [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks). You can't use hooks in a non-React function, so you can't use hooks in your `beforeLoad` or `loader` functions.
 
-So, how do we use React Context or Hooks in our route's `beforeLoad` or `loader` functions? We can use the router
-context to pass down the React Context or Hooks to our route's `beforeLoad` or `loader` functions.
+So, how do we use React Context or Hooks in our route's `beforeLoad` or `loader` functions? We can use the router context to pass down the React Context or Hooks to our route's `beforeLoad` or `loader` functions.
 
 Let's look at the setup for an example, where we pass down a `useNetworkStrength` hook to our route's `loader` function:
 
@@ -5755,8 +5223,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 ```
 
-In this example, we'd instantiate the hook before rendering the router using the `<RouterProvider />`. This way, the
-hook would be called in React-land, therefore adhering to the Rules of Hooks.
+In this example, we'd instantiate the hook before rendering the router using the `<RouterProvider />`. This way, the hook would be called in React-land, therefore adhering to the Rules of Hooks.
 
 - `src/router.tsx`
 
@@ -5809,8 +5276,7 @@ export const Route = createFileRoute('/posts')({
 
 ## Modifying the Router Context
 
-The router context is passed down the route tree and is merged at each route. This means that you can modify the context
-at each route and the modifications will be available to all child routes. Here's an example:
+The router context is passed down the route tree and is merged at each route. This means that you can modify the context at each route and the modifications will be available to all child routes. Here's an example:
 
 - `src/routes/__root.tsx`
 
@@ -5862,9 +5328,7 @@ export const Route = createFileRoute('/todos')({
 
 ## Processing Accumulated Route Context
 
-Context, especially the isolated route `context` objects, make it trivial to accumulate and process the route context
-objects for all matched routes. Here's an example where we use all of the matched route contexts to generate a
-breadcrumb trail:
+Context, especially the isolated route `context` objects, make it trivial to accumulate and process the route context objects for all matched routes. Here's an example where we use all of the matched route contexts to generate a breadcrumb trail:
 
 ```tsx
 // src/routes/__root.tsx
@@ -5914,15 +5378,11 @@ export const Route = createRootRoute({
 
 ## Hash/Top-of-Page Scrolling
 
-Out of the box, TanStack Router supports both **hash scrolling** and **top-of-page scrolling** without any additional
-configuration.
+Out of the box, TanStack Router supports both **hash scrolling** and **top-of-page scrolling** without any additional configuration.
 
 ## Scroll-to-top & Nested Scrollable Areas
 
-By default, scroll-to-top mimics the behavior of the browser, which means only the `window` itself is scrolled to the
-top after successful navigation. For many apps however, it's common for the main scrollable area to be a nested div or
-similar because of advanced layouts. If you would like TanStack Router to also scroll these main scrollable areas for
-you, you can add selectors to target them using the `routerOptions.scrollToTopSelectors`:
+By default, scroll-to-top mimics the behavior of the browser, which means only the `window` itself is scrolled to the top after successful navigation. For many apps however, it's common for the main scrollable area to be a nested div or similar because of advanced layouts. If you would like TanStack Router to also scroll these main scrollable areas for you, you can add selectors to target them using the `routerOptions.scrollToTopSelectors`:
 
 ```tsx
 const router = createRouter({
@@ -5930,8 +5390,7 @@ const router = createRouter({
 })
 ```
 
-For complex selectors that cannot be simply resolved using `document.querySelector(selector)`, you can pass functions
-that return HTML elements to `routerOptions.scrollToTopSelectors`:
+For complex selectors that cannot be simply resolved using `document.querySelector(selector)`, you can pass functions that return HTML elements to `routerOptions.scrollToTopSelectors`:
 
 ```tsx
 const selector = () =>
@@ -5946,22 +5405,15 @@ These selectors are handled **in addition to `window`** which cannot be disabled
 
 ## Scroll Restoration
 
-Scroll restoration is the process of restoring the scroll position of a page when the user navigates back to it. This is
-normally a built-in feature for standard HTML based websites, but can be difficult to replicate for SPA applications
-because:
+Scroll restoration is the process of restoring the scroll position of a page when the user navigates back to it. This is normally a built-in feature for standard HTML based websites, but can be difficult to replicate for SPA applications because:
 
-- SPAs typically use the `history.pushState` API for navigation, so the browser doesn't know to restore the scroll
-  position natively
-- SPAs sometimes render content asynchronously, so the browser doesn't know the height of the page until after it's
-  rendered
+- SPAs typically use the `history.pushState` API for navigation, so the browser doesn't know to restore the scroll position natively
+- SPAs sometimes render content asynchronously, so the browser doesn't know the height of the page until after it's rendered
 - SPAs can sometimes use nested scrollable containers to force specific layouts and features.
 
-Not only that, but it's very common for applications to have multiple scrollable areas within an app, not just the body.
-For example, a chat application might have a scrollable sidebar and a scrollable chat area. In this case, you would want
-to restore the scroll position of both areas independently.
+Not only that, but it's very common for applications to have multiple scrollable areas within an app, not just the body. For example, a chat application might have a scrollable sidebar and a scrollable chat area. In this case, you would want to restore the scroll position of both areas independently.
 
-To alleviate this problem, TanStack Router provides a scroll restoration component and hook that handle the process of
-monitoring, caching and restoring scroll positions for you.
+To alleviate this problem, TanStack Router provides a scroll restoration component and hook that handle the process of monitoring, caching and restoring scroll positions for you.
 
 It does this by:
 
@@ -5986,19 +5438,13 @@ const router = createRouter({
 
 ## Custom Cache Keys
 
-Falling in behind Remix's own Scroll Restoration APIs, you can also customize the key used to cache scroll positions for
-a given scrollable area using the `getKey` option. This could be used, for example, to force the same scroll position to
-be used regardless of the users browser history.
+Falling in behind Remix's own Scroll Restoration APIs, you can also customize the key used to cache scroll positions for a given scrollable area using the `getKey` option. This could be used, for example, to force the same scroll position to be used regardless of the users browser history.
 
-The `getKey` option receives the relevant `Location` state from TanStack Router and expects you to return a string to
-uniquely identify the scrollable measurements for that state.
+The `getKey` option receives the relevant `Location` state from TanStack Router and expects you to return a string to uniquely identify the scrollable measurements for that state.
 
-The default `getKey` is `(location) => location.state.__TSR_key!`, where `__TSR_key` is the unique key generated for
-each entry in the history.
+The default `getKey` is `(location) => location.state.__TSR_key!`, where `__TSR_key` is the unique key generated for each entry in the history.
 
-> Older versions, prior to `v1.121.34`, used `state.key` as the default key, but this has been deprecated in favor of
-> `state.__TSR_key`. For now, `location.state.key` will still be available for compatibility, but it will be removed in
-> the next major version.
+> Older versions, prior to `v1.121.34`, used `state.key` as the default key, but this has been deprecated in favor of `state.__TSR_key`. For now, `location.state.key` will still be available for compatibility, but it will be removed in the next major version.
 
 ## Examples
 
@@ -6027,20 +5473,17 @@ const router = createRouter({
 
 ## Preventing Scroll Restoration
 
-Sometimes you may want to prevent scroll restoration from happening. To do this you can utilize the `resetScroll` option
-available on the following APIs:
+Sometimes you may want to prevent scroll restoration from happening. To do this you can utilize the `resetScroll` option available on the following APIs:
 
 - `<Link resetScroll={false}>`
 - `navigate({ resetScroll: false })`
 - `redirect({ resetScroll: false })`
 
-When `resetScroll` is set to `false`, the scroll position for the next navigation will not be restored (if navigating to
-an existing history event in the stack) or reset to the top (if it's a new history event in the stack).
+When `resetScroll` is set to `false`, the scroll position for the next navigation will not be restored (if navigating to an existing history event in the stack) or reset to the top (if it's a new history event in the stack).
 
 ## Manual Scroll Restoration
 
-Most of the time, you won't need to do anything special to get scroll restoration to work. However, there are some cases
-where you may need to manually control scroll restoration. The most common example is **virtualized lists**.
+Most of the time, you won't need to do anything special to get scroll restoration to work. However, there are some cases where you may need to manually control scroll restoration. The most common example is **virtualized lists**.
 
 To manually control scroll restoration for virtualized lists within the whole browser window:
 
@@ -6073,8 +5516,7 @@ function Component() {
 
 [//]: # 'VirtualizedWindowScrollRestorationExample'
 
-To manually control scroll restoration for a specific element, you can use the `useElementScrollRestoration` hook and
-the `data-scroll-restoration-id` DOM attribute:
+To manually control scroll restoration for a specific element, you can use the `useElementScrollRestoration` hook and the `data-scroll-restoration-id` DOM attribute:
 
 [//]: # 'ManualRestorationExample'
 
@@ -6119,10 +5561,7 @@ function Component() {
 
 ## Scroll Behavior
 
-To control the scroll behavior when navigating between pages, you can use the `scrollRestorationBehavior` option. This
-allows you to make the transition between pages instant instead of a smooth scroll. The global configuration of scroll
-restoration behavior has the same options as those supported by the browser, which are `smooth`, `instant`, and `auto` (
-see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView#behavior) for more information).
+To control the scroll behavior when navigating between pages, you can use the `scrollRestorationBehavior` option. This allows you to make the transition between pages instant instead of a smooth scroll. The global configuration of scroll restoration behavior has the same options as those supported by the browser, which are `smooth`, `instant`, and `auto` (see [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView#behavior) for more information).
 
 ```tsx
 import { createRouter } from '@tanstack/react-router'
@@ -6134,50 +5573,35 @@ const router = createRouter({
 
 # Search Params
 
-Similar to how TanStack Query made handling server-state in your React and Solid applications a breeze, TanStack Router
-aims to unlock the power of URL search params in your applications.
+Similar to how TanStack Query made handling server-state in your React and Solid applications a breeze, TanStack Router aims to unlock the power of URL search params in your applications.
 
 > 🧠 If you are on a really old browser, like IE11, you may need to use a polyfill for `URLSearchParams`.
 
 ## Why not just use `URLSearchParams`?
 
-We get it, you've been hearing a lot of "use the platform" lately and for the most part, we agree. However, we also
-believe it's important to recognize where the platform falls short for more advanced use-cases and we believe
-`URLSearchParams` is one of these circumstances.
+We get it, you've been hearing a lot of "use the platform" lately and for the most part, we agree. However, we also believe it's important to recognize where the platform falls short for more advanced use-cases and we believe `URLSearchParams` is one of these circumstances.
 
 Traditional Search Param APIs usually assume a few things:
 
 - Search params are always strings
 - They are _mostly_ flat
 - Serializing and deserializing using `URLSearchParams` is good enough (Spoiler alert: it's not.)
-- Search params modifications are tightly coupled with the URL's pathname and must be updated together, even if the
-  pathname is not changing.
+- Search params modifications are tightly coupled with the URL's pathname and must be updated together, even if the pathname is not changing.
 
 Reality is very different from these assumptions though.
 
-- Search params represent application state, so inevitably, we will expect them to have the same DX associated with
-  other state managers. This means having the capability of distinguishing between primitive value types and efficiently
-  storing and manipulating complex data structures like nested arrays and objects.
-- There are many ways to serialize and deserialize state with different tradeoffs. You should be able to choose the best
-  one for your application or at the very least get a better default than `URLSearchParams`.
-- Immutability & Structural Sharing. Every time you stringify and parse url search params, referential integrity and
-  object identity is lost because each new parse creates a brand new data structure with a unique memory reference. If
-  not properly managed over its lifetime, this constant serialization and parsing can result in unexpected and
-  undesirable performance issues, especially in frameworks like React that choose to track reactivity via immutability
-  or in Solid that normally relies on reconciliation to detect changes from deserialized data sources.
-- Search params, while an important part of the URL, do frequently change independently of the URL's pathname. For
-  example, a user may want to change the page number of a paginated list without touching the URL's pathname.
+- Search params represent application state, so inevitably, we will expect them to have the same DX associated with other state managers. This means having the capability of distinguishing between primitive value types and efficiently storing and manipulating complex data structures like nested arrays and objects.
+- There are many ways to serialize and deserialize state with different tradeoffs. You should be able to choose the best one for your application or at the very least get a better default than `URLSearchParams`.
+- Immutability & Structural Sharing. Every time you stringify and parse url search params, referential integrity and object identity is lost because each new parse creates a brand new data structure with a unique memory reference. If not properly managed over its lifetime, this constant serialization and parsing can result in unexpected and undesirable performance issues, especially in frameworks like React that choose to track reactivity via immutability or in Solid that normally relies on reconciliation to detect changes from deserialized data sources.
+- Search params, while an important part of the URL, do frequently change independently of the URL's pathname. For example, a user may want to change the page number of a paginated list without touching the URL's pathname.
 
 ## Search Params, the "OG" State Manager
 
-You've probably seen search params like `?page=3` or `?filter-name=tanner` in the URL. There is no question that this is
-truly **a form of global state** living inside of the URL. It's valuable to store specific pieces of state in the URL
-because:
+You've probably seen search params like `?page=3` or `?filter-name=tanner` in the URL. There is no question that this is truly **a form of global state** living inside of the URL. It's valuable to store specific pieces of state in the URL because:
 
 - Users should be able to:
   - Cmd/Ctrl + Click to open a link in a new tab and reliably see the state they expected
-  - Bookmark and share links from your application with others with assurances that they will see exactly the state as
-    when the link was copied.
+  - Bookmark and share links from your application with others with assurances that they will see exactly the state as when the link was copied.
   - Refresh your app or navigate back and forth between pages without losing their state
 - Developers should be able to easily:
   - Add, remove or modify state in the URL with the same great DX as other state managers
@@ -6186,10 +5610,7 @@ because:
 
 ## JSON-first Search Params
 
-To achieve the above, the first step built in to TanStack Router is a powerful search param parser that automatically
-converts the search string of your URL to structured JSON. This means that you can store any JSON-serializable data
-structure in your search params and it will be parsed and serialized as JSON. This is a huge improvement over
-`URLSearchParams` which has limited support for array-like structures and nested data.
+To achieve the above, the first step built in to TanStack Router is a powerful search param parser that automatically converts the search string of your URL to structured JSON. This means that you can store any JSON-serializable data structure in your search params and it will be parsed and serialized as JSON. This is a huge improvement over `URLSearchParams` which has limited support for array-like structures and nested data.
 
 For example, navigating to the following route:
 
@@ -6230,21 +5651,15 @@ If you noticed, there are a few things going on here:
 - First level values that are not strings are accurately preserved as actual numbers and booleans.
 - Nested data structures are automatically converted to URL-safe JSON strings
 
-> 🧠 It's common for other tools to assume that search params are always flat and string-based which is why we've chosen
-> to keep things URLSearchParam compliant at the first level. This ultimately means that even though TanStack Router is
-> managing your nested search params as JSON, other tools will still be able to write to the URL and read first-level
-> params normally.
+> 🧠 It's common for other tools to assume that search params are always flat and string-based which is why we've chosen to keep things URLSearchParam compliant at the first level. This ultimately means that even though TanStack Router is managing your nested search params as JSON, other tools will still be able to write to the URL and read first-level params normally.
 
 ## Validating and Typing Search Params
 
-Despite TanStack Router being able to parse search params into reliable JSON, they ultimately still came from **a
-user-facing raw-text input**. Similar to other serialization boundaries, this means that before you consume search
-params, they should be validated into a format that your application can trust and rely on.
+Despite TanStack Router being able to parse search params into reliable JSON, they ultimately still came from **a user-facing raw-text input**. Similar to other serialization boundaries, this means that before you consume search params, they should be validated into a format that your application can trust and rely on.
 
 ### Enter Validation + TypeScript!
 
-TanStack Router provides convenient APIs for validating and typing search params. This all starts with the `Route`'s
-`validateSearch` option:
+TanStack Router provides convenient APIs for validating and typing search params. This all starts with the `Route`'s `validateSearch` option:
 
 ```tsx
 // /routes/shop.products.tsx
@@ -6269,14 +5684,11 @@ export const Route = createFileRoute('/shop/products')({
 })
 ```
 
-In the above example, we're validating the search params of the `Route` and returning a typed `ProductSearch` object.
-This typed object is then made available to this route's other options **and any child routes, too!**
+In the above example, we're validating the search params of the `Route` and returning a typed `ProductSearch` object. This typed object is then made available to this route's other options **and any child routes, too!**
 
 ### Validating Search Params
 
-The `validateSearch` option is a function that is provided the JSON parsed (but non-validated) search params as a
-`Record<string, unknown>` and returns a typed object of your choice. It's usually best to provide sensible fallbacks for
-malformed or unexpected search params so your users' experience stays non-interrupted.
+The `validateSearch` option is a function that is provided the JSON parsed (but non-validated) search params as a `Record<string, unknown>` and returns a typed object of your choice. It's usually best to provide sensible fallbacks for malformed or unexpected search params so your users' experience stays non-interrupted.
 
 Here's an example:
 
@@ -6303,8 +5715,7 @@ export const Route = createFileRoute('/shop/products')({
 })
 ```
 
-Here's an example using the [Zod](https://zod.dev/) library (but feel free to use any validation library you want) to
-both validate and type the search params in a single step:
+Here's an example using the [Zod](https://zod.dev/) library (but feel free to use any validation library you want) to both validate and type the search params in a single step:
 
 ```tsx
 // /routes/shop.products.tsx
@@ -6330,20 +5741,13 @@ Because `validateSearch` also accepts an object with the `parse` property, this 
 validateSearch: productSearchSchema
 ```
 
-In the above example, we used Zod's `.catch()` modifier instead of `.default()` to avoid showing an error to the user
-because we firmly believe that if a search parameter is malformed, you probably don't want to halt the user's experience
-through the app to show a big fat error message. That said, there may be times that you **do want to show an error
-message**. In that case, you can use `.default()` instead of `.catch()`.
+In the above example, we used Zod's `.catch()` modifier instead of `.default()` to avoid showing an error to the user because we firmly believe that if a search parameter is malformed, you probably don't want to halt the user's experience through the app to show a big fat error message. That said, there may be times that you **do want to show an error message**. In that case, you can use `.default()` instead of `.catch()`.
 
-The underlying mechanics why this works relies on the `validateSearch` function throwing an error. If an error is
-thrown, the route's `onError` option will be triggered (and `error.routerCode` will be set to `VALIDATE_SEARCH` and the
-`errorComponent` will be rendered instead of the route's `component` where you can handle the search param error however
-you'd like.
+The underlying mechanics why this works relies on the `validateSearch` function throwing an error. If an error is thrown, the route's `onError` option will be triggered (and `error.routerCode` will be set to `VALIDATE_SEARCH` and the `errorComponent` will be rendered instead of the route's `component` where you can handle the search param error however you'd like.
 
 #### Adapters
 
-When using a library like [Zod](https://zod.dev/) to validate search params you might want to `transform` search params
-before committing the search params to the URL. A common `zod` `transform` is `default` for example.
+When using a library like [Zod](https://zod.dev/) to validate search params you might want to `transform` search params before committing the search params to the URL. A common `zod` `transform` is `default` for example.
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -6360,8 +5764,7 @@ export const Route = createFileRoute('/shop/products/')({
 })
 ```
 
-It might be surprising that when you try to navigate to this route, `search` is required. The following `Link` will type
-error as `search` is missing.
+It might be surprising that when you try to navigate to this route, `search` is required. The following `Link` will type error as `search` is missing.
 
 ```tsx
 <Link to="/shop/products" />
@@ -6395,9 +5798,7 @@ The important part here is the following use of `Link` no longer requires `searc
 <Link to="/shop/products" />
 ```
 
-However the use of `catch` here overrides the types and makes `page`, `filter` and `sort` `unknown` causing type loss.
-We have handled this case by providing a `fallback` generic function which retains the types but provides a `fallback`
-value when validation fails
+However the use of `catch` here overrides the types and makes `page`, `filter` and `sort` `unknown` causing type loss. We have handled this case by providing a `fallback` generic function which retains the types but provides a `fallback` value when validation fails
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -6417,8 +5818,7 @@ export const Route = createFileRoute('/shop/products/')({
 
 Therefore when navigating to this route, `search` is optional and retains the correct types.
 
-While not recommended, it is also possible to configure `input` and `output` type in case the `output` type is more
-accurate than the `input` type
+While not recommended, it is also possible to configure `input` and `output` type in case the `output` type is more accurate than the `input` type
 
 ```tsx
 const productSearchSchema = z.object({
@@ -6436,17 +5836,14 @@ export const Route = createFileRoute('/shop/products/')({
 })
 ```
 
-This provides flexibility in which type you want to infer for navigation and which types you want to infer for reading
-search params.
+This provides flexibility in which type you want to infer for navigation and which types you want to infer for reading search params.
 
 ### Valibot
 
 > [!WARNING]
 > Router expects the valibot 1.0 package to be installed.
 
-When using [Valibot](https://valibot.dev/) an adapter is not needed to ensure the correct `input` and `output` types are
-used for navigation and reading search params. This is because `valibot`
-implements [Standard Schema](https://github.com/standard-schema/standard-schema)
+When using [Valibot](https://valibot.dev/) an adapter is not needed to ensure the correct `input` and `output` types are used for navigation and reading search params. This is because `valibot` implements [Standard Schema](https://github.com/standard-schema/standard-schema)
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -6468,9 +5865,7 @@ export const Route = createFileRoute('/shop/products/')({
 > [!WARNING]
 > Router expects the arktype 2.0-rc package to be installed.
 
-When using [ArkType](https://arktype.io/) an adapter is not needed to ensure the correct `input` and `output` types are
-used for navigation and reading search params. This is because [ArkType](https://arktype.io/)
-implements [Standard Schema](https://github.com/standard-schema/standard-schema)
+When using [ArkType](https://arktype.io/) an adapter is not needed to ensure the correct `input` and `output` types are used for navigation and reading search params. This is because [ArkType](https://arktype.io/) implements [Standard Schema](https://github.com/standard-schema/standard-schema)
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -6489,10 +5884,7 @@ export const Route = createFileRoute('/shop/products/')({
 
 ### Effect/Schema
 
-When using [Effect/Schema](https://effect.website/docs/schema/introduction/) an adapter is not needed to ensure the
-correct `input` and `output` types are used for navigation and reading search params. This is
-because [Effect/Schema](https://effect.website/docs/schema/standard-schema/)
-implements [Standard Schema](https://github.com/standard-schema/standard-schema)
+When using [Effect/Schema](https://effect.website/docs/schema/introduction/) an adapter is not needed to ensure the correct `input` and `output` types are used for navigation and reading search params. This is because [Effect/Schema](https://effect.website/docs/schema/standard-schema/) implements [Standard Schema](https://github.com/standard-schema/standard-schema)
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -6531,18 +5923,15 @@ export const Route = createFileRoute('/shop/products/')({
 
 ## Reading Search Params
 
-Once your search params have been validated and typed, you're finally ready to start reading and writing to them. There
-are a few ways to do this in TanStack Router, so let's check them out.
+Once your search params have been validated and typed, you're finally ready to start reading and writing to them. There are a few ways to do this in TanStack Router, so let's check them out.
 
 ### Using Search Params in Loaders
 
-Please read the [Search Params in Loaders](../data-loading.md#using-loaderdeps-to-access-search-params) section for more
-information about how to read search params in loaders with the `loaderDeps` option.
+Please read the [Search Params in Loaders](../data-loading.md#using-loaderdeps-to-access-search-params) section for more information about how to read search params in loaders with the `loaderDeps` option.
 
 ### Search Params are inherited from Parent Routes
 
-The search parameters and types of parents are merged as you go down the route tree, so child routes also have access to
-their parent's search params:
+The search parameters and types of parents are merged as you go down the route tree, so child routes also have access to their parent's search params:
 
 - `shop.products.tsx`
 
@@ -6590,14 +5979,11 @@ const ProductList = () => {
 ```
 
 > [!TIP]
-> If your component is code-split, you can use
-> the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper)
-> to avoid having to import the `Route` configuration to get access to the typed `useSearch()` hook.
+> If your component is code-split, you can use the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper) to avoid having to import the `Route` configuration to get access to the typed `useSearch()` hook.
 
 ### Search Params outside of Route Components
 
-You can access your route's validated search params anywhere in your app using the `useSearch` hook. By passing the
-`from` id/path of your origin route, you'll get even better type safety:
+You can access your route's validated search params anywhere in your app using the `useSearch` hook. By passing the `from` id/path of your origin route, you'll get even better type safety:
 
 ```tsx
 // /routes/shop.products.tsx
@@ -6643,8 +6029,7 @@ function ProductList() {
 
 ## Writing Search Params
 
-Now that you've learned how to read your route's search params, you'll be happy to know that you've already seen the
-primary APIs to modify and update them. Let's remind ourselves a bit
+Now that you've learned how to read your route's search params, you'll be happy to know that you've already seen the primary APIs to modify and update them. Let's remind ourselves a bit
 
 ### `<Link search />`
 
@@ -6670,8 +6055,7 @@ const ProductList = () => {
 }
 ```
 
-If you want to update the search params in a generic component that is rendered on multiple routes, specifying `from`
-can be challenging.
+If you want to update the search params in a generic component that is rendered on multiple routes, specifying `from` can be challenging.
 
 In this scenario you can set `to="."` which will give you access to loosely typed search params.  
 Here is an example that illustrates this:
@@ -6689,8 +6073,7 @@ const PageSelector = () => {
 }
 ```
 
-If the generic component is only rendered in a specific subtree of the route tree, you can specify that subtree using
-`from`. Here you can omit `to='.'` if you want.
+If the generic component is only rendered in a specific subtree of the route tree, you can specify that subtree using `from`. Here you can omit `to='.'` if you want.
 
 ```tsx
 // `page` is a search param that is defined in the /posts route and hence available on all of its child routes.
@@ -6743,22 +6126,17 @@ The `router.navigate` function works exactly the same way as the `useNavigate`/`
 
 ### `<Navigate search />`
 
-The `<Navigate search />` component works exactly the same way as the `useNavigate`/`navigate` hook/function above, but
-accepts its options as props instead of a function argument.
+The `<Navigate search />` component works exactly the same way as the `useNavigate`/`navigate` hook/function above, but accepts its options as props instead of a function argument.
 
 ## Transforming search with search middlewares
 
-When link hrefs are built, by default the only thing that matters for the query string part is the `search` property of
-a `<Link>`.
+When link hrefs are built, by default the only thing that matters for the query string part is the `search` property of a `<Link>`.
 
 TanStack Router provides a way to manipulate search params before the href is generated via **search middlewares**.
-Search middlewares are functions that transform the search parameters when generating new links for a route or its
-descendants.
+Search middlewares are functions that transform the search parameters when generating new links for a route or its descendants.
 They are also executed upon navigation after search validation to allow manipulation of the query string.
 
-The following example shows how to make sure that for **every** link that is being built, the `rootValue` search param
-is added _if_ it is part of the current search params. If a link specifies `rootValue` inside `search`, then that value
-is used for building the link.
+The following example shows how to make sure that for **every** link that is being built, the `rootValue` search param is added _if_ it is part of the current search params. If a link specifies `rootValue` inside `search`, then that value is used for building the link.
 
 ```tsx
 import { z } from 'zod'
@@ -6785,8 +6163,7 @@ export const Route = createRootRoute({
 })
 ```
 
-Since this specific use case is quite common, TanStack Router provides a generic implementation to retain search params
-via `retainSearchParams`:
+Since this specific use case is quite common, TanStack Router provides a generic implementation to retain search params via `retainSearchParams`:
 
 ```tsx
 import { z } from 'zod'
@@ -6805,8 +6182,7 @@ export const Route = createRootRoute({
 })
 ```
 
-Another common use case is to strip out search params from links if their default value is set. TanStack Router provides
-a generic implementation for this use case via `stripSearchParams`:
+Another common use case is to strip out search params from links if their default value is set. TanStack Router provides a generic implementation for this use case via `stripSearchParams`:
 
 ```tsx
 import { z } from 'zod'
@@ -6832,8 +6208,7 @@ export const Route = createFileRoute('/hello')({
 })
 ```
 
-Multiple middlewares can be chained. The following example shows how to combine both `retainSearchParams` and
-`stripSearchParams`.
+Multiple middlewares can be chained. The following example shows how to combine both `retainSearchParams` and `stripSearchParams`.
 
 ```tsx
 import {
@@ -6867,70 +6242,53 @@ export const Route = createFileRoute('/search')({
 # SSR
 
 > [!WARNING]
-> While every effort has been made to separate these APIs from changes to Tanstack Start, there are underlying shared
-> implementations internally. Therefore these can be subject to change and should be regarded as experimental until Start
-> reaches stable status.
+> While every effort has been made to separate these APIs from changes to Tanstack Start, there are underlying shared implementations internally. Therefore these can be subject to change and should be regarded as experimental until Start reaches stable status.
 
-Server Side Rendering (SSR) is the process of rendering a component on the server and sending the HTML markup to the
-client. The client then hydrates the markup into a fully interactive component.
+Server Side Rendering (SSR) is the process of rendering a component on the server and sending the HTML markup to the client. The client then hydrates the markup into a fully interactive component.
 
 There are usually two different flavors of SSR to be considered:
 
 - Non-streaming SSR
-  - The entire page is rendered on the server and sent to the client in one single HTML request, including the
-    serialized data the application needs to hydrate on the client.
+  - The entire page is rendered on the server and sent to the client in one single HTML request, including the serialized data the application needs to hydrate on the client.
 - Streaming SSR
-  - The critical first paint of the page is rendered on the server and sent to the client in one single HTML request,
-    including the serialized data the application needs to hydrate on the client
+  - The critical first paint of the page is rendered on the server and sent to the client in one single HTML request, including the serialized data the application needs to hydrate on the client
   - The rest of the page is then streamed to the client as it is rendered on the server.
 
 This guide will explain how to implement both flavors of SSR with TanStack Router!
 
 ## Non-Streaming SSR
 
-Non-Streaming server-side rendering is the classic process of rendering the markup for your entire application page on
-the server and sending the completed HTML markup (and data) to the client. The client then hydrates the markup into a
-fully interactive application again.
+Non-Streaming server-side rendering is the classic process of rendering the markup for your entire application page on the server and sending the completed HTML markup (and data) to the client. The client then hydrates the markup into a fully interactive application again.
 
 To implement non-streaming SSR with TanStack Router, you will need the following utilities:
 
 - `RouterClient` from `@tanstack/react-router`
   - e.g. `<RouterClient router={router} />`
-  - Rendering this component in your client entry will render your application and also automatically implement the
-    `Wrap` component option on `Router`
+  - Rendering this component in your client entry will render your application and also automatically implement the `Wrap` component option on `Router`
 - And, either:
   - `defaultRenderHandler` from `@tanstack/react-router`
-    - This will render your application in your server entry and also automatically handle application-level
-      hydration/dehydration and also automatically implement the RouterServer component.
+    - This will render your application in your server entry and also automatically handle application-level hydration/dehydration and also automatically implement the RouterServer component.
       or:
   - `renderRouterToString` from `@tanstack/react-router`
-    - This differs from defaultRenderHandler in that it allows you to manually specify the `Wrap` component option on
-      `Router` together with any other providers you may need to wrap it with.
+    - This differs from defaultRenderHandler in that it allows you to manually specify the `Wrap` component option on `Router` together with any other providers you may need to wrap it with.
   - `RouterServer` from `@tanstack/react-router`
     - This implements the `Wrap` component option on `Router`
 
 ### Automatic Server History
 
-On the client, Router defaults to using an instance of `createBrowserHistory`, which is the preferred type of history to
-use on the client. On the server, however, you will want to use an instance of `createMemoryHistory` instead. This is
-because `createBrowserHistory` uses the `window` object, which does not exist on the server. This is handled
-automatically for you in the RouterServer component.
+On the client, Router defaults to using an instance of `createBrowserHistory`, which is the preferred type of history to use on the client. On the server, however, you will want to use an instance of `createMemoryHistory` instead. This is because `createBrowserHistory` uses the `window` object, which does not exist on the server. This is handled automatically for you in the RouterServer component.
 
 ### Automatic Loader Dehydration/Hydration
 
-Resolved loader data fetched by routes is automatically dehydrated and rehydrated by TanStack Router so long as you
-complete the standard SSR steps outlined in this guide.
+Resolved loader data fetched by routes is automatically dehydrated and rehydrated by TanStack Router so long as you complete the standard SSR steps outlined in this guide.
 
-⚠️ If you are using deferred data streaming, you will also need to ensure that you have implemented
-the [SSR Streaming & Stream Transform](#streaming-ssr) pattern near the end of this guide.
+⚠️ If you are using deferred data streaming, you will also need to ensure that you have implemented the [SSR Streaming & Stream Transform](#streaming-ssr) pattern near the end of this guide.
 
 For more information on how to utilize data loading, see the [Data Loading](../data-loading.md) guide.
 
 ### Router Creation
 
-Since your router will exist both on the server and the client, it's important that you create your router in a way that
-is consistent between both of these environments. The easiest way to do this is to expose a `createRouter` function in a
-shared file that can be imported and called by both your server and client entry files.
+Since your router will exist both on the server and the client, it's important that you create your router in a way that is consistent between both of these environments. The easiest way to do this is to expose a `createRouter` function in a shared file that can be imported and called by both your server and client entry files.
 
 ```tsx
 // src/router.tsx
@@ -6950,8 +6308,7 @@ declare module '@tanstack/react-router' {
 
 ### Rendering the Application on the Server
 
-Now that you have a router instance that has loaded all of the critical data for the current URL, you can render your
-application on the server:
+Now that you have a router instance that has loaded all of the critical data for the current URL, you can render your application on the server:
 
 using `defaultRenderToString`
 
@@ -6992,11 +6349,9 @@ export function render({ request }: { request: Request }) {
 }
 ```
 
-NOTE: The createRequestHandler method requires a web api standard Request object, while the handler method will return a
-web api standard Response promise.
+NOTE: The createRequestHandler method requires a web api standard Request object, while the handler method will return a web api standard Response promise.
 
-Should you be using a server framework like Express that uses its own Request and Response objects you would need to
-convert from the one to the other. Please have a look at the examples for how such an implementation might look like.
+Should you be using a server framework like Express that uses its own Request and Response objects you would need to convert from the one to the other. Please have a look at the examples for how such an implementation might look like.
 
 ## Rendering the Application on the Client
 
@@ -7024,18 +6379,12 @@ With this setup, your application will be rendered on the server and then hydrat
 
 ## Streaming SSR
 
-Streaming SSR is the most modern flavor of SSR and is the process of continuously and incrementally sending HTML markup
-to the client as it is rendered on the server. This is slightly different from traditional SSR in concept because beyond
-being able to dehydrate and rehydrate a critical first paint, markup and data with less priority or slower response
-times can be streamed to the client after the initial render, but in the same request.
+Streaming SSR is the most modern flavor of SSR and is the process of continuously and incrementally sending HTML markup to the client as it is rendered on the server. This is slightly different from traditional SSR in concept because beyond being able to dehydrate and rehydrate a critical first paint, markup and data with less priority or slower response times can be streamed to the client after the initial render, but in the same request.
 
-This pattern can be useful for pages that have slow or high-latency data fetching requirements. For example, if you have
-a page that needs to fetch data from a third-party API, you can stream the critical initial markup and data to the
-client and then stream the less-critical third-party data to the client as it is resolved.
+This pattern can be useful for pages that have slow or high-latency data fetching requirements. For example, if you have a page that needs to fetch data from a third-party API, you can stream the critical initial markup and data to the client and then stream the less-critical third-party data to the client as it is resolved.
 
 > [!NOTE]
-> This streaming pattern is all automatic as long as you are using either `defaultStreamHandler` or
-> `renderRouterToStream`.
+> This streaming pattern is all automatic as long as you are using either `defaultStreamHandler` or `renderRouterToStream`.
 
 using `defaultStreamHandler`
 
@@ -7078,15 +6427,11 @@ export function render({ request }: { request: Request }) {
 
 ## Streaming Dehydration/Hydration
 
-Streaming dehydration/hydration is an advanced pattern that goes beyond markup and allows you to dehydrate and stream
-any supporting data from the server to the client and rehydrate it on arrival. This is useful for applications that may
-need to further use/manage the underlying data that was used to render the initial markup on the server.
+Streaming dehydration/hydration is an advanced pattern that goes beyond markup and allows you to dehydrate and stream any supporting data from the server to the client and rehydrate it on arrival. This is useful for applications that may need to further use/manage the underlying data that was used to render the initial markup on the server.
 
 ## Data Serialization
 
-When using SSR, data passed between the server and the client must be serialized before it is sent across
-network-boundaries. TanStack Router handles this serialization using a very lightweight serializer that supports common
-data types beyond JSON.stringify/JSON.parse.
+When using SSR, data passed between the server and the client must be serialized before it is sent across network-boundaries. TanStack Router handles this serialization using a very lightweight serializer that supports common data types beyond JSON.stringify/JSON.parse.
 
 Out of the box, the following types are supported:
 
@@ -7095,21 +6440,15 @@ Out of the box, the following types are supported:
 - `Error`
 - `FormData`
 
-If you feel that there are other types that should be supported by default, please open an issue on the TanStack Router
-repository.
+If you feel that there are other types that should be supported by default, please open an issue on the TanStack Router repository.
 
-If you are using more complex data types like `Map`, `Set`, `BigInt`, etc, you may need to use a custom serializer to
-ensure that your type-definitions are accurate and your data is correctly serialized and deserialized. We are currently
-working on both a more robust serializer and a way to customize the serializer for your application. Open an issue if
-you are interested in helping out!
+If you are using more complex data types like `Map`, `Set`, `BigInt`, etc, you may need to use a custom serializer to ensure that your type-definitions are accurate and your data is correctly serialized and deserialized. We are currently working on both a more robust serializer and a way to customize the serializer for your application. Open an issue if you are interested in helping out!
 
 # Static Route Data
 
-When creating routes, you can optionally specify a `staticData` property in the route's options. This object can
-literally contain anything you want as long as it's synchronously available when you create your route.
+When creating routes, you can optionally specify a `staticData` property in the route's options. This object can literally contain anything you want as long as it's synchronously available when you create your route.
 
-In addition to being able to access this data from the route itself, you can also access it from any match under the
-`match.staticData` property.
+In addition to being able to access this data from the route itself, you can also access it from any match under the `match.staticData` property.
 
 ## Example
 
@@ -7125,8 +6464,7 @@ export const Route = createFileRoute('/posts')({
 })
 ```
 
-You can then access this data anywhere you have access to your routes, including matches that can be mapped back to
-their routes.
+You can then access this data anywhere you have access to your routes, including matches that can be mapped back to their routes.
 
 - `__root.tsx`
 
@@ -7150,8 +6488,7 @@ export const Route = createRootRoute({
 
 ## Enforcing Static Data
 
-If you want to enforce that a route has static data, you can use declaration merging to add a type to the route's static
-option:
+If you want to enforce that a route has static data, you can use declaration merging to add a type to the route's static option:
 
 ```tsx
 declare module '@tanstack/react-router' {
@@ -7189,8 +6526,7 @@ As long as there are any required properties on the `StaticDataRouteOption`, you
 
 # TanStack Start
 
-TanStack Start is a full-stack framework for building server-rendered React applications built on top
-of [TanStack Router](https://tanstack.com/router).
+TanStack Start is a full-stack framework for building server-rendered React applications built on top of [TanStack Router](https://tanstack.com/router).
 
 To set up a TanStack Start project, you'll need to:
 
@@ -7303,8 +6639,7 @@ Once configuration is done, we'll have a file tree that looks like the following
 
 ## The Router Configuration
 
-This is the file that will dictate the behavior of TanStack Router used within Start for both the server and the client.
-Here, you can configure everything
+This is the file that will dictate the behavior of TanStack Router used within Start for both the server and the client. Here, you can configure everything
 from the default [preloading functionality](../preloading.md) to [caching staleness](../data-loading.md).
 
 ```tsx
@@ -7332,8 +6667,7 @@ declare module '@tanstack/react-router' {
 
 ## The Root of Your Application
 
-Finally, we need to create the root of our application. This is the entry point for all application routes. The code in
-this file will wrap all other routes in the application.
+Finally, we need to create the root of our application. This is the entry point for all application routes. The code in this file will wrap all other routes in the application.
 
 ```tsx
 // app/routes/__root.tsx
@@ -7384,8 +6718,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 
 # Writing Your First Route
 
-Now that we have the basic templating setup, we can write our first route. This is done by creating a new file in the
-`app/routes` directory.
+Now that we have the basic templating setup, we can write our first route. This is done by creating a new file in the `app/routes` directory.
 
 ```tsx
 // app/routes/index.tsx
@@ -7441,26 +6774,19 @@ You can now run `npm run dev` to start your server and navigate to `http://local
 
 # Type Safety
 
-TanStack Router is built to be as type-safe as possible within the limits of the TypeScript compiler and runtime. This
-means that it's not only written in TypeScript, but that it also **fully infers the types it's provided and tenaciously
-pipes them through the entire routing experience**.
+TanStack Router is built to be as type-safe as possible within the limits of the TypeScript compiler and runtime. This means that it's not only written in TypeScript, but that it also **fully infers the types it's provided and tenaciously pipes them through the entire routing experience**.
 
-Ultimately, this means that you write **less types as a developer** and have **more confidence in your code** as it
-evolves.
+Ultimately, this means that you write **less types as a developer** and have **more confidence in your code** as it evolves.
 
 ## Route Definitions
 
 ### File-based Routing
 
-Routes are hierarchical, and so are their definitions. If you're using file-based routing, much of the type-safety is
-already taken care of for you.
+Routes are hierarchical, and so are their definitions. If you're using file-based routing, much of the type-safety is already taken care of for you.
 
 ### Code-based Routing
 
-If you're using the `Route` class directly, you'll need to be aware of how to ensure your routes are typed properly
-using the `Route`'s `getParentRoute` option. This is because child routes need to be aware of **all** of their parent
-routes types. Without this, those precious search params you parsed out of your _layout_ and _pathless layout_ routes, 3
-levels up, would be lost to the JS void.
+If you're using the `Route` class directly, you'll need to be aware of how to ensure your routes are typed properly using the `Route`'s `getParentRoute` option. This is because child routes need to be aware of **all** of their parent routes types. Without this, those precious search params you parsed out of your _layout_ and _pathless layout_ routes, 3 levels up, would be lost to the JS void.
 
 So, don't forget to pass the parent route to your child routes!
 
@@ -7472,9 +6798,7 @@ const parentRoute = createRoute({
 
 ## Exported Hooks, Components, and Utilities
 
-For the types of your router to work with top-level exports like `Link`, `useNavigate`, `useParams`, etc. they must
-permeate the type-script module boundary and be registered right into the library. To do this, we use declaration
-merging on the exported `Register` interface.
+For the types of your router to work with top-level exports like `Link`, `useNavigate`, `useParams`, etc. they must permeate the type-script module boundary and be registered right into the library. To do this, we use declaration merging on the exported `Register` interface.
 
 ```ts
 const router = createRouter({
@@ -7488,15 +6812,11 @@ declare module '@tanstack/react-router' {
 }
 ```
 
-By registering your router with the module, you can now use the exported hooks, components, and utilities with your
-router's exact types.
+By registering your router with the module, you can now use the exported hooks, components, and utilities with your router's exact types.
 
 ## Fixing the Component Context Problem
 
-Component context is a wonderful tool in React and other frameworks for providing dependencies to components. However,
-if that context is changing types as it moves throughout your component hierarchy, it becomes impossible for TypeScript
-to know how to infer those changes. To get around this, context-based hooks and components require that you give them a
-hint on how and where they are being used.
+Component context is a wonderful tool in React and other frameworks for providing dependencies to components. However, if that context is changing types as it moves throughout your component hierarchy, it becomes impossible for TypeScript to know how to infer those changes. To get around this, context-based hooks and components require that you give them a hint on how and where they are being used.
 
 ```tsx
 export const Route = createFileRoute('/posts')({
@@ -7515,30 +6835,21 @@ function PostsComponent() {
 }
 ```
 
-Every hook and component that requires a context hint will have a `from` param where you can pass the ID or path of the
-route you are rendering within.
+Every hook and component that requires a context hint will have a `from` param where you can pass the ID or path of the route you are rendering within.
 
-> 🧠 Quick tip: If your component is code-split, you can use
-> the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper)
-> to avoid having to pass in the `Route.fullPath` to get access to the typed `useParams()` and `useSearch()` hooks.
+> 🧠 Quick tip: If your component is code-split, you can use the [getRouteApi function](../code-splitting.md#manually-accessing-route-apis-in-other-files-with-the-getrouteapi-helper) to avoid having to pass in the `Route.fullPath` to get access to the typed `useParams()` and `useSearch()` hooks.
 
 ### What if I don't know the route? What if it's a shared component?
 
-The `from` property is optional, which means if you don't pass it, you'll get the router's best guess on what types will
-be available. Usually, that means you'll get a union of all of the types of all of the routes in the router.
+The `from` property is optional, which means if you don't pass it, you'll get the router's best guess on what types will be available. Usually, that means you'll get a union of all of the types of all of the routes in the router.
 
 ### What if I pass the wrong `from` path?
 
-It's technically possible to pass a `from` that satisfies TypeScript, but may not match the actual route you are
-rendering within at runtime. In this case, each hook and component that supports `from` will detect if your expectations
-don't match the actual route you are rendering within, and will throw a runtime error.
+It's technically possible to pass a `from` that satisfies TypeScript, but may not match the actual route you are rendering within at runtime. In this case, each hook and component that supports `from` will detect if your expectations don't match the actual route you are rendering within, and will throw a runtime error.
 
 ### What if I don't know the route, or it's a shared component, and I can't pass `from`?
 
-If you are rendering a component that is shared across multiple routes, or you are rendering a component that is not
-within a route, you can pass `strict: false` instead of a `from` option. This will not only silence the runtime error,
-but will also give you relaxed, but accurate types for the potential hook you are calling. A good example of this is
-calling `useSearch` from a shared component:
+If you are rendering a component that is shared across multiple routes, or you are rendering a component that is not within a route, you can pass `strict: false` instead of a `from` option. This will not only silence the runtime error, but will also give you relaxed, but accurate types for the potential hook you are calling. A good example of this is calling `useSearch` from a shared component:
 
 ```tsx
 function MyComponent() {
@@ -7546,18 +6857,13 @@ function MyComponent() {
 }
 ```
 
-In this case, the `search` variable will be typed as a union of all possible search params from all routes in the
-router.
+In this case, the `search` variable will be typed as a union of all possible search params from all routes in the router.
 
 ## Router Context
 
-Router context is so extremely useful as it's the ultimate hierarchical dependency injection. You can supply context to
-the router and to each and every route it renders. As you build up this context, TanStack Router will merge it down with
-the hierarchy of routes, so that each route has access to the context of all of its parents.
+Router context is so extremely useful as it's the ultimate hierarchical dependency injection. You can supply context to the router and to each and every route it renders. As you build up this context, TanStack Router will merge it down with the hierarchy of routes, so that each route has access to the context of all of its parents.
 
-The `createRootRouteWithContext` factory creates a new router with the instantiated type, which then creates a
-requirement for you to fulfill the same type contract to your router, and will also ensure that your context is properly
-typed throughout the entire route tree.
+The `createRootRouteWithContext` factory creates a new router with the instantiated type, which then creates a requirement for you to fulfill the same type contract to your router, and will also ensure that your context is properly typed throughout the entire route tree.
 
 ```tsx
 const rootRoute = createRootRouteWithContext<{ whateverYouWant: true }>()({
@@ -7579,13 +6885,11 @@ const router = createRouter({
 
 ## Performance Recommendations
 
-As your application scales, TypeScript check times will naturally increase. There are a few things to keep in mind when
-your application scales to keep your TS check times down.
+As your application scales, TypeScript check times will naturally increase. There are a few things to keep in mind when your application scales to keep your TS check times down.
 
 ### Only infer types you need
 
-A great pattern with client side data caches (TanStack Query, etc.) is to prefetch data. For example with TanStack Query
-you might have a route which calls `queryClient.ensureQueryData` in a `loader`.
+A great pattern with client side data caches (TanStack Query, etc.) is to prefetch data. For example with TanStack Query you might have a route which calls `queryClient.ensureQueryData` in a `loader`.
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId/deep')({
@@ -7602,10 +6906,7 @@ function PostDeepComponent() {
 }
 ```
 
-This may look fine and for small route trees and you may not notice any TS performance issues. However in this case TS
-has to infer the loader's return type, despite it never being used in your route. If the loader data is a complex type
-with many routes that prefetch in this manner, it can slow down editor performance. In this case, the change is quite
-simple and let typescript infer Promise<void>.
+This may look fine and for small route trees and you may not notice any TS performance issues. However in this case TS has to infer the loader's return type, despite it never being used in your route. If the loader data is a complex type with many routes that prefetch in this manner, it can slow down editor performance. In this case, the change is quite simple and let typescript infer Promise<void>.
 
 ```tsx
 export const Route = createFileRoute('/posts/$postId/deep')({
@@ -7623,8 +6924,7 @@ function PostDeepComponent() {
 }
 ```
 
-This way the loader data is never inferred and it moves the inference out of the route tree to the first time you use
-`useSuspenseQuery`.
+This way the loader data is never inferred and it moves the inference out of the route tree to the first time you use `useSuspenseQuery`.
 
 ### Narrow to relevant routes as much as you possibly can
 
@@ -7635,12 +6935,7 @@ Consider the following usage of `Link`
 <Link to="." search={{ page: 0 }} />
 ```
 
-**These examples are bad for TS performance**. That's because `search` resolves to a union of all `search` params for
-all routes and TS has to check whatever you pass to the `search` prop against this potentially big union. As your
-application grows, this check time will increase linearly to number of routes and search params. We have done our best
-to optimize for this case (TypeScript will typically do this work once and cache it) but the initial check against this
-large union is expensive. This also applies to `params` and other API's such as `useSearch`, `useParams`, `useNavigate`
-etc.
+**These examples are bad for TS performance**. That's because `search` resolves to a union of all `search` params for all routes and TS has to check whatever you pass to the `search` prop against this potentially big union. As your application grows, this check time will increase linearly to number of routes and search params. We have done our best to optimize for this case (TypeScript will typically do this work once and cache it) but the initial check against this large union is expensive. This also applies to `params` and other API's such as `useSearch`, `useParams`, `useNavigate` etc.
 
 Instead you should try to narrow to relevant routes with `from` or `to`.
 
@@ -7667,13 +6962,9 @@ const from = '/posts'
 
 ### Consider using the object syntax of `addChildren`
 
-It's typical of routes to have `params` `search`, `loaders` or `context` that can even reference external dependencies
-which are also heavy on TS inference. For such applications, using objects for creating the route tree can be more
-performant than tuples.
+It's typical of routes to have `params` `search`, `loaders` or `context` that can even reference external dependencies which are also heavy on TS inference. For such applications, using objects for creating the route tree can be more performant than tuples.
 
-`createChildren` also can accept an object. For large route trees with complex routes and external libraries, objects
-can be much faster for TS to type check as opposed to large tuples. The performance gains depend on your project, what
-external dependencies you have and how the types for those libraries are written
+`createChildren` also can accept an object. For large route trees with complex routes and external libraries, objects can be much faster for TS to type check as opposed to large tuples. The performance gains depend on your project, what external dependencies you have and how the types for those libraries are written
 
 ```tsx
 const routeTree = rootRoute.addChildren({
@@ -7682,8 +6973,7 @@ const routeTree = rootRoute.addChildren({
 })
 ```
 
-Note this syntax is more verbose but has better TS performance. With file based routing, the route tree is generated for
-you so a verbose route tree is not a concern
+Note this syntax is more verbose but has better TS performance. With file based routing, the route tree is generated for you so a verbose route tree is not a concern
 
 ### Avoid internal types without narrowing
 
@@ -7699,9 +6989,7 @@ return (
 )
 ```
 
-**This is VERY bad for TS Performance**. The problem here is `LinkProps` has no type arguments and is therefore an
-extremely large type. It includes `search` which is a union of all `search` params, it contains `params` which is a
-union of all `params`. When merging this object with `Link` it will do a structural comparison of this huge type.
+**This is VERY bad for TS Performance**. The problem here is `LinkProps` has no type arguments and is therefore an extremely large type. It includes `search` which is a union of all `search` params, it contains `params` which is a union of all `params`. When merging this object with `Link` it will do a structural comparison of this huge type.
 
 Instead you can use `as const satisfies` to infer a precise type and not `LinkProps` directly to avoid the huge check
 
@@ -7715,8 +7003,7 @@ return (
 )
 ```
 
-As `props` is not of type `LinkProps` and therefore this check is cheaper because the type is much more precise. You can
-also improve type checking further by narrowing `LinkProps`
+As `props` is not of type `LinkProps` and therefore this check is cheaper because the type is much more precise. You can also improve type checking further by narrowing `LinkProps`
 
 ```tsx
 const props = {
@@ -7730,8 +7017,7 @@ return (
 
 This is even faster as we're checking against the narrowed `LinkProps` type.
 
-You can also use this to narrow the type of `LinkProps` to a specific type to be used as a prop or parameter to a
-function
+You can also use this to narrow the type of `LinkProps` to a specific type to be used as a prop or parameter to a function
 
 ```tsx
 export const myLinkProps = [
@@ -7753,8 +7039,7 @@ const MyComponent = (props: { linkProps: MyLinkProps }) => {
 
 This is faster than using `LinkProps` directly in a component because `MyLinkProps` is a much more precise type
 
-Another solution is not to use `LinkProps` and to provide inversion of control to render a `Link` component narrowed to
-a specific route. Render props are a good method of inverting control to the user of a component
+Another solution is not to use `LinkProps` and to provide inversion of control to render a `Link` component narrowed to a specific route. Render props are a good method of inverting control to the user of a component
 
 ```tsx
 export interface MyComponentProps {
@@ -7770,22 +7055,16 @@ const Page = () => {
 }
 ```
 
-This particular example is very fast as we've inverted control of where we're navigating to the user of the component.
-The `Link` is narrowed to the exact route
+This particular example is very fast as we've inverted control of where we're navigating to the user of the component. The `Link` is narrowed to the exact route
 we want to navigate to
 
 # Type Utilities
 
-Most types exposed by TanStack Router are internal, subject to breaking changes and not always easy to use. That is why
-TanStack Router has a subset of exposed types focused on ease of use with the intension to be used externally. These
-types provide the same type safe experience from TanStack Router's runtime concepts on the type level, with flexibility
-of where to provide type checking
+Most types exposed by TanStack Router are internal, subject to breaking changes and not always easy to use. That is why TanStack Router has a subset of exposed types focused on ease of use with the intension to be used externally. These types provide the same type safe experience from TanStack Router's runtime concepts on the type level, with flexibility of where to provide type checking
 
 ## Type checking Link options with `ValidateLinkOptions`
 
-`ValidateLinkOptions` type checks object literal types to ensure they conform to `Link` options at inference sites. For
-example, you may have a generic `HeadingLink` component which accepts a `title` prop along with `linkOptions`, the idea
-being this component can be re-used for any navigation.
+`ValidateLinkOptions` type checks object literal types to ensure they conform to `Link` options at inference sites. For example, you may have a generic `HeadingLink` component which accepts a `title` prop along with `linkOptions`, the idea being this component can be re-used for any navigation.
 
 ```tsx
 export interface HeaderLinkProps<
@@ -7809,13 +7088,9 @@ export function HeadingLink(props: HeaderLinkProps): React.ReactNode {
 }
 ```
 
-A more permissive overload of `HeadingLink` is used to avoid type assertions you would otherwise have to do with the
-generic signature. Using a looser signature without type parameters is an easy way to avoid type assertions in the
-implementation of `HeadingLink`
+A more permissive overload of `HeadingLink` is used to avoid type assertions you would otherwise have to do with the generic signature. Using a looser signature without type parameters is an easy way to avoid type assertions in the implementation of `HeadingLink`
 
-All type parameters for utilities are optional but for the best TypeScript performance `TRouter` should always be
-specified for the public facing signature. And `TOptions` should always be used at inference sites like `HeadingLink` to
-infer the `linkOptions` to correctly narrow `params` and `search`
+All type parameters for utilities are optional but for the best TypeScript performance `TRouter` should always be specified for the public facing signature. And `TOptions` should always be used at inference sites like `HeadingLink` to infer the `linkOptions` to correctly narrow `params` and `search`
 
 The result of this is that `linkOptions` in the following is completely type-safe
 
@@ -7826,8 +7101,7 @@ The result of this is that `linkOptions` in the following is completely type-saf
 
 ## Type checking an array of Link options with `ValidateLinkOptionsArray`
 
-All navigation type utilities have an array variant. `ValidateLinkOptionsArray` enables type checking of an array of
-`Link` options. For example, you might have a generic `Menu` component where each item is a `Link`.
+All navigation type utilities have an array variant. `ValidateLinkOptionsArray` enables type checking of an array of `Link` options. For example, you might have a generic `Menu` component where each item is a `Link`.
 
 ```tsx
 export interface MenuProps<
@@ -7860,8 +7134,7 @@ This of course allows the following `items` prop to be completely type-safe
 <Menu items={[{ to: '/posts' }, { to: '/posts/$postId', params: { postId: 'postId' } }]} />
 ```
 
-It is also possible to fix `from` for each `Link` options in the array. This would allow all `Menu` items to navigate
-relative to `from`. Additional type checking of `from` can be provided by the `ValidateFromPath` utility
+It is also possible to fix `from` for each `Link` options in the array. This would allow all `Menu` items to navigate relative to `from`. Additional type checking of `from` can be provided by the `ValidateFromPath` utility
 
 ```tsx
 export interface MenuProps<
@@ -7891,8 +7164,7 @@ export function Menu(props: MenuProps): React.ReactNode {
 }
 ```
 
-`ValidateLinkOptionsArray` allows you to fix `from` by providing an extra type parameter. The result is a type safe
-array of `Link` options providing navigation relative to `from`
+`ValidateLinkOptionsArray` allows you to fix `from` by providing an extra type parameter. The result is a type safe array of `Link` options providing navigation relative to `from`
 
 ```tsx
 <Menu from="/posts" items={[{ to: '.' }, { to: './$postId', params: { postId: 'postId' } }]} />
@@ -7900,9 +7172,7 @@ array of `Link` options providing navigation relative to `from`
 
 ## Type checking redirect options with `ValidateRedirectOptions`
 
-`ValidateRedirectOptions` type checks object literal types to ensure they conform to redirect options at inference
-sites. For example, you may need a generic `fetchOrRedirect` function which accepts a `url` along with
-`redirectOptions`, the idea being this function will redirect when the `fetch` fails.
+`ValidateRedirectOptions` type checks object literal types to ensure they conform to redirect options at inference sites. For example, you may need a generic `fetchOrRedirect` function which accepts a `url` along with `redirectOptions`, the idea being this function will redirect when the `fetch` fails.
 
 ```tsx
 export async function fetchOrRedirect<
@@ -7931,8 +7201,7 @@ fetchOrRedirect('http://example.com/', { to: '/login' })
 
 ## Type checking navigate options with `ValidateNavigateOptions`
 
-`ValidateNavigateOptions` type checks object literal types to ensure they conform to navigate options at inference
-sites. For example, you may want to write a custom hook to enable/disable navigation.
+`ValidateNavigateOptions` type checks object literal types to ensure they conform to navigate options at inference sites. For example, you may want to write a custom hook to enable/disable navigation.
 
 [//]: # 'TypeCheckingNavigateOptionsWithValidateNavigateOptionsImpl'
 
@@ -7966,8 +7235,7 @@ export function useConditionalNavigate(
 
 [//]: # 'TypeCheckingNavigateOptionsWithValidateNavigateOptionsImpl'
 
-The result of this is that `navigateOptions` passed to `useConditionalNavigate` is completely type-safe and we can
-enable/disable navigation based on react state
+The result of this is that `navigateOptions` passed to `useConditionalNavigate` is completely type-safe and we can enable/disable navigation based on react state
 
 ```tsx
 const { enable, disable, navigate } = useConditionalNavigate({
