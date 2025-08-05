@@ -1,12 +1,26 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@foadonis/openapi/decorators'
 
 import Movie from '#models/movie'
 import { moviePaginateValidator } from '#validators/movie_validator'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import cache from '@adonisjs/cache/services/main'
+import bindMovie from '#decorators/bind_movie'
+import { PaginatedMovieResponse } from '../openapi/movie_responses.js'
 
+@ApiBearerAuth()
+@ApiTags('Movies')
 export default class MoviesController {
+  @ApiOperation({
+    summary: 'List all paginated movies.',
+    description: 'Movies list description.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All movies available.',
+    type: PaginatedMovieResponse,
+  })
   async index({ request }: HttpContext) {
     const {
       page = 1,
@@ -20,61 +34,43 @@ export default class MoviesController {
       .paginate(page || 1, safeLimit)
 
     movies.baseUrl(router.makeUrl('api.movies.index'))
-    const trakt = await app.container.make('trakt')
-    const fanart = await app.container.make('fanart')
-    const data = await Promise.all(
-      movies.all().map(async (movie) => {
-        const movieId = movie.id
-        return {
-          id: movieId,
-          metadata: movie.metadata,
-          images: await cache.getOrSet({
-            key: `movie-img-${movie.id}`,
-            factory: async () => await fanart.movie.get(movie.tmdb),
-            grace: '24h',
-            ttl: '24h',
-            tags: ['movie', 'images'],
-          }),
-          ...(await cache.getOrSet({
-            key: `movie-min-${movie.id}`,
-            factory: async () => await trakt.movies.get(movieId),
-            grace: '24h',
-            ttl: '24h',
-            tags: ['movie'],
-          })),
-        }
-      })
-    )
+    const data = movies.all().map((movie) => {
+      const movieId = movie.id
+      return {
+        id: movieId,
+        title: movie.title,
+        year: movie.year,
+      }
+    })
+
     return {
       meta: movies.getMeta(),
       data,
     }
   }
 
-  async show({ params, response }: HttpContext) {
-    const movie = await Movie.query().where('id', params.id).first()
-
-    if (!movie) return response.notFound({ message: 'Movie not found' })
-
-    const trakt = await app.container.make('trakt')
+  @bindMovie()
+  async images({}: HttpContext, movie: Movie) {
     const fanart = await app.container.make('fanart')
-    return {
-      id: movie.id,
-      image: await cache.getOrSet({
-        key: `movie-img-${movie.id}`,
-        factory: async () => await fanart.movie.get(movie.tmdb),
-        grace: '24h',
-        ttl: '24h',
-        tags: ['movie', 'images'],
-      }),
-      ...(await cache.getOrSet({
-        key: `movie-ful-${movie.id}`,
-        factory: async () => await trakt.movies.get(movie.id, true),
-        grace: '24h',
-        ttl: '24h',
-        tags: ['movie'],
-      })),
-    }
+    return cache.getOrSet({
+      key: `movie-images-${movie.id}`,
+      factory: async () => await fanart.movie.get(movie.tmdb),
+      grace: '24h',
+      ttl: '24h',
+      tags: ['movie-images'],
+    })
+  }
+
+  @bindMovie()
+  async info({}: HttpContext, movie: Movie) {
+    const trakt = await app.container.make('trakt')
+    return cache.getOrSet({
+      key: `movie-info-${movie.id}`,
+      factory: async () => await trakt.movies.get(movie.id, true),
+      grace: '24h',
+      ttl: '24h',
+      tags: ['movie-info'],
+    })
   }
 
   async stream({ request, response, params }: HttpContext) {

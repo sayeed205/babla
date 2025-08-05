@@ -8,7 +8,7 @@ export default class DocsController {
     response.header('Content-Type', 'text/html')
     return response.send(`
       <!doctype html>
-      <html>
+      <html lang="en-IN">
         <head>
           <title>Scalar API Reference</title>
           <meta charset="utf-8" />
@@ -27,12 +27,12 @@ export default class DocsController {
           <script>
             const app = Scalar.createApiReference('#app', {
               // The URL of the OpenAPI/Swagger document
-              url: '/docs/swagger.json',
+              url: '/api/docs/swagger.json',
               // Avoid CORS issues
               proxyUrl: 'https://proxy.scalar.com',
             })
             app.updateConfiguration({
-              url: '/docs/swagger.json'
+              url: '/api/docs/swagger.json'
             })
           </script>
         </body>

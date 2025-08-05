@@ -13,7 +13,6 @@ import { middleware } from '#start/kernel'
 
 const DocsController = () => import('#controllers/docs_controller')
 const AuthController = () => import('#controllers/auth_controller')
-const CollectionsController = () => import('#controllers/collections_controller')
 const MoviesController = () => import('#controllers/movies_controller')
 const TVShowsController = () => import('#controllers/tvs_controller')
 
@@ -54,27 +53,28 @@ router
 
     /*
     |--------------------------------------------------------------------------
-    | COLLECTIONS Routes
-    |--------------------------------------------------------------------------
-    */
-    router
-      .resource('collections', CollectionsController)
-      .only(['index', 'show'])
-      .where('id', router.matchers.number())
-
-    /*
-    |--------------------------------------------------------------------------
     | MOVIES Routes
     |--------------------------------------------------------------------------
     */
     router
-      .resource('movies', MoviesController)
-      .only(['index', 'show'])
-      .where('id', router.matchers.slug())
-    router
-      .get('movies/:id/stream', [MoviesController, 'stream'])
-      .as('movies.stream')
-      .where('id', router.matchers.slug())
+      .group(() => {
+        router.get('/', [MoviesController, 'index']).as('index')
+        router
+          .get('/:id/images', [MoviesController, 'images'])
+          .as('images')
+          .where('id', router.matchers.slug())
+        router
+          .get('/:id/info', [MoviesController, 'info'])
+          .as('info')
+          .where('id', router.matchers.slug())
+        router
+          .get('/:id/stream', [MoviesController, 'stream'])
+          .as('stream')
+          .where('id', router.matchers.slug())
+      })
+      .as('movies')
+      .prefix('movies')
+      .use([middleware.auth()])
 
     /*
     |--------------------------------------------------------------------------

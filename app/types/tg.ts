@@ -5,6 +5,7 @@ export type ParsedMediaText = ParsedMovieText | ParsedShowText
 export type MediaMetadata = {
   mimeType: string
   size: number
+  filename: string
 }
 
 export type TGMetadata = {

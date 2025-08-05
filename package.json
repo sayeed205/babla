@@ -29,6 +29,7 @@
     "#abilities/*": "./app/abilities/*.js",
     "#types/*": "./app/types/*.js",
     "#utils/*": "./app/utils/*.js",
+    "#decorators/*": "./app/decorators/*.js",
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
     "#tests/*": "./tests/*.js",

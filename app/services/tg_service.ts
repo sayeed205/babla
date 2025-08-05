@@ -32,8 +32,6 @@ export class TGService {
       .update(dataCheckString)
       .digest('hex')
 
-    console.log(calculatedHash, hash)
-
     return calculatedHash === hash
   }
 }

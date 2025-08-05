@@ -132,7 +132,7 @@ const handleMovie = async (
     tmdb: traktMovie.ids.tmdb,
     year: traktMovie.year,
     imdb: traktMovie.ids.imdb,
-    metadata: { size: media.fileSize!, mimeType: media.mimeType },
+    metadata: { size: media.fileSize!, mimeType: media.mimeType, filename: media.fileName! },
     tgMetadata: { fileId: media.fileId, fileLink: link },
   })
 
@@ -221,10 +221,7 @@ const handleTV = async (
     tvdb: traktEpisode.ids.tvdb,
     trakt: traktEpisode.ids.trakt,
     title: traktEpisode.title,
-    metadata: {
-      mimeType: media.mimeType,
-      size: media.fileSize!,
-    },
+    metadata: { mimeType: media.mimeType, size: media.fileSize!, filename: media.fileName! },
     tgMetadata: { fileId: media.fileId, fileLink: link },
   })
   await episode.save()

@@ -1,4 +1,5 @@
 import { errors } from '@adonisjs/core'
+import { errors as authErrors } from '@adonisjs/auth'
 import { ExceptionHandler, HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 
@@ -15,9 +16,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async handle(error: unknown, ctx: HttpContext) {
     if (error instanceof errors.E_ROUTE_NOT_FOUND) {
-      return ctx.response.status(404).send({ message: 'Resource not found' })
+      return ctx.response.notFound({ message: 'Resource not found' })
     }
 
+    if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS) {
+      return ctx.response.unauthorized({ message: 'Unauthorized access' })
+    }
     return super.handle(error, ctx)
   }
 

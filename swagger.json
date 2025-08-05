@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "Babla",
     "description": "",
@@ -7,63 +7,26 @@
   },
   "tags": [
     {
-      "name": "Collections"
+      "name": "Authentication"
     },
     {
       "name": "Movies"
     },
     {
       "name": "TV Shows"
+    },
+    {
+      "name": "Trakt"
     }
   ],
   "paths": {
-    "/collections": {
+    "/auth/start": {
       "get": {
-        "summary": "All Collections",
+        "summary": "Start Auth",
         "deprecated": false,
-        "description": "Get all the collections in a paginated format",
-        "tags": ["Collections"],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "example": 1,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "example": 2,
-            "schema": {
-              "type": "number",
-              "default": 20,
-              "minimum": 1,
-              "maximum": 20,
-              "examples": [5]
-            }
-          },
-          {
-            "name": "order",
-            "in": "query",
-            "description": "",
-            "required": false,
-            "example": "asc",
-            "schema": {
-              "type": "string",
-              "enum": ["asc", "desc"],
-              "default": "asc",
-              "examples": ["asc", "desc"]
-            }
-          }
-        ],
+        "description": "",
+        "tags": ["Authentication"],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -71,148 +34,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "integer"
-                        },
-                        "perPage": {
-                          "type": "integer"
-                        },
-                        "currentPage": {
-                          "type": "integer"
-                        },
-                        "lastPage": {
-                          "type": "integer"
-                        },
-                        "firstPage": {
-                          "type": "integer"
-                        },
-                        "firstPageUrl": {
-                          "type": "string"
-                        },
-                        "lastPageUrl": {
-                          "type": "string"
-                        },
-                        "nextPageUrl": {
-                          "type": "null"
-                        },
-                        "previousPageUrl": {
-                          "type": "null"
-                        }
-                      },
-                      "required": [
-                        "total",
-                        "perPage",
-                        "currentPage",
-                        "lastPage",
-                        "firstPage",
-                        "firstPageUrl",
-                        "lastPageUrl",
-                        "nextPageUrl",
-                        "previousPageUrl"
-                      ]
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "title": {
-                            "type": "string"
-                          },
-                          "poster": {
-                            "type": "string"
-                          },
-                          "totalMovies": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "required": ["meta", "data"]
-                },
-                "example": {
-                  "meta": {
-                    "total": 1,
-                    "perPage": 2,
-                    "currentPage": 1,
-                    "lastPage": 1,
-                    "firstPage": 1,
-                    "firstPageUrl": "/collections?page=1",
-                    "lastPageUrl": "/collections?page=1",
-                    "nextPageUrl": null,
-                    "previousPageUrl": null
-                  },
-                  "data": [
-                    {
-                      "id": "87359",
-                      "title": "Mission: Impossible Collection",
-                      "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
-                      "totalMovies": 1
-                    }
-                  ]
-                }
-              }
-            },
-            "headers": {}
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errors": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "message": {
-                            "type": "string"
-                          },
-                          "rule": {
-                            "type": "string"
-                          },
-                          "field": {
-                            "type": "string"
-                          },
-                          "meta": {
-                            "type": "object",
-                            "properties": {
-                              "choices": {
-                                "type": "array",
-                                "items": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "required": ["choices"]
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "required": ["errors"]
-                },
-                "example": {
-                  "errors": [
-                    {
-                      "message": "The selected order is invalid",
-                      "rule": "enum",
-                      "field": "order",
-                      "meta": {
-                        "choices": ["asc", "desc"]
-                      }
-                    }
-                  ]
+                  "properties": {}
                 }
               }
             },
@@ -222,21 +44,21 @@
         "security": []
       }
     },
-    "/collections/{id}": {
+    "/auth/poll/{id}": {
       "get": {
-        "summary": "Collection by ID",
+        "summary": "Poll Auth Status",
         "deprecated": false,
         "description": "",
-        "tags": ["Collections"],
+        "tags": ["Authentication"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "description": "",
             "required": true,
-            "example": 123424,
+            "example": "k3u11olwgj0nkybs3si0j6ug",
             "schema": {
-              "type": "integer"
+              "type": "string"
             }
           }
         ],
@@ -248,78 +70,106 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "firstName": {
+                          "type": "string"
+                        },
+                        "lastName": {
+                          "type": "null"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "avatar": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "firstName",
+                        "lastName",
+                        "username",
+                        "avatar",
+                        "createdAt",
+                        "updatedAt"
+                      ]
                     },
-                    "title": {
-                      "type": "string"
-                    },
-                    "overview": {
-                      "type": "string"
-                    },
-                    "poster": {
-                      "type": "string"
-                    },
-                    "backdrop": {
-                      "type": "string"
-                    },
-                    "movies": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "title": {
-                            "type": "string"
-                          },
-                          "releaseDate": {
-                            "type": "string"
-                          },
-                          "runtime": {
-                            "type": "integer"
-                          },
-                          "popularity": {
-                            "type": "number"
-                          },
-                          "voteAverage": {
-                            "type": "number"
-                          },
-                          "voteCount": {
-                            "type": "integer"
-                          },
-                          "adult": {
-                            "type": "boolean"
-                          },
-                          "poster": {
+                    "token": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "null"
+                        },
+                        "token": {
+                          "type": "string"
+                        },
+                        "abilities": {
+                          "type": "array",
+                          "items": {
                             "type": "string"
                           }
+                        },
+                        "lastUsedAt": {
+                          "type": "null"
+                        },
+                        "expiresAt": {
+                          "type": "null"
                         }
-                      }
+                      },
+                      "required": ["type", "name", "token", "abilities", "lastUsedAt", "expiresAt"]
                     }
                   },
-                  "required": ["id", "title", "overview", "poster", "backdrop", "movies"]
+                  "required": ["user", "token"]
                 },
                 "example": {
-                  "id": "87359",
-                  "title": "Mission: Impossible Collection",
-                  "overview": "Mission: Impossible is a series of a secret agent thriller films based on the popular 1966–73 television series. They chronicle the missions of a team of secret government agents known as the Impossible Missions Force (IMF) under the leadership of agent Ethan Hunt.",
-                  "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
-                  "backdrop": "/mroWh717g0Ah2c0rrPGW6f3EWMM.jpg",
-                  "movies": [
-                    {
-                      "id": "954",
-                      "title": "Mission: Impossible",
-                      "releaseDate": "1996-05-22T00:00:00.000Z",
-                      "runtime": 110,
-                      "popularity": 22.1827,
-                      "voteAverage": 7.003,
-                      "voteCount": 9344,
-                      "adult": false,
-                      "poster": "/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg"
+                  "user": {
+                    "id": "6252490183",
+                    "firstName": "Hitarashi (\"⁧;(\"",
+                    "lastName": null,
+                    "username": "sayeed69",
+                    "avatar": "https://t.me/i/userpic/320/bBe8s6eYYwE5CzHABZsIU0yV9paLztxCiaV752qnfiXi3wb8ir7FfNYu_vqCvrfB.jpg",
+                    "createdAt": "2025-08-01T06:22:58.812+00:00",
+                    "updatedAt": "2025-08-01T06:22:58.812+00:00"
+                  },
+                  "token": {
+                    "type": "bearer",
+                    "name": null,
+                    "token": "oat_MQ.bm8tYmR2NHV6YmF5WWFYN0VidFhvZ2VLRW5nQzBaWXgtYVA1Wko3dzUwNTI1NDkyNg",
+                    "abilities": ["*"],
+                    "lastUsedAt": null,
+                    "expiresAt": null
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
                     }
-                  ]
+                  },
+                  "required": ["message"]
                 }
               }
             },
@@ -338,21 +188,28 @@
                   },
                   "required": ["message"]
                 },
-                "examples": {
-                  "2": {
-                    "summary": "Exception",
-                    "description": "",
-                    "value": {
-                      "message": "Collection not found"
+                "example": {
+                  "message": "Session not found"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "410": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
                     }
                   },
-                  "3": {
-                    "summary": "Exception",
-                    "description": "",
-                    "value": {
-                      "message": "Resource not found"
-                    }
-                  }
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Authentication failed"
                 }
               }
             },
@@ -360,6 +217,56 @@
           }
         },
         "security": []
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "ME",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Authentication"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                },
+                "example": {
+                  "id": "6252490183",
+                  "firstName": "Hitarashi (\"⁧;(\"",
+                  "lastName": null,
+                  "username": "sayeed69",
+                  "avatar": "https://t.me/i/userpic/320/bBe8s6eYYwE5CzHABZsIU0yV9paLztxCiaV752qnfiXi3wb8ir7FfNYu_vqCvrfB.jpg",
+                  "createdAt": "2025-08-02T12:18:46.884+00:00",
+                  "updatedAt": "2025-08-02T12:18:46.884+00:00"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedAccess"
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/movies": {
@@ -402,8 +309,8 @@
             "example": "title",
             "schema": {
               "type": "string",
-              "enum": ["title", "releaseDate", "popularity", "voteAverage", "voteCount"],
-              "examples": ["title", "voteCount"],
+              "enum": ["title", "year"],
+              "examples": ["title", "year"],
               "default": "title"
             }
           },
@@ -430,47 +337,7 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object",
-                      "properties": {
-                        "total": {
-                          "type": "integer"
-                        },
-                        "perPage": {
-                          "type": "integer"
-                        },
-                        "currentPage": {
-                          "type": "integer"
-                        },
-                        "lastPage": {
-                          "type": "integer"
-                        },
-                        "firstPage": {
-                          "type": "integer"
-                        },
-                        "firstPageUrl": {
-                          "type": "string"
-                        },
-                        "lastPageUrl": {
-                          "type": "string"
-                        },
-                        "nextPageUrl": {
-                          "type": "null"
-                        },
-                        "previousPageUrl": {
-                          "type": "null"
-                        }
-                      },
-                      "required": [
-                        "total",
-                        "perPage",
-                        "currentPage",
-                        "lastPage",
-                        "firstPage",
-                        "firstPageUrl",
-                        "lastPageUrl",
-                        "nextPageUrl",
-                        "previousPageUrl"
-                      ]
+                      "$ref": "#/components/schemas/PanigatedResponseMeta"
                     },
                     "data": {
                       "type": "array",
@@ -478,44 +345,20 @@
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string"
+                            "type": "string",
+                            "minLength": 1,
+                            "examples": ["mission-impossible-1996"]
                           },
                           "title": {
                             "type": "string"
                           },
-                          "releaseDate": {
-                            "type": "string"
-                          },
-                          "runtime": {
-                            "type": "integer"
-                          },
-                          "popularity": {
-                            "type": "number"
-                          },
-                          "voteAverage": {
-                            "type": "number"
-                          },
-                          "voteCount": {
-                            "type": "integer"
-                          },
-                          "adult": {
-                            "type": "boolean"
-                          },
-                          "poster": {
-                            "type": "string"
+                          "year": {
+                            "type": "integer",
+                            "examples": [1996],
+                            "minimum": 1
                           }
                         },
-                        "required": [
-                          "id",
-                          "title",
-                          "releaseDate",
-                          "runtime",
-                          "popularity",
-                          "voteAverage",
-                          "voteCount",
-                          "adult",
-                          "poster"
-                        ]
+                        "required": ["id", "title", "year"]
                       }
                     }
                   },
@@ -523,38 +366,48 @@
                 },
                 "example": {
                   "meta": {
-                    "total": 4,
+                    "total": 1,
                     "perPage": 2,
                     "currentPage": 1,
-                    "lastPage": 2,
+                    "lastPage": 1,
                     "firstPage": 1,
-                    "firstPageUrl": "/movies?page=1",
-                    "lastPageUrl": "/movies?page=2",
-                    "nextPageUrl": "/movies?page=2",
+                    "firstPageUrl": "/api/movies?page=1",
+                    "lastPageUrl": "/api/movies?page=1",
+                    "nextPageUrl": null,
                     "previousPageUrl": null
                   },
                   "data": [
                     {
-                      "id": "1195506",
-                      "title": "Novocaine",
-                      "releaseDate": "2025-03-12T00:00:00.000Z",
-                      "runtime": 110,
-                      "popularity": 33.2446,
-                      "voteAverage": 6.926,
-                      "voteCount": 916,
-                      "adult": false,
-                      "poster": "/nRr3JoDXkhK6kz2AIxtrTHB8GGO.jpg"
-                    },
-                    {
-                      "id": "954",
+                      "id": "mission-impossible-1996",
                       "title": "Mission: Impossible",
-                      "releaseDate": "1996-05-22T00:00:00.000Z",
-                      "runtime": 110,
-                      "popularity": 22.1827,
-                      "voteAverage": 7.003,
-                      "voteCount": 9343,
-                      "adult": false,
-                      "poster": "/9EMjStHHLHBpZS6aImLb7soabv1.jpg"
+                      "year": 1996
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["Unauthorized access"],
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "Unauthorized Access"
                     }
                   ]
                 }
@@ -621,9 +474,9 @@
         "security": []
       }
     },
-    "/movies/{id}": {
+    "/movies/{id}/images": {
       "get": {
-        "summary": "Movie by ID",
+        "summary": "Movie Images by ID",
         "deprecated": false,
         "description": "",
         "tags": ["Movies"],
@@ -633,9 +486,10 @@
             "in": "path",
             "description": "",
             "required": true,
-            "example": "1195506",
+            "example": "mission-impossible-1996",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
             }
           }
         ],
@@ -645,221 +499,109 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "title": {
-                      "type": "string"
-                    },
-                    "originalTitle": {
-                      "type": "string"
-                    },
-                    "releaseDate": {
-                      "type": "string"
-                    },
-                    "overview": {
-                      "type": "string"
-                    },
-                    "tagline": {
-                      "type": "string"
-                    },
-                    "runtime": {
-                      "type": "integer"
-                    },
-                    "popularity": {
-                      "type": "number"
-                    },
-                    "voteAverage": {
-                      "type": "number"
-                    },
-                    "voteCount": {
-                      "type": "integer"
-                    },
-                    "adult": {
-                      "type": "boolean"
-                    },
-                    "genres": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "videos": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "key": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
-                    "links": {
-                      "type": "null"
-                    },
-                    "homepage": {
-                      "type": "string"
-                    },
-                    "meta": {
-                      "type": "object",
-                      "properties": {
-                        "ext": {
-                          "type": "string"
-                        },
-                        "size": {
-                          "type": "integer"
-                        },
-                        "type": {
-                          "type": "string"
-                        },
-                        "bitRate": {
-                          "type": "integer"
-                        },
-                        "bitDepth": {
-                          "type": "integer"
-                        },
-                        "frameRate": {
-                          "type": "number"
-                        },
-                        "videoCodec": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "ext",
-                        "size",
-                        "type",
-                        "bitRate",
-                        "bitDepth",
-                        "frameRate",
-                        "videoCodec"
-                      ]
-                    },
-                    "productionCountries": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "collectionId": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "createdAt": {
-                      "type": "string"
-                    },
-                    "updatedAt": {
-                      "type": "string"
-                    },
-                    "collection": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "poster": {
-                          "type": "string"
-                        },
-                        "backdrop": {
-                          "type": "string"
-                        }
-                      },
-                      "required": ["id", "title", "poster", "backdrop"],
-                      "nullable": true
-                    },
-                    "poster": {
-                      "type": "string"
-                    },
-                    "backdrop": {
-                      "type": "string"
-                    },
-                    "logo": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "title",
-                    "originalTitle",
-                    "releaseDate",
-                    "overview",
-                    "tagline",
-                    "runtime",
-                    "popularity",
-                    "voteAverage",
-                    "voteCount",
-                    "adult",
-                    "genres",
-                    "videos",
-                    "links",
-                    "homepage",
-                    "meta",
-                    "productionCountries",
-                    "collectionId",
-                    "createdAt",
-                    "updatedAt",
-                    "collection",
-                    "poster",
-                    "backdrop",
-                    "logo"
-                  ]
+                  "$ref": "#/components/schemas/MovieImages"
                 },
                 "example": {
-                  "id": "954",
-                  "title": "Mission: Impossible",
-                  "originalTitle": "Mission: Impossible",
-                  "releaseDate": "1996-05-22T00:00:00.000Z",
-                  "overview": "When Ethan Hunt, the leader of a crack espionage team whose perilous operation has gone awry with no explanation, discovers that a mole has penetrated the CIA, he's surprised to learn that he's the prime suspect. To clear his name, Hunt now must ferret out the real double agent and, in the process, even the score.",
-                  "tagline": "Expect the impossible.",
-                  "runtime": 110,
-                  "popularity": 22.1827,
-                  "voteAverage": 7.003,
-                  "voteCount": 9343,
-                  "adult": false,
-                  "genres": ["Adventure", "Action", "Thriller"],
-                  "videos": [
+                  "name": "Mission: Impossible",
+                  "tmdb_id": "954",
+                  "imdb_id": "tt0117060",
+                  "hdmovielogo": [
                     {
-                      "key": "L8Pbjh4EZRk",
-                      "name": "Official Trailer",
-                      "type": "Trailer"
+                      "id": "71561",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/hdmovielogo/mission-impossible-536d3c446eaa6.png",
+                      "lang": "en",
+                      "likes": "15"
                     }
                   ],
-                  "links": null,
-                  "homepage": "",
-                  "meta": {
-                    "ext": "mkv",
-                    "size": 2279077531,
-                    "type": "video/x-matroska",
-                    "bitRate": 1251,
-                    "bitDepth": 10,
-                    "frameRate": 23.976,
-                    "videoCodec": "HEVC"
+                  "moviedisc": [
+                    {
+                      "id": "90705",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/moviedisc/mission-impossible-5481914f8ce7c.png",
+                      "lang": "en",
+                      "likes": "9",
+                      "disc": "1",
+                      "disc_type": "bluray"
+                    }
+                  ],
+                  "hdmovieclearart": [
+                    {
+                      "id": "58420",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/hdmovieclearart/mission-impossible-529b6b25e62e5.png",
+                      "lang": "en",
+                      "likes": "8"
+                    }
+                  ],
+                  "movieposter": [
+                    {
+                      "id": "65883",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/movieposter/mission-impossible-53172da055225.jpg",
+                      "lang": "en",
+                      "likes": "7"
+                    }
+                  ],
+                  "moviethumb": [
+                    {
+                      "id": "37978",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/moviethumb/mission-impossible-51b39a23d148b.jpg",
+                      "lang": "en",
+                      "likes": "5"
+                    }
+                  ],
+                  "moviebackground": [
+                    {
+                      "id": "223478",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/moviebackground/mission-impossible-5ac4b88bbc947.jpg",
+                      "lang": "",
+                      "likes": "4"
+                    }
+                  ],
+                  "moviebanner": [
+                    {
+                      "id": "37977",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/moviebanner/mission-impossible-51b39a15d74c3.jpg",
+                      "lang": "en",
+                      "likes": "3"
+                    }
+                  ],
+                  "movie4kbackground": [
+                    {
+                      "id": "453857",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/movie4kbackground/mission-impossible-684f4f9807f94.jpg",
+                      "lang": "",
+                      "likes": "2"
+                    }
+                  ],
+                  "movielogo": [
+                    {
+                      "id": "249",
+                      "url": "https://assets.fanart.tv/fanart/movies/954/movielogo/mission-impossible-4efa1e7797b50.png",
+                      "lang": "en",
+                      "likes": "1"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["Unauthorized access"],
+                      "minLength": 1
+                    }
                   },
-                  "productionCountries": ["United States of America"],
-                  "collectionId": "87359",
-                  "createdAt": "2025-06-28T05:36:04.208+00:00",
-                  "updatedAt": "2025-06-28T05:36:04.208+00:00",
-                  "collection": {
-                    "id": "87359",
-                    "title": "Mission: Impossible Collection",
-                    "poster": "/geEjCGfdmRAA1skBPwojcdvnZ8A.jpg",
-                    "backdrop": "/mroWh717g0Ah2c0rrPGW6f3EWMM.jpg"
-                  },
-                  "poster": "/tjiQIC8duuHZRndYEjeMvMTvWxS.jpg",
-                  "backdrop": "/3ZfJcWicmh9vLGQ89CrExqpWMll.jpg",
-                  "logo": "/dZUAflbV66xj3ufb2j4rkSEXwqz.png"
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Unauthorized access"
                 }
               }
             },
@@ -889,9 +631,9 @@
         "security": []
       }
     },
-    "/movies/{id}/stream": {
+    "/movies/{id}/info": {
       "get": {
-        "summary": "Stream a Movie",
+        "summary": "Movie Info by ID",
         "deprecated": false,
         "description": "",
         "tags": ["Movies"],
@@ -901,7 +643,120 @@
             "in": "path",
             "description": "",
             "required": true,
-            "example": "1195506",
+            "example": "mission-impossible-1996",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieInfo"
+                },
+                "example": {
+                  "title": "Mission: Impossible",
+                  "year": 1996,
+                  "ids": {
+                    "trakt": 45491255,
+                    "slug": "mission-impossible-1996",
+                    "imdb": "tt0117060",
+                    "tmdb": 80210323
+                  },
+                  "tagline": "Expect the impossible.",
+                  "overview": "When Ethan Hunt, the leader of a crack espionage team whose perilous operation has gone awry with no explanation, discovers that a mole has penetrated the CIA, he's surprised to learn that he's the prime suspect. To clear his name, Hunt now must ferret out the real double agent and, in the process, even the score.",
+                  "released": "1996-05-2",
+                  "runtime": 110,
+                  "country": "en",
+                  "trailer": "https://youtube.com/watch?v=L8Pbjh4EZRk",
+                  "homepage": null,
+                  "status": "released",
+                  "rating": 7.40212,
+                  "votes": 19666,
+                  "comment_count": 65,
+                  "updated_at": "2025-08-04T17:15:50.000Z",
+                  "language": "en",
+                  "languages": ["en", "cs", "fr"],
+                  "available_translations": ["ca", "bg"],
+                  "genres": ["adventure"],
+                  "subgenres": ["undercover", "undercover"],
+                  "certification": "PG-13",
+                  "original_title": null,
+                  "after_credits": false,
+                  "during_credits": false
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "",
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["Unauthorized access"],
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Unauthorized access"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["message"]
+                },
+                "example": {
+                  "message": "Movie not found"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/movies/{id}/stream": {
+      "get": {
+        "summary": "Movie Stream by ID",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "mission-impossible-1996",
             "schema": {
               "type": "string"
             }
@@ -921,7 +776,11 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/tvs": {
@@ -983,7 +842,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "meat": {
+                    "meta": {
                       "type": "object",
                       "properties": {
                         "total": {
@@ -1005,13 +864,13 @@
                           "type": "string"
                         },
                         "lastPageUrl": {
-                          "type": "string"
+                          "type": ["string", "null"]
                         },
                         "nextPageUrl": {
-                          "type": "null"
+                          "type": ["string", "null"]
                         },
                         "previousPageUrl": {
-                          "type": "null"
+                          "type": ["string", "null"]
                         }
                       },
                       "required": [
@@ -1062,10 +921,10 @@
                       }
                     }
                   },
-                  "required": ["meat", "data"]
+                  "required": ["meta", "data"]
                 },
                 "example": {
-                  "meat": {
+                  "meta": {
                     "total": 1,
                     "perPage": 20,
                     "currentPage": 1,
@@ -1150,7 +1009,11 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/tvs/{id}": {
@@ -1307,7 +1170,11 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/tvs/{tvId}/seasons/{seasonNumber}": {
@@ -1358,8 +1225,7 @@
                       "type": "integer"
                     },
                     "airDate": {
-                      "type": "string",
-                      "nullable": true
+                      "type": ["string", "null"]
                     },
                     "overview": {
                       "type": "string"
@@ -1529,7 +1395,11 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/tvs/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}": {
@@ -1789,7 +1659,11 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/tvs/{tvId}/seasons/{seasonNumber}/episodes/{episodeNumber}/stream": {
@@ -1844,13 +1718,642 @@
             "headers": {}
           }
         },
-        "security": []
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/trakt/start": {
+      "get": {
+        "summary": "Start Trakt auth",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Trakt"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "device_code": {
+                      "type": "string"
+                    },
+                    "user_code": {
+                      "type": "string"
+                    },
+                    "verification_url": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "interval": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "device_code",
+                    "user_code",
+                    "verification_url",
+                    "expires_in",
+                    "interval"
+                  ]
+                },
+                "example": {
+                  "device_code": "6a35e2f407029dc3ab09485ac3ec8725c14939dbe7de55fc2887ed5905e3513f",
+                  "user_code": "73380AD5",
+                  "verification_url": "https://trakt.tv/activate",
+                  "expires_in": 600,
+                  "interval": 5
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["errors"]
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/trakt/poll": {
+      "post": {
+        "summary": "Poll Trrakt Auth",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Trakt"],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": ["code"]
+              },
+              "example": {
+                "code": "de15eb164c9106a4fc331041292b96d78ad0965eac6eb428e1f23f321adc0c40"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["message", "status"]
+                },
+                "example": {
+                  "message": "Success",
+                  "status": 200
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["status", "message"]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["status", "message"]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Already Used – user already approved this code"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     }
   },
+  "webhooks": {},
   "components": {
-    "schemas": {},
-    "securitySchemes": {}
+    "schemas": {
+      "PanigatedResponseMeta": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "examples": [1]
+          },
+          "perPage": {
+            "type": "integer",
+            "title": "",
+            "minimum": 1,
+            "examples": [1]
+          },
+          "currentPage": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [1]
+          },
+          "lastPage": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [1]
+          },
+          "firstPage": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [1]
+          },
+          "firstPageUrl": {
+            "type": "string"
+          },
+          "lastPageUrl": {
+            "type": "string"
+          },
+          "nextPageUrl": {
+            "type": ["string", "null"]
+          },
+          "previousPageUrl": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": [
+          "total",
+          "perPage",
+          "currentPage",
+          "lastPage",
+          "firstPage",
+          "firstPageUrl",
+          "lastPageUrl",
+          "nextPageUrl",
+          "previousPageUrl"
+        ]
+      },
+      "MovieInfo": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "examples": ["Mission: Impossible"]
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "",
+            "examples": [1996]
+          },
+          "ids": {
+            "type": "object",
+            "properties": {
+              "trakt": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 1
+              },
+              "slug": {
+                "type": "string",
+                "examples": ["mission-impossible-1996"]
+              },
+              "imdb": {
+                "type": "string",
+                "examples": ["tt0117060"]
+              },
+              "tmdb": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 1
+              }
+            },
+            "required": ["trakt", "slug", "imdb", "tmdb"]
+          },
+          "tagline": {
+            "type": "string",
+            "examples": ["Expect the impossible."]
+          },
+          "overview": {
+            "type": "string",
+            "examples": [
+              "When Ethan Hunt, the leader of a crack espionage team whose perilous operation has gone awry with no explanation, discovers that a mole has penetrated the CIA, he's surprised to learn that he's the prime suspect. To clear his name, Hunt now must ferret out the real double agent and, in the process, even the score."
+            ]
+          },
+          "released": {
+            "type": "string",
+            "format": "date",
+            "examples": ["1996-05-2"]
+          },
+          "runtime": {
+            "type": "integer",
+            "minimum": 1,
+            "format": "uint",
+            "examples": [110]
+          },
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "examples": ["en"]
+          },
+          "trailer": {
+            "type": "string",
+            "examples": ["https://youtube.com/watch?v=L8Pbjh4EZRk"]
+          },
+          "homepage": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "type": "string",
+            "examples": ["released"]
+          },
+          "rating": {
+            "type": "number",
+            "format": "float",
+            "examples": [7.40212]
+          },
+          "votes": {
+            "type": "integer",
+            "format": "uint",
+            "examples": [19666],
+            "minimum": 0
+          },
+          "comment_count": {
+            "type": "integer",
+            "format": "uint",
+            "examples": [65],
+            "minimum": 0
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": ["2025-08-04T17:15:50.000Z"]
+          },
+          "language": {
+            "type": "string",
+            "examples": ["en"],
+            "minLength": 2
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "examples": ["en", "fr", "cs"]
+            }
+          },
+          "available_translations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "examples": ["ar", "bg", "ca", "cs"]
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": ["action", "adventure", "thriller"]
+            }
+          },
+          "subgenres": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": ["undercover"]
+            }
+          },
+          "certification": {
+            "type": "string",
+            "examples": ["PG-13"]
+          },
+          "original_title": {
+            "type": "string"
+          },
+          "after_credits": {
+            "type": "boolean"
+          },
+          "during_credits": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "title",
+          "year",
+          "ids",
+          "tagline",
+          "overview",
+          "released",
+          "runtime",
+          "country",
+          "trailer",
+          "homepage",
+          "status",
+          "rating",
+          "votes",
+          "comment_count",
+          "updated_at",
+          "language",
+          "languages",
+          "available_translations",
+          "genres",
+          "subgenres",
+          "certification",
+          "original_title",
+          "after_credits",
+          "during_credits"
+        ]
+      },
+      "UnauthorizedAccess": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "examples": ["Unauthorized access"],
+            "minLength": 1
+          }
+        },
+        "required": ["message"]
+      },
+      "MovieImages": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "tmdb_id": {
+            "type": "string"
+          },
+          "imdb_id": {
+            "type": "string"
+          },
+          "hdmovielogo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "moviedisc": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieDiscImage"
+            }
+          },
+          "hdmovieclearart": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "movieposter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "moviethumb": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "moviebackground": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "moviebanner": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "movie4kbackground": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          },
+          "movielogo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieImage"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "tmdb_id",
+          "imdb_id",
+          "hdmovielogo",
+          "moviedisc",
+          "hdmovieclearart",
+          "movieposter",
+          "moviethumb",
+          "moviebackground",
+          "moviebanner",
+          "movie4kbackground",
+          "movielogo"
+        ]
+      },
+      "MovieImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": ["335965"],
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "examples": [
+              "https://assets.fanart.tv/fanart/movies/954/hdmovieclearart/mission-impossible-529b6b25e62e5.png"
+            ],
+            "minLength": 1
+          },
+          "lang": {
+            "type": "string",
+            "examples": ["en"],
+            "minLength": 2
+          },
+          "likes": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["8"]
+          }
+        },
+        "required": ["id", "url", "lang", "likes"]
+      },
+      "MovieDiscImage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["90705"]
+          },
+          "url": {
+            "type": "string",
+            "examples": [
+              "https://assets.fanart.tv/fanart/movies/954/moviedisc/mission-impossible-5481914f8ce7c.png"
+            ],
+            "minLength": 1
+          },
+          "lang": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["en"]
+          },
+          "likes": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["9"]
+          },
+          "disc": {
+            "type": "string",
+            "examples": ["1"],
+            "minLength": 1
+          },
+          "disc_type": {
+            "type": "string",
+            "examples": ["bluray"],
+            "minLength": 1
+          }
+        },
+        "required": ["id", "url", "lang", "likes", "disc", "disc_type"]
+      },
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": ["6252490183"],
+            "minLength": 1
+          },
+          "firstName": {
+            "type": "string",
+            "examples": ["Hitarashi"],
+            "format": "1"
+          },
+          "lastName": {
+            "type": ["string", "null"]
+          },
+          "username": {
+            "type": ["string", "null"],
+            "examples": ["sayeed69"],
+            "minLength": 1
+          },
+          "avatar": {
+            "type": "string",
+            "examples": [
+              "https://t.me/i/userpic/320/bBe8s6eYYwE5CzHABZsIU0yV9paLztxCiaV752qnfiXi3wb8ir7FfNYu_vqCvrfB.jpg"
+            ],
+            "minLength": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "examples": ["2025-08-02T12:18:46.884+00:00"],
+            "format": "date-time",
+            "minLength": 1
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1,
+            "examples": ["2025-08-02T12:18:46.884+00:00"]
+          }
+        },
+        "required": ["id", "firstName", "lastName", "username", "avatar", "createdAt", "updatedAt"]
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
   },
-  "servers": []
+  "servers": [
+    {
+      "url": "http://localhost:3333/api",
+      "description": "Develop Env"
+    }
+  ]
 }
