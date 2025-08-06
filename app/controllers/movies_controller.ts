@@ -12,23 +12,32 @@ export default class MoviesController {
     const {
       page = 1,
       limit = 20,
-      order,
+      order = 'asc',
       sort = 'title',
+      search = '',
     } = await moviePaginateValidator.validate(request.qs())
+
     const safeLimit = Math.min(limit || 1, 20)
-    const movies = await Movie.query()
-      .orderBy(sort, order)
-      .paginate(page || 1, safeLimit)
+
+    const moviesQuery = Movie.query()
+
+    if (search) {
+      moviesQuery.whereRaw('title % ?', [search])
+      moviesQuery.orWhereILike('title', `%${search}%`)
+      moviesQuery.orderByRaw('similarity(title, ?) DESC', [search])
+    }
+
+    moviesQuery.orderBy(sort, order)
+
+    const movies = await moviesQuery.paginate(page || 1, safeLimit)
 
     movies.baseUrl(router.makeUrl('api.movies.index'))
-    const data = movies.all().map((movie) => {
-      const movieId = movie.id
-      return {
-        id: movieId,
-        title: movie.title,
-        year: movie.year,
-      }
-    })
+
+    const data = movies.all().map((movie) => ({
+      id: movie.id,
+      title: movie.title,
+      year: movie.year,
+    }))
 
     return {
       meta: movies.getMeta(),
