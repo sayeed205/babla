@@ -3,7 +3,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Episode from '#models/episode'
 import Season from '#models/season'
 import TV from '#models/tv'
-import { ImageTypeEnum } from '#types/media'
 import { tvPaginateValidator } from '#validators/tv_validator'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
@@ -37,7 +36,6 @@ export default class TvsController {
     const data = await Promise.all(
       tvs.all().map(async (tv) => ({
         ...tv.toJSON(),
-        ...(await tv.getImages(ImageTypeEnum.POSTER)),
       }))
     )
 
@@ -77,7 +75,6 @@ export default class TvsController {
       const { tvId, ...t } = season.toJSON()
       data.push({
         ...t,
-        ...(await season.getImages(ImageTypeEnum.POSTER)),
         totalEpisodes: Number.parseInt(season.$extras.totalEpisodes),
       })
     }
@@ -116,43 +113,21 @@ export default class TvsController {
       .first()
     if (!season) return response.notFound({ message: 'Season not found' })
 
-    const [seasonImages, tvImages] = await Promise.all([
-      season.getImages(ImageTypeEnum.POSTER),
-      season.tvShow.getImages(ImageTypeEnum.POSTER, ImageTypeEnum.BACKDROP, ImageTypeEnum.LOGO),
-    ])
-
     const episodes = await Promise.all(
       season.episodes.map(async (episode) => {
-        const thumb = await episode.getImages(ImageTypeEnum.THUMBNAIL)
         const { seasonId, ...data } = episode.toJSON()
-        return { ...data, ...thumb }
+        return { ...data }
       })
     )
 
     const tvShow = season.tvShow
-    const tvShowSeasons = tvShow.seasons.map(({ id, seasonNumber, title }) => ({
-      id,
-      seasonNumber,
-      title,
-    }))
 
     return {
       id: season.id,
-      title: season.title,
-      seasonNumber: season.seasonNumber,
-      airDate: season.airDate,
-      overview: season.overview,
-      voteAverage: season.voteAverage,
-      poster: seasonImages.poster,
       episodes,
       tvShow: {
         id: tvShow.id,
         title: tvShow.title,
-        originalTitle: tvShow.originalTitle,
-        poster: tvImages.poster,
-        backdrop: tvImages.backdrop,
-        logo: tvImages.logo,
-        seasons: tvShowSeasons,
       },
     }
   }
@@ -175,33 +150,23 @@ export default class TvsController {
     const season = tvShow.seasons[0]
     if (!season) return response.notFound({ message: 'Season not found' })
 
-    const episode = season.episodes.find((ep) => ep.episodeNumber === Number(episodeNumber))
+    const episode = season.episodes.find((ep) => ep.number === Number(episodeNumber))
     if (!episode) return response.notFound({ message: 'Episode not found' })
 
-    const [episodeImages, tvImages] = await Promise.all([
-      episode.getImages(ImageTypeEnum.THUMBNAIL),
-      tvShow.getImages(ImageTypeEnum.POSTER, ImageTypeEnum.BACKDROP, ImageTypeEnum.LOGO),
-    ])
-
     const moreEpisodes = season.episodes
-      .filter((ep) => ep.episodeNumber !== Number(episodeNumber))
+      .filter((ep) => ep.number !== Number(episodeNumber))
       .map((ep) => ({
         id: ep.id,
-        episodeNumber: ep.episodeNumber,
+        episodeNumber: ep.number,
         title: ep.title,
-        airDate: ep.airDate,
-        ...(ep.meta ? { meta: ep.meta } : {}),
       }))
     const { seasonId, ...episodeData } = episode.toJSON()
     return {
       ...episodeData,
-      ...episodeImages,
       more: moreEpisodes,
       tvShow: {
         id: tvShow.id,
         title: tvShow.title,
-        originalTitle: tvShow.originalTitle,
-        ...tvImages,
       },
     }
   }
@@ -212,7 +177,7 @@ export default class TvsController {
     // Find the exact episode
     const episode = await Episode.query()
       .select(['id', 'title', 'meta', 'tgMeta'])
-      .whereHas('season', (seasonQuery) => {
+      .whereHas('seasonInfo', (seasonQuery) => {
         seasonQuery.where('tvId', tvId).where('seasonNumber', seasonNumber)
       })
       .where('episodeNumber', episodeNumber)
@@ -220,7 +185,7 @@ export default class TvsController {
 
     if (!episode) return response.notFound({ message: 'Episode not found' })
 
-    const { size, type, ext } = episode.meta
+    const { size, mimeType } = episode.metadata
     const range = request.header('range')
 
     let start = 0
@@ -248,16 +213,16 @@ export default class TvsController {
 
     // Set headers
     response.header('Content-Length', contentLength.toString())
-    response.header('Content-Type', type)
+    response.header('Content-Type', mimeType)
     response.header('Accept-Ranges', 'bytes')
-    response.header('Content-Disposition', `inline; filename="${episode.title}.${ext}"`)
+    // response.header('Content-Disposition', `inline; filename="${episode.title}.${ext}"`)
     response.header('Access-Control-Allow-Origin', '*')
     response.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
     response.header('Access-Control-Allow-Headers', 'Range, Content-Type')
 
     // Telegram stream
     const { tg } = await app.container.make('tg')
-    const tgStream = tg.downloadAsNodeStream(episode.tgMeta.fileId, {
+    const tgStream = tg.downloadAsNodeStream(episode.tgMetadata.fileId, {
       offset: start,
       limit: contentLength,
     })
