@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import MoviesPage from '@/features/movies/page'
-import { validateMoviesSearch } from '@/features/movies/types/search-params'
+import { validateMoviesSearch, type MoviesSearchParams } from '@/features/movies/types/search-params'
 
 export const Route = createFileRoute('/_authenticated/movies')({
   component: MoviesPage,
-  validateSearch: validateMoviesSearch,
+  validateSearch: (search: Record<string, unknown>): MoviesSearchParams => validateMoviesSearch(search),
 })

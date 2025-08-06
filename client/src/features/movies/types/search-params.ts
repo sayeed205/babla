@@ -18,8 +18,18 @@ export const DEFAULT_MOVIES_SEARCH_PARAMS: Required<MoviesSearchParams> = {
 
 // Validation function for search parameters
 export function validateMoviesSearch(search: Record<string, unknown>): MoviesSearchParams {
-  const page = typeof search.page === 'string' ? parseInt(search.page, 10) : undefined
-  const limit = typeof search.limit === 'string' ? parseInt(search.limit, 10) : undefined
+  const page =
+    typeof search.page === 'string'
+      ? parseInt(search.page, 10)
+      : typeof search.page === 'number'
+        ? search.page
+        : undefined
+  const limit =
+    typeof search.limit === 'string'
+      ? parseInt(search.limit, 10)
+      : typeof search.limit === 'number'
+        ? search.limit
+        : undefined
   const sort =
     typeof search.sort === 'string' && ['title', 'year'].includes(search.sort)
       ? (search.sort as 'title' | 'year')
