@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedMoviesRouteImport } from './routes/_authenticated/movies'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedMoviesIdRouteImport } from './routes/_authenticated/movies.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -39,32 +40,40 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMoviesIdRoute = AuthenticatedMoviesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedMoviesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/movies': typeof AuthenticatedMoviesRoute
+  '/movies': typeof AuthenticatedMoviesRouteWithChildren
+  '/movies/$id': typeof AuthenticatedMoviesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/movies': typeof AuthenticatedMoviesRoute
+  '/movies': typeof AuthenticatedMoviesRouteWithChildren
+  '/movies/$id': typeof AuthenticatedMoviesIdRoute
 }
 export interface FileRoutesById {
-  '__root__': typeof rootRouteImport
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
-  '/_authenticated/movies': typeof AuthenticatedMoviesRoute
+  '/_authenticated/movies': typeof AuthenticatedMoviesRouteWithChildren
+  '/_authenticated/movies/$id': typeof AuthenticatedMoviesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/home' | '/movies'
+  fullPaths: '/' | '/login' | '/home' | '/movies' | '/movies/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/home' | '/movies'
+  to: '/' | '/login' | '/home' | '/movies' | '/movies/$id'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/home'
     | '/_authenticated/movies'
+    | '/_authenticated/movies/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,22 +127,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/movies/$id': {
+      id: '/_authenticated/movies/$id'
+      path: '/$id'
+      fullPath: '/movies/$id'
+      preLoaderRoute: typeof AuthenticatedMoviesIdRouteImport
+      parentRoute: typeof AuthenticatedMoviesRoute
+    }
   }
 }
 
+interface AuthenticatedMoviesRouteChildren {
+  AuthenticatedMoviesIdRoute: typeof AuthenticatedMoviesIdRoute
+}
+
+const AuthenticatedMoviesRouteChildren: AuthenticatedMoviesRouteChildren = {
+  AuthenticatedMoviesIdRoute: AuthenticatedMoviesIdRoute,
+}
+
+const AuthenticatedMoviesRouteWithChildren =
+  AuthenticatedMoviesRoute._addFileChildren(AuthenticatedMoviesRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
-  AuthenticatedMoviesRoute: typeof AuthenticatedMoviesRoute
+  AuthenticatedMoviesRoute: typeof AuthenticatedMoviesRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
-  AuthenticatedMoviesRoute: AuthenticatedMoviesRoute,
+  AuthenticatedMoviesRoute: AuthenticatedMoviesRouteWithChildren,
 }
 
-const AuthenticatedRouteRouteWithChildren = AuthenticatedRouteRoute._addFileChildren(
-  AuthenticatedRouteRouteChildren
-)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,

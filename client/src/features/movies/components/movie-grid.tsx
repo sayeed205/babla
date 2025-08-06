@@ -2,6 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { SearchX } from 'lucide-react'
 import { memo, useMemo } from 'react'
 import { MovieCard } from './movie-card'
+import { Link } from '@tanstack/react-router'
 
 interface Movie {
   id: string
@@ -74,12 +75,17 @@ export const MovieGrid = memo(function MovieGrid({
   const movieCards = useMemo(
     () =>
       movies.map((movie, index) => (
-        <div key={movie.id} className="w-full max-w-[160px] sm:max-w-none">
+        <Link
+          to="/movies/$id"
+          params={{ id: movie.id }}
+          key={movie.id}
+          className="w-full max-w-[160px] sm:max-w-none"
+        >
           <MovieCard
             id={movie.id}
             priority={index < 12} // Prioritize first 12 movies (above-the-fold)
           />
-        </div>
+        </Link>
       )),
     [movies]
   )
