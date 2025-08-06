@@ -8,6 +8,7 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen'
 
 import './styles.css'
+import { ThemeProvider } from '@/components/theme-provider.tsx'
 
 // Create a new router instance
 
@@ -37,7 +38,9 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
+        <ThemeProvider storageKey="theme" defaultTheme="system">
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>
   )

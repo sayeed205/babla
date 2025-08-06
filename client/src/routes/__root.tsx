@@ -4,7 +4,6 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import type { QueryClient } from '@tanstack/react-query'
-import { ThemeProvider } from '@/components/theme-provider.tsx'
 import { NavigationProgress } from '@/components/navigation-progress.tsx'
 import AuthGuard from '@/components/layout/auth-guard.tsx'
 import { Toaster } from '@/components/ui/sonner.tsx'
@@ -17,7 +16,7 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
-    <ThemeProvider storageKey="theme" defaultTheme="system">
+    <>
       <NavigationProgress />
       <AuthGuard>
         <Outlet />
@@ -29,7 +28,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           <TanStackQueryLayout />
         </>
       )}
-    </ThemeProvider>
+    </>
   ),
   notFoundComponent: NotFoundError,
   errorComponent: GeneralError,

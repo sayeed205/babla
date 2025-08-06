@@ -1,15 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '../components/ui/button'
+import { Button } from '@/components/ui/button.tsx'
 import { useAuthStore } from '@/features/auth/stores/auth-store.ts'
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute('/_authenticated/home')({
   component: DashboardPage,
 })
 
-/**
- * Dashboard page component - requires authentication
- * Requirements: 3.1, 3.2, 4.1
- */
 function DashboardPage() {
   const { user, logout, isLoading } = useAuthStore()
 
