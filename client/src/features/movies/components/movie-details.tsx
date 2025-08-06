@@ -4,6 +4,7 @@ import { memo, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { apiQuery } from '@/lib/api-client'
+import { MovieHero } from './movie-hero'
 
 interface MovieDetailsProps {
   id: string
@@ -58,7 +59,12 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
 
   // Loading state - show skeleton while either API call is loading
   if (movieInfoLoading || movieImagesLoading) {
-    return <MovieDetailsSkeleton />
+    return (
+      <div className="space-y-8">
+        <MovieHero isLoading={true} />
+        <MovieDetailsSkeleton />
+      </div>
+    )
   }
 
   // Error state - both API calls failed
@@ -98,16 +104,20 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
   // Success state - at least movie info loaded
   return (
     <div className="space-y-8">
-      {/* Movie info section */}
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{movieInfo?.title}</h1>
-        {movieInfo?.tagline && (
-          <p className="text-lg text-muted-foreground italic">{movieInfo.tagline}</p>
-        )}
-        {movieInfo?.overview && (
-          <p className="text-base leading-relaxed">{movieInfo.overview}</p>
-        )}
-      </div>
+      {/* Movie Hero Section */}
+      <MovieHero 
+        movieInfo={movieInfo} 
+        movieImages={movieImages} 
+        isLoading={false}
+      />
+
+      {/* Movie Overview */}
+      {movieInfo?.overview && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Overview</h2>
+          <p className="text-base leading-relaxed text-muted-foreground">{movieInfo.overview}</p>
+        </div>
+      )}
 
       {/* Movie metadata */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

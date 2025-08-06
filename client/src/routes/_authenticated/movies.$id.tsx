@@ -2,6 +2,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { Button } from '@/components/ui/button'
 import GeneralError from '@/features/general-error'
+import { MovieDetails } from '@/features/movies/components/movie-details'
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/movies/$id')({
@@ -31,14 +32,8 @@ function MovieDetailsPage() {
         <h1 className="text-lg font-semibold">Movie Details</h1>
       </Header>
       <Main>
-        <div className="max-w-7xl mx-auto">
-          {/* Movie details content will be implemented in subsequent tasks */}
-          <div className="py-6">
-            <p className="text-muted-foreground">Loading movie details for ID: {id}</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Movie details component will be implemented in the next task.
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <MovieDetails id={id} />
         </div>
       </Main>
     </>
