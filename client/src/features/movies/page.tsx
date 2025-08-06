@@ -1,13 +1,8 @@
 // components/MovieList.tsx
 import { Header } from '@/components/layout/header.tsx'
 import { Main } from '@/components/layout/main.tsx'
+import { PaginationControls } from '@/components/pagination-controls'
 import { SearchInput } from '@/components/search-input'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from '@/components/ui/pagination'
 import {
   getMoviesSearchParamsWithDefaults,
   type MoviesSearchParams,
@@ -61,8 +56,6 @@ export default function MovieList() {
 
   // We'll handle loading and error states in the MovieGrid component
 
-  const totalPages = Math.ceil((data?.meta.total ?? 0) / limit)
-
   return (
     <>
       <Header fixed>
@@ -90,40 +83,12 @@ export default function MovieList() {
               searchTerm={searchParams.search}
             />
 
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationLink
-                    onClick={() => updateSearchParams({ page: Math.max(page - 1, 1) })}
-                    isActive={false}
-                    className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-                  >
-                    Prev
-                  </PaginationLink>
-                </PaginationItem>
-
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <PaginationItem key={i}>
-                    <PaginationLink
-                      isActive={i + 1 === page}
-                      onClick={() => updateSearchParams({ page: i + 1 })}
-                    >
-                      {i + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-
-                <PaginationItem>
-                  <PaginationLink
-                    onClick={() => updateSearchParams({ page: Math.min(page + 1, totalPages) })}
-                    isActive={false}
-                    className={page === totalPages ? 'pointer-events-none opacity-50' : ''}
-                  >
-                    Next
-                  </PaginationLink>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            {data?.meta && (
+              <PaginationControls
+                meta={data.meta}
+                onPageChange={(newPage) => updateSearchParams({ page: newPage })}
+              />
+            )}
           </div>
         </div>
       </Main>
