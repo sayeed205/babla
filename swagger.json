@@ -529,11 +529,11 @@
         "security": []
       }
     },
-    "/movies/{id}/info": {
+    "/movies/{id}": {
       "get": {
-        "summary": "Movie Info by ID",
+        "summary": "Movie by ID",
         "deprecated": false,
-        "description": "",
+        "description": "Get movie details by ID",
         "tags": ["Movies"],
         "parameters": [
           {

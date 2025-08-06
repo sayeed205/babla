@@ -60,8 +60,8 @@ router
       .group(() => {
         router.get('/', [MoviesController, 'index']).as('index')
         router
-          .get('/:id/info', [MoviesController, 'info'])
-          .as('info')
+          .get('/:id', [MoviesController, 'show'])
+          .as('show')
           .where('id', router.matchers.slug())
         router
           .get('/:id/stream', [MoviesController, 'stream'])

@@ -47,7 +47,7 @@ export default class MoviesController {
   }
 
   @bindMovie()
-  async info({}: HttpContext, movie: Movie) {
+  async show({}: HttpContext, movie: Movie) {
     const tmdb = await app.container.make('tmdb')
     return cache.getOrSet({
       key: `movie-info-${movie.id}`,

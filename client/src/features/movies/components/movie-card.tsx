@@ -78,9 +78,7 @@ export const MovieCard = memo(function MovieCard({ movie, priority = false }: Mo
               /* Show message for failed image loads */
               <>
                 <ImageIcon className="w-12 h-12 text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground text-center">
-                  Image not available
-                </p>
+                <p className="text-xs text-muted-foreground text-center">Image not available</p>
               </>
             ) : (
               /* Show fallback placeholder */
@@ -104,9 +102,7 @@ export const MovieCard = memo(function MovieCard({ movie, priority = false }: Mo
         <h3 className="font-bold text-lg text-center text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1">
           {movie.title}
         </h3>
-        <p className="text-sm text-muted-foreground text-center">
-          {movie.year || 'Year unknown'}
-        </p>
+        <p className="text-sm text-muted-foreground text-center">{movie.year || 'Year unknown'}</p>
       </div>
     </Card>
   )
