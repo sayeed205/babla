@@ -11,7 +11,7 @@ interface Movie {
 interface MovieGridProps {
   movies: Movie[]
   isLoading: boolean
-  error: Error | null
+  error: any // Accept any error type from the API query
   searchTerm?: string
 }
 
@@ -65,7 +65,7 @@ export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridPro
         </div>
         <h3 className="text-xl font-semibold text-foreground mb-2">Failed to load movies</h3>
         <p className="text-muted-foreground">
-          {error.message || 'An error occurred while loading movies'}
+          {error?.message || 'An error occurred while loading movies'}
         </p>
       </div>
     )
