@@ -124,6 +124,9 @@ const handleMovie = async (
     .if(traktMovie.ids.tmdb, (q) => q.orWhere('tmdb', '=', traktMovie.ids.tmdb!))
     .first()
 
+  const tmdb = await app.container.make('tmdb')
+  const tmdbMovie = await tmdb.movies.details(traktMovie.ids.tmdb!)
+
   if (movieExists) return logger.info(`Movie already exists: ${traktMovie.title}`)
   const movie = await Movie.create({
     id: traktMovie.ids.slug,
@@ -132,6 +135,7 @@ const handleMovie = async (
     tmdb: traktMovie.ids.tmdb,
     year: traktMovie.year,
     imdb: traktMovie.ids.imdb,
+    poster: tmdbMovie.poster_path,
     metadata: { size: media.fileSize!, mimeType: media.mimeType, filename: media.fileName! },
     tgMetadata: { fileId: media.fileId, fileLink: link },
   })

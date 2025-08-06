@@ -24,6 +24,9 @@ export default class Movie extends compose(BaseModel, withTimestamps()) {
   @column()
   declare tmdb: number
 
+  @column()
+  declare poster: string
+
   @column({
     consume: (value) => value,
     prepare: (value) => JSON.stringify(value),

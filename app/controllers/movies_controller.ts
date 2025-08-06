@@ -37,6 +37,7 @@ export default class MoviesController {
       id: movie.id,
       title: movie.title,
       year: movie.year,
+      poster: movie.poster,
     }))
 
     return {
@@ -46,23 +47,11 @@ export default class MoviesController {
   }
 
   @bindMovie()
-  async images({}: HttpContext, movie: Movie) {
-    const fanart = await app.container.make('fanart')
-    return cache.getOrSet({
-      key: `movie-images-${movie.id}`,
-      factory: async () => await fanart.movie.get(movie.tmdb),
-      grace: '24h',
-      ttl: '24h',
-      tags: ['movie-images'],
-    })
-  }
-
-  @bindMovie()
   async info({}: HttpContext, movie: Movie) {
-    const trakt = await app.container.make('trakt')
+    const tmdb = await app.container.make('tmdb')
     return cache.getOrSet({
       key: `movie-info-${movie.id}`,
-      factory: async () => await trakt.movies.get(movie.id, true),
+      factory: async () => await tmdb.movies.details(movie.tmdb, ['images', 'credits', 'videos']),
       grace: '24h',
       ttl: '24h',
       tags: ['movie-info'],

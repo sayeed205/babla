@@ -1,28 +1,22 @@
 import type { ApplicationService } from '@adonisjs/core/types'
-import Trakt from '@hitarashi/trakt'
+import { TMDB } from 'tmdb-ts'
 
 import env from '#start/env'
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
-    trakt: Trakt
+    tmdb: TMDB
   }
 }
 
-export default class TraktProvider {
+export default class TmdbProvider {
   constructor(protected app: ApplicationService) {}
 
   /**
    * Register bindings to the container
    */
   register() {
-    this.app.container.singleton('trakt', () => {
-      return new Trakt({
-        client_id: env.get('TRAKT_CLIENT_ID'),
-        client_secret: env.get('TRAKT_CLIENT_SECRET'),
-        user_agent: 'Babla',
-      })
-    })
+    this.app.container.singleton('tmdb', () => new TMDB(env.get('TMDB_API_KEY')))
   }
 
   /**

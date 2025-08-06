@@ -45,4 +45,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   REDIS_PASSWORD: Env.schema.string.optional(),
 
   FANART_API_KEY: Env.schema.string(),
+
+  TMDB_API_KEY: Env.schema.string(),
 })

@@ -63,6 +63,7 @@ export default defineConfig({
     () => import('@adonisjs/cache/cache_provider'),
     () => import('@adonisjs/redis/redis_provider'),
     () => import('#providers/fanart_provider'),
+    () => import('#providers/tmdb_provider'),
   ],
 
   /*

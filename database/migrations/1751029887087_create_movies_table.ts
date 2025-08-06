@@ -13,6 +13,7 @@ export default class extends BaseSchema {
       table.integer('trakt').notNullable().unique().unsigned()
       table.string('imdb').notNullable().unique()
       table.integer('tmdb').notNullable().unique().unsigned()
+      table.string('poster').notNullable().unique()
       table.jsonb('tg_metadata').notNullable()
       table.jsonb('metadata').notNullable()
 
