@@ -52,8 +52,9 @@ export default function MovieList() {
         },
         // Include all search params in query key for proper cache invalidation
         queryKey: ['movies', { page, limit, sort, order }],
-        staleTime: 24 * 60 * 60 * 1000, // 24 hours as per requirements
-        keepPreviousData: true,
+        staleTime: 0, // No caching for movies list queries - always fetch fresh data
+        cacheTime: 0, // Don't keep in cache
+        keepPreviousData: false, // Don't keep previous data to ensure fresh results
     })
 
     if (isLoading) {

@@ -1,7 +1,7 @@
+import { Badge } from '@/components/ui/badge.tsx'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { apiQuery } from '@/lib/api-client.ts'
-import { Badge } from '@/components/ui/badge.tsx'
 import { Star } from 'lucide-react'
 
 interface MovieCardProps {
@@ -17,12 +17,16 @@ export function MovieCard({ id }: MovieCardProps) {
     params: {
       path: { id },
     },
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours - images don't change often
+    cacheTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
   })
 
   const { data: movieData } = apiQuery.useQuery('get', '/movies/{id}/info', {
     params: {
       path: { id },
     },
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours - movie info doesn't change often
+    cacheTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
   })
 
   if (imageLoading) {
