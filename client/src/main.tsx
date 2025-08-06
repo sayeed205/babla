@@ -1,14 +1,15 @@
+import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { createRouter, RouterProvider } from '@tanstack/react-router'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 
-import './styles.css'
 import { ThemeProvider } from '@/components/theme-provider.tsx'
+import { TailwindIndicator } from './components/tailwind-indicator.tsx'
+import './styles.css'
 
 // Create a new router instance
 
@@ -40,6 +41,7 @@ if (rootElement && !rootElement.innerHTML) {
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <ThemeProvider storageKey="theme" defaultTheme="system">
           <RouterProvider router={router} />
+          <TailwindIndicator/>
         </ThemeProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>
