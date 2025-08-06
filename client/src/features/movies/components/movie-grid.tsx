@@ -37,27 +37,19 @@ function EmptyState({ searchTerm }: { searchTerm?: string }) {
       <div className="rounded-full bg-muted p-6 mb-6">
         <SearchX className="h-12 w-12 text-muted-foreground" />
       </div>
-      
+
       {searchTerm ? (
         <>
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            No movies found
-          </h3>
-          <p className="text-muted-foreground mb-1">
-            No movies found matching "{searchTerm}"
-          </p>
+          <h3 className="text-xl font-semibold text-foreground mb-2">No movies found</h3>
+          <p className="text-muted-foreground mb-1">No movies found matching "{searchTerm}"</p>
           <p className="text-sm text-muted-foreground">
             Try adjusting your search terms or browse all movies
           </p>
         </>
       ) : (
         <>
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            No movies available
-          </h3>
-          <p className="text-muted-foreground">
-            There are no movies to display at the moment
-          </p>
+          <h3 className="text-xl font-semibold text-foreground mb-2">No movies available</h3>
+          <p className="text-muted-foreground">There are no movies to display at the moment</p>
         </>
       )}
     </div>
@@ -71,9 +63,7 @@ export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridPro
         <div className="rounded-full bg-destructive/10 p-6 mb-6">
           <SearchX className="h-12 w-12 text-destructive" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground mb-2">
-          Failed to load movies
-        </h3>
+        <h3 className="text-xl font-semibold text-foreground mb-2">Failed to load movies</h3>
         <p className="text-muted-foreground">
           {error.message || 'An error occurred while loading movies'}
         </p>
@@ -93,8 +83,8 @@ export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridPro
     <div className="grid gap-4 md:gap-6 justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {movies.map((movie, index) => (
         <div key={movie.id} className="w-full max-w-[160px] sm:max-w-none">
-          <MovieCard 
-            id={movie.id} 
+          <MovieCard
+            id={movie.id}
             priority={index < 12} // Prioritize first 12 movies (above-the-fold)
           />
         </div>

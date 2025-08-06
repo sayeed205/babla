@@ -3,14 +3,14 @@ import { Header } from '@/components/layout/header.tsx'
 import { Main } from '@/components/layout/main.tsx'
 import { SearchInput } from '@/components/search-input'
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
 } from '@/components/ui/pagination'
 import {
-    getMoviesSearchParamsWithDefaults,
-    type MoviesSearchParams,
+  getMoviesSearchParamsWithDefaults,
+  type MoviesSearchParams,
 } from '@/features/movies/types/search-params'
 import { apiQuery } from '@/lib/api-client.ts'
 import { useNavigate, useSearch } from '@tanstack/react-router'

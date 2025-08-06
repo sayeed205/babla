@@ -41,7 +41,7 @@ if (rootElement && !rootElement.innerHTML) {
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <ThemeProvider storageKey="theme" defaultTheme="system">
           <RouterProvider router={router} />
-          <TailwindIndicator/>
+          <TailwindIndicator />
         </ThemeProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>

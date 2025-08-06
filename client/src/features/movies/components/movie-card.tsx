@@ -23,15 +23,15 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     params: {
       path: { id },
     },
-    queryKey:[`movie-image-${id}`],
+    queryKey: [`movie-image-${id}`],
     staleTime: 24 * 60 * 60 * 1000, // 24 hours - images don't change often
     gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
     retry: 2, // Retry failed requests twice
-    retryDelay: (attemptIndex:number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
-  },)
+    retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+  })
 
-  const { 
-    data: movieData, 
+  const {
+    data: movieData,
     isLoading: movieDataLoading,
     error: movieDataError,
     refetch: refetchMovieInfo,
@@ -39,11 +39,11 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     params: {
       path: { id },
     },
-    queryKey:[`movie-info-${id}`],
+    queryKey: [`movie-info-${id}`],
     staleTime: 24 * 60 * 60 * 1000, // 24 hours - movie info doesn't change often
     gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
     retry: 2, // Retry failed requests twice
-    retryDelay: (attemptIndex:number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   })
 
   // Handle image load error
@@ -73,12 +73,12 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
   // Get the best available poster image
   const getPosterUrl = () => {
     if (!imageData?.movieposter?.length) return null
-    
+
     // Sort by likes (popularity) and return the most liked poster
-    const sortedPosters = [...imageData.movieposter].sort((a, b) => 
-      parseInt(b.likes || '0') - parseInt(a.likes || '0')
+    const sortedPosters = [...imageData.movieposter].sort(
+      (a, b) => parseInt(b.likes || '0') - parseInt(a.likes || '0')
     )
-    
+
     return sortedPosters[0]?.url
   }
 
@@ -225,12 +225,11 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
           {movieTitle}
         </h3>
         <p className="text-sm text-muted-foreground text-center">
-          {movieYear && movieGenres 
+          {movieYear && movieGenres
             ? `${movieYear} • ${movieGenres}`
-            : movieYear || movieGenres || 'Movie'
-          }
+            : movieYear || movieGenres || 'Movie'}
         </p>
-        
+
         {/* Error indicator for movie info */}
         {movieDataError && (
           <div className="flex items-center justify-center mt-2">

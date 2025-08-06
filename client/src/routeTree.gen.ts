@@ -53,7 +53,7 @@ export interface FileRoutesByTo {
   '/movies': typeof AuthenticatedMoviesRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
+  '__root__': typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
@@ -130,8 +130,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMoviesRoute: AuthenticatedMoviesRoute,
 }
 
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+const AuthenticatedRouteRouteWithChildren = AuthenticatedRouteRoute._addFileChildren(
+  AuthenticatedRouteRouteChildren
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
