@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { SearchX } from 'lucide-react'
+import { memo, useMemo } from 'react'
 import { MovieCard } from './movie-card'
 
 interface Movie {
@@ -15,10 +16,11 @@ interface MovieGridProps {
   searchTerm?: string
 }
 
-function MovieGridSkeleton() {
-  return (
-    <div className="grid gap-4 md:gap-6 justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {Array.from({ length: 20 }).map((_, index) => (
+const MovieGridSkeleton = memo(function MovieGridSkeleton() {
+  // Memoize skeleton items to prevent unnecessary re-renders
+  const skeletonItems = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, index) => (
         <div key={index} className="w-full max-w-[160px] sm:max-w-none space-y-3">
           <Skeleton className="aspect-[2/3] w-full rounded-lg" />
           <div className="space-y-2 px-1">
@@ -26,12 +28,18 @@ function MovieGridSkeleton() {
             <Skeleton className="h-4 w-1/2 mx-auto" />
           </div>
         </div>
-      ))}
+      )),
+    []
+  )
+
+  return (
+    <div className="grid gap-4 md:gap-6 justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+      {skeletonItems}
     </div>
   )
-}
+})
 
-function EmptyState({ searchTerm }: { searchTerm?: string }) {
+const EmptyState = memo(function EmptyState({ searchTerm }: { searchTerm?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="rounded-full bg-muted p-6 mb-6">
@@ -54,9 +62,28 @@ function EmptyState({ searchTerm }: { searchTerm?: string }) {
       )}
     </div>
   )
-}
+})
 
-export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridProps) {
+export const MovieGrid = memo(function MovieGrid({
+  movies,
+  isLoading,
+  error,
+  searchTerm,
+}: MovieGridProps) {
+  // Memoize movie cards to prevent unnecessary re-renders
+  const movieCards = useMemo(
+    () =>
+      movies.map((movie, index) => (
+        <div key={movie.id} className="w-full max-w-[160px] sm:max-w-none">
+          <MovieCard
+            id={movie.id}
+            priority={index < 12} // Prioritize first 12 movies (above-the-fold)
+          />
+        </div>
+      )),
+    [movies]
+  )
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -81,14 +108,7 @@ export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridPro
 
   return (
     <div className="grid gap-4 md:gap-6 justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {movies.map((movie, index) => (
-        <div key={movie.id} className="w-full max-w-[160px] sm:max-w-none">
-          <MovieCard
-            id={movie.id}
-            priority={index < 12} // Prioritize first 12 movies (above-the-fold)
-          />
-        </div>
-      ))}
+      {movieCards}
     </div>
   )
-}
+})

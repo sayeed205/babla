@@ -3,14 +3,14 @@ import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { apiQuery } from '@/lib/api-client.ts'
 import { AlertCircle, ImageIcon, RotateCcw, Star } from 'lucide-react'
-import { useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 
 interface MovieCardProps {
   id: string
   priority?: boolean // for above-fold images
 }
 
-export function MovieCard({ id, priority = false }: MovieCardProps) {
+export const MovieCard = memo(function MovieCard({ id, priority = false }: MovieCardProps) {
   const [imageLoadError, setImageLoadError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
 
@@ -23,11 +23,15 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     params: {
       path: { id },
     },
-    queryKey: [`movie-image-${id}`],
+    // Structured query key for better cache management
+    queryKey: ['movies', 'images', id],
     staleTime: 24 * 60 * 60 * 1000, // 24 hours - images don't change often
     gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
-    retry: 2, // Retry failed requests twice
-    retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    // Use global retry settings from QueryClient
+    retry: undefined,
+    retryDelay: undefined,
+    // Don't refetch on window focus for images
+    refetchOnWindowFocus: false,
   })
 
   const {
@@ -39,39 +43,40 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     params: {
       path: { id },
     },
-    queryKey: [`movie-info-${id}`],
+    // Structured query key for better cache management
+    queryKey: ['movies', 'info', id],
     staleTime: 24 * 60 * 60 * 1000, // 24 hours - movie info doesn't change often
     gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
-    retry: 2, // Retry failed requests twice
-    retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    // Use global retry settings from QueryClient
+    retry: undefined,
+    retryDelay: undefined,
+    // Don't refetch on window focus for movie info
+    refetchOnWindowFocus: false,
   })
 
-  // Handle image load error
-  const handleImageError = () => {
+  // Memoized handlers for better performance
+  const handleImageError = useCallback(() => {
     setImageLoadError(true)
     setImageLoading(false)
-  }
+  }, [])
 
-  // Handle image load success
-  const handleImageLoad = () => {
+  const handleImageLoad = useCallback(() => {
     setImageLoadError(false)
     setImageLoading(false)
-  }
+  }, [])
 
-  // Retry loading images
-  const handleRetryImages = () => {
+  const handleRetryImages = useCallback(() => {
     setImageLoadError(false)
     setImageLoading(true)
     refetchImages()
-  }
+  }, [refetchImages])
 
-  // Retry loading movie info
-  const handleRetryMovieInfo = () => {
+  const handleRetryMovieInfo = useCallback(() => {
     refetchMovieInfo()
-  }
+  }, [refetchMovieInfo])
 
-  // Get the best available poster image
-  const getPosterUrl = () => {
+  // Memoized poster URL calculation for performance
+  const posterUrl = useMemo(() => {
     if (!imageData?.movieposter?.length) return null
 
     // Sort by likes (popularity) and return the most liked poster
@@ -80,10 +85,10 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     )
 
     return sortedPosters[0]?.url
-  }
+  }, [imageData?.movieposter])
 
-  // Generate fallback placeholder with movie title
-  const getFallbackImage = () => {
+  // Memoized fallback image generation
+  const fallbackImage = useMemo(() => {
     const title = imageData?.name || movieData?.title || 'Movie'
     const year = movieData?.year || ''
     return `data:image/svg+xml;base64,${btoa(`
@@ -97,7 +102,18 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
         </g>
       </svg>
     `)}`
-  }
+  }, [imageData?.name, movieData?.title, movieData?.year])
+
+  // Memoized movie data for performance
+  const movieInfo = useMemo(
+    () => ({
+      title: imageData?.name || movieData?.title || 'Unknown Movie',
+      year: movieData?.year,
+      rating: movieData?.rating,
+      genres: movieData?.genres?.slice(0, 2).join(', ') || '',
+    }),
+    [imageData?.name, movieData?.title, movieData?.year, movieData?.rating, movieData?.genres]
+  )
 
   // Show loading skeleton while data is loading
   if (imageDataLoading || movieDataLoading) {
@@ -138,11 +154,8 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
     )
   }
 
-  const posterUrl = getPosterUrl()
-  const movieTitle = imageData?.name || movieData?.title || 'Unknown Movie'
-  const movieYear = movieData?.year
-  const movieRating = movieData?.rating
-  const movieGenres = movieData?.genres?.slice(0, 2).join(', ') || ''
+  // Use memoized values
+  const { title: movieTitle, year: movieYear, rating: movieRating, genres: movieGenres } = movieInfo
 
   return (
     <Card className="group relative overflow-hidden border-0 bg-card shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
@@ -166,6 +179,10 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
               onLoad={handleImageLoad}
               onError={handleImageError}
               decoding="async"
+              // Add fetchpriority for above-fold images
+              fetchPriority={priority ? 'high' : 'auto'}
+              // Add referrerpolicy for better privacy
+              referrerPolicy="no-referrer"
             />
           </>
         ) : (
@@ -189,10 +206,11 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
             ) : (
               /* Show fallback placeholder */
               <img
-                src={getFallbackImage()}
+                src={fallbackImage}
                 alt={`${movieTitle} placeholder`}
                 className="w-full h-full object-cover"
                 loading={priority ? 'eager' : 'lazy'}
+                decoding="async"
               />
             )}
           </div>
@@ -246,4 +264,4 @@ export function MovieCard({ id, priority = false }: MovieCardProps) {
       </div>
     </Card>
   )
-}
+})

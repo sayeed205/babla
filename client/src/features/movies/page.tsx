@@ -9,6 +9,7 @@ import {
 } from '@/features/movies/types/search-params'
 import { apiQuery } from '@/lib/api-client.ts'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useCallback, useMemo } from 'react'
 import { FilterBar } from './components/filter-bar'
 import { MovieGrid } from './components/movie-grid'
 
@@ -16,26 +17,33 @@ export default function MovieList() {
   const searchParams = useSearch({ from: '/_authenticated/movies' })
   const navigate = useNavigate()
 
-  // Apply default values for undefined search params
-  const { page, limit, sort, order } = getMoviesSearchParamsWithDefaults(searchParams)
+  // Memoize search params with defaults to prevent unnecessary re-renders
+  const normalizedSearchParams = useMemo(
+    () => getMoviesSearchParamsWithDefaults(searchParams),
+    [searchParams]
+  )
+  const { page, limit, sort, order } = normalizedSearchParams
 
-  // Function to update search params
-  const updateSearchParams = (updates: Partial<MoviesSearchParams>) => {
-    navigate({
-      to: '/movies',
-      search: (prev) => {
-        const merged = { ...prev, ...updates }
-        // Ensure we don't lose any existing parameters
-        return {
-          page: merged.page,
-          limit: merged.limit,
-          sort: merged.sort,
-          order: merged.order,
-          search: merged.search,
-        }
-      },
-    })
-  }
+  // Memoized function to update search params for better performance
+  const updateSearchParams = useCallback(
+    (updates: Partial<MoviesSearchParams>) => {
+      navigate({
+        to: '/movies',
+        search: (prev) => {
+          const merged = { ...prev, ...updates }
+          // Ensure we don't lose any existing parameters
+          return {
+            page: merged.page,
+            limit: merged.limit,
+            sort: merged.sort,
+            order: merged.order,
+            search: merged.search,
+          }
+        },
+      })
+    },
+    [navigate]
+  )
 
   const { data, isLoading, error } = apiQuery.useQuery('get', '/movies', {
     params: {
@@ -47,11 +55,27 @@ export default function MovieList() {
         ...(searchParams.search && { search: searchParams.search }),
       },
     },
-    // Include all search params in query key for proper cache invalidation
-    queryKey: ['movies', { page, limit, sort, order, search: searchParams.search }],
-    staleTime: 0, // No caching for movies list queries - always fetch fresh data
-    cacheTime: 0, // Don't keep in cache
-    keepPreviousData: false, // Don't keep previous data to ensure fresh results
+    // Structured query key for proper cache invalidation and management
+    queryKey: [
+      'movies',
+      'list',
+      {
+        page,
+        limit,
+        sort,
+        order,
+        // Only include search in key if it exists to avoid cache misses
+        ...(searchParams.search && { search: searchParams.search }),
+      },
+    ],
+    // 24-hour stale time for movies list - movies don't change frequently
+    staleTime: 24 * 60 * 60 * 1000,
+    // Keep in cache for 7 days for better performance
+    gcTime: 7 * 24 * 60 * 60 * 1000,
+    // Keep previous data while fetching new data for better UX
+    placeholderData: (previousData: any) => previousData,
+    // Refetch on window focus to ensure fresh data when user returns
+    refetchOnWindowFocus: true,
   })
 
   // We'll handle loading and error states in the MovieGrid component
