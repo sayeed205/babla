@@ -39,7 +39,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (isAuthenticated && pathname === '/login') {
-    return <Navigate to="/dashboard" />
+    return <Navigate to="/home" />
   }
 
   if (!isAuthenticated && pathname === '/login') return children
