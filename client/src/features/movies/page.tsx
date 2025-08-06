@@ -1,34 +1,44 @@
 // components/MovieList.tsx
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-} from '@/components/ui/pagination'
-import { useState } from 'react'
-import { MovieCard } from '@/features/movies/components/movie-card.tsx'
-import { apiQuery } from '@/lib/api-client.ts'
-import { Link } from '@tanstack/react-router'
-import { Main } from '@/components/layout/main.tsx'
 import { Header } from '@/components/layout/header.tsx'
-
-const ITEMS_PER_PAGE = 10
+import { Main } from '@/components/layout/main.tsx'
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from '@/components/ui/pagination'
+import { MovieCard } from '@/features/movies/components/movie-card.tsx'
+import { getMoviesSearchParamsWithDefaults, type MoviesSearchParams } from '@/features/movies/types/search-params'
+import { apiQuery } from '@/lib/api-client.ts'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 
 export default function MovieList() {
-  const [page, setPage] = useState(1)
+  const searchParams = useSearch({ from: '/_authenticated/movies' })
+  const navigate = useNavigate()
+
+  // Apply default values for undefined search params
+  const { page, limit, sort, order } = getMoviesSearchParamsWithDefaults(searchParams)
+
+  // Function to update search params
+  const updateSearchParams = (updates: Partial<MoviesSearchParams>) => {
+    navigate({
+      to: '/movies',
+      search: { ...searchParams, ...updates },
+    })
+  }
 
   const { data, isLoading } = apiQuery.useQuery('get', '/movies', {
     params: {
       query: {
         page,
-        limit: ITEMS_PER_PAGE,
-        sort: 'title',
-        order: 'asc',
+        limit,
+        sort,
+        order,
       },
     },
-    // ✅ this makes sure it refetches when `page` changes
-    queryKey: ['movies', page],
-    staleTime: 0,
+    // Include all search params in query key for proper cache invalidation
+    queryKey: ['movies', { page, limit, sort, order }],
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours as per requirements
     keepPreviousData: true,
   })
 
@@ -40,7 +50,7 @@ export default function MovieList() {
     return <div>Failed to load movies.</div>
   }
 
-  const totalPages = Math.ceil((data.meta.total ?? 0) / ITEMS_PER_PAGE)
+  const totalPages = Math.ceil((data.meta.total ?? 0) / limit)
 
   return (
     <>
@@ -49,9 +59,9 @@ export default function MovieList() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.data.map((movie) => (
-              <Link key={movie.id} to={`/movies/${movie.id}`}>
+              <div key={movie.id}>
                 <MovieCard id={movie.id} />
-              </Link>
+              </div>
             ))}
           </div>
 
@@ -59,7 +69,7 @@ export default function MovieList() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationLink
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() => updateSearchParams({ page: Math.max(page - 1, 1) })}
                   isActive={false}
                   className={page === 1 ? 'pointer-events-none opacity-50' : ''}
                 >
@@ -69,7 +79,10 @@ export default function MovieList() {
 
               {Array.from({ length: totalPages }).map((_, i) => (
                 <PaginationItem key={i}>
-                  <PaginationLink isActive={i + 1 === page} onClick={() => setPage(i + 1)}>
+                  <PaginationLink 
+                    isActive={i + 1 === page} 
+                    onClick={() => updateSearchParams({ page: i + 1 })}
+                  >
                     {i + 1}
                   </PaginationLink>
                 </PaginationItem>
@@ -77,7 +90,7 @@ export default function MovieList() {
 
               <PaginationItem>
                 <PaginationLink
-                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() => updateSearchParams({ page: Math.min(page + 1, totalPages) })}
                   isActive={false}
                   className={page === totalPages ? 'pointer-events-none opacity-50' : ''}
                 >
