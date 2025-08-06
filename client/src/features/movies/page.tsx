@@ -4,8 +4,8 @@ import { Main } from '@/components/layout/main.tsx'
 import { PaginationControls } from '@/components/pagination-controls'
 import { SearchInput } from '@/components/search-input'
 import {
-  getMoviesSearchParamsWithDefaults,
-  type MoviesSearchParams,
+    getMoviesSearchParamsWithDefaults,
+    type MoviesSearchParams,
 } from '@/features/movies/types/search-params'
 import { apiQuery } from '@/lib/api-client.ts'
 import { useNavigate, useSearch } from '@tanstack/react-router'
@@ -22,7 +22,7 @@ export default function MovieList() {
     () => getMoviesSearchParamsWithDefaults(searchParams),
     [searchParams]
   )
-  const { page, limit, sort, order } = normalizedSearchParams
+  const { page, limit, sort, order, search } = normalizedSearchParams
 
   // Memoized function to update search params for better performance
   const updateSearchParams = useCallback(
@@ -52,7 +52,7 @@ export default function MovieList() {
         limit,
         sort,
         order,
-        ...(searchParams.search && { search: searchParams.search }),
+        ...(search && { search }),
       },
     },
     // Structured query key for proper cache invalidation and management
@@ -64,17 +64,12 @@ export default function MovieList() {
         limit,
         sort,
         order,
-        // Only include search in key if it exists to avoid cache misses
-        ...(searchParams.search && { search: searchParams.search }),
+        ...(search && { search }),
       },
     ],
-    // 24-hour stale time for movies list - movies don't change frequently
-    staleTime: 24 * 60 * 60 * 1000,
-    // Keep in cache for 7 days for better performance
-    gcTime: 7 * 24 * 60 * 60 * 1000,
-    // Keep previous data while fetching new data for better UX
+    staleTime:0,
+    gcTime: 0,
     placeholderData: (previousData: any) => previousData,
-    // Refetch on window focus to ensure fresh data when user returns
     refetchOnWindowFocus: true,
   })
 
@@ -85,7 +80,7 @@ export default function MovieList() {
       <Header fixed>
         <div className="flex-1 max-w-md">
           <SearchInput
-            value={searchParams.search || ''}
+            value={search || ''}
             onChange={(value) => updateSearchParams({ search: value, page: 1 })}
             placeholder="Search movies..."
             className="w-full"
@@ -95,7 +90,7 @@ export default function MovieList() {
       <Main>
         <div className="space-y-0">
           <FilterBar
-            searchParams={{ page, limit, sort, order, search: searchParams.search || '' }}
+            searchParams={{ page, limit, sort, order, search }}
             totalResults={data?.meta.total ?? 0}
             onUpdateSearchParams={updateSearchParams}
           />
@@ -104,7 +99,7 @@ export default function MovieList() {
               movies={data?.data ?? []}
               isLoading={isLoading}
               error={error}
-              searchTerm={searchParams.search}
+              searchTerm={search}
             />
 
             {data?.meta && (

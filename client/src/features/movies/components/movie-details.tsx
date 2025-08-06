@@ -74,7 +74,8 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
         <AlertCircle className="w-16 h-16 text-muted-foreground mb-4" />
         <h2 className="text-xl font-semibold mb-2">Failed to load movie details</h2>
         <p className="text-muted-foreground text-center mb-6 max-w-md">
-          We couldn't load the movie information and images. Please check your connection and try again.
+          We couldn't load the movie information and images. Please check your connection and try
+          again.
         </p>
         <Button onClick={handleRetryAll} className="flex items-center gap-2">
           <RotateCcw className="w-4 h-4" />
@@ -93,7 +94,11 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
         <p className="text-muted-foreground text-center mb-6 max-w-md">
           The movie you're looking for doesn't exist or has been removed.
         </p>
-        <Button onClick={handleRetryMovieInfo} variant="outline" className="flex items-center gap-2">
+        <Button
+          onClick={handleRetryMovieInfo}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <RotateCcw className="w-4 h-4" />
           Try again
         </Button>
@@ -105,11 +110,7 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
   return (
     <div className="space-y-8">
       {/* Movie Hero Section */}
-      <MovieHero 
-        movieInfo={movieInfo} 
-        movieImages={movieImages} 
-        isLoading={false}
-      />
+      <MovieHero movieInfo={movieInfo} movieImages={movieImages} isLoading={false} />
 
       {/* Movie Overview */}
       {movieInfo?.overview && (
@@ -123,37 +124,49 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {movieInfo?.year && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Year</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Year
+            </h3>
             <p className="text-lg">{movieInfo.year}</p>
           </div>
         )}
         {movieInfo?.runtime && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Runtime</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Runtime
+            </h3>
             <p className="text-lg">{movieInfo.runtime} minutes</p>
           </div>
         )}
         {movieInfo?.rating && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Rating</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Rating
+            </h3>
             <p className="text-lg">{movieInfo.rating.toFixed(1)}/10</p>
           </div>
         )}
         {movieInfo?.certification && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Certification</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Certification
+            </h3>
             <p className="text-lg">{movieInfo.certification}</p>
           </div>
         )}
         {movieInfo?.status && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Status</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Status
+            </h3>
             <p className="text-lg capitalize">{movieInfo.status}</p>
           </div>
         )}
         {movieInfo?.country && (
           <div>
-            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Country</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+              Country
+            </h3>
             <p className="text-lg">{movieInfo.country}</p>
           </div>
         )}
@@ -162,7 +175,9 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
       {/* Genres */}
       {movieInfo?.genres && movieInfo.genres.length > 0 && (
         <div>
-          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-2">Genres</h3>
+          <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-2">
+            Genres
+          </h3>
           <div className="flex flex-wrap gap-2">
             {movieInfo.genres.map((genre) => (
               <span
@@ -181,9 +196,7 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
         <div className="bg-muted/50 rounded-lg p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              Failed to load movie images
-            </span>
+            <span className="text-sm text-muted-foreground">Failed to load movie images</span>
           </div>
           <Button
             onClick={handleRetryMovieImages}

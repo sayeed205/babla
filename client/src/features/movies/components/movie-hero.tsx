@@ -15,7 +15,7 @@ export const MovieHero = memo(function MovieHero({
   // Get the best background image (prefer moviebackground, fallback to movie4kbackground)
   const getBackgroundImage = () => {
     if (!movieImages) return null
-    
+
     // Try moviebackground first
     if (movieImages.moviebackground && movieImages.moviebackground.length > 0) {
       // Sort by likes (descending) and take the first one
@@ -24,7 +24,7 @@ export const MovieHero = memo(function MovieHero({
       )
       return sortedBackgrounds[0].url
     }
-    
+
     // Fallback to movie4kbackground
     if (movieImages.movie4kbackground && movieImages.movie4kbackground.length > 0) {
       const sortedBackgrounds = [...movieImages.movie4kbackground].sort(
@@ -32,14 +32,14 @@ export const MovieHero = memo(function MovieHero({
       )
       return sortedBackgrounds[0].url
     }
-    
+
     return null
   }
 
   // Get the movie logo (prefer hdmovielogo, fallback to movielogo)
   const getMovieLogo = () => {
     if (!movieImages) return null
-    
+
     // Try hdmovielogo first
     if (movieImages.hdmovielogo && movieImages.hdmovielogo.length > 0) {
       const sortedLogos = [...movieImages.hdmovielogo].sort(
@@ -47,7 +47,7 @@ export const MovieHero = memo(function MovieHero({
       )
       return sortedLogos[0].url
     }
-    
+
     // Fallback to movielogo
     if (movieImages.movielogo && movieImages.movielogo.length > 0) {
       const sortedLogos = [...movieImages.movielogo].sort(
@@ -55,7 +55,7 @@ export const MovieHero = memo(function MovieHero({
       )
       return sortedLogos[0].url
     }
-    
+
     return null
   }
 
@@ -126,16 +126,12 @@ export const MovieHero = memo(function MovieHero({
           {/* Basic movie info */}
           <div className="flex flex-wrap items-center gap-4 mt-6 text-white/80">
             {movieInfo?.year && (
-              <span className="text-sm md:text-base font-medium">
-                {movieInfo.year}
-              </span>
+              <span className="text-sm md:text-base font-medium">{movieInfo.year}</span>
             )}
             {movieInfo?.runtime && (
               <>
                 <span className="text-white/40">•</span>
-                <span className="text-sm md:text-base font-medium">
-                  {movieInfo.runtime} min
-                </span>
+                <span className="text-sm md:text-base font-medium">{movieInfo.runtime} min</span>
               </>
             )}
             {movieInfo?.certification && (
@@ -166,15 +162,15 @@ function MovieHeroSkeleton() {
   return (
     <div className="relative w-full h-[60vh] min-h-[400px] max-h-[600px] overflow-hidden rounded-lg bg-muted animate-pulse">
       <div className="absolute inset-0 bg-gradient-to-br from-muted via-muted/80 to-muted/60" />
-      
+
       <div className="relative z-10 flex flex-col justify-end h-full p-6 md:p-8 lg:p-12">
         <div className="max-w-4xl space-y-4">
           {/* Title skeleton */}
           <div className="h-12 md:h-16 lg:h-20 w-3/4 max-w-md bg-white/20 rounded" />
-          
+
           {/* Tagline skeleton */}
           <div className="h-6 md:h-8 w-1/2 max-w-sm bg-white/15 rounded" />
-          
+
           {/* Info skeleton */}
           <div className="flex gap-4 mt-6">
             <div className="h-5 w-12 bg-white/15 rounded" />

@@ -1,13 +1,14 @@
 import { Skeleton } from '@/components/ui/skeleton'
+import { Link } from '@tanstack/react-router'
 import { SearchX } from 'lucide-react'
 import { memo, useMemo } from 'react'
 import { MovieCard } from './movie-card'
-import { Link } from '@tanstack/react-router'
 
 interface Movie {
-  id: string
-  title: string
-  year: number
+  id?: string
+  title?: string
+  year?: number
+  poster?: string
 }
 
 interface MovieGridProps {
@@ -74,19 +75,21 @@ export const MovieGrid = memo(function MovieGrid({
   // Memoize movie cards to prevent unnecessary re-renders
   const movieCards = useMemo(
     () =>
-      movies.map((movie, index) => (
-        <Link
-          to="/movies/$id"
-          params={{ id: movie.id }}
-          key={movie.id}
-          className="w-full max-w-[160px] sm:max-w-none"
-        >
-          <MovieCard
-            id={movie.id}
-            priority={index < 12} // Prioritize first 12 movies (above-the-fold)
-          />
-        </Link>
-      )),
+      movies
+        .filter((movie) => movie.id) // Filter out movies without IDs
+        .map((movie, index) => (
+          <Link
+            to="/movies/$id"
+            params={{ id: movie.id! }}
+            key={movie.id}
+            className="w-full max-w-[160px] sm:max-w-none"
+          >
+            <MovieCard
+              movie={movie as Required<Movie>}
+              priority={index < 12} // Prioritize first 12 movies (above-the-fold)
+            />
+          </Link>
+        )),
     [movies]
   )
 

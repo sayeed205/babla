@@ -38,7 +38,10 @@ export function validateMoviesSearch(search: Record<string, unknown>): MoviesSea
     typeof search.order === 'string' && ['asc', 'desc'].includes(search.order)
       ? (search.order as 'asc' | 'desc')
       : undefined
-  const searchTerm = typeof search.search === 'string' ? search.search : undefined
+  const searchTerm =
+    typeof search.search === 'string' && search.search.trim().length > 0
+      ? search.search.trim()
+      : undefined
 
   return {
     page: page && page > 0 ? page : undefined,

@@ -1,58 +1,22 @@
-import { Badge } from '@/components/ui/badge.tsx'
 import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { apiQuery } from '@/lib/api-client.ts'
-import { AlertCircle, ImageIcon, RotateCcw, Star } from 'lucide-react'
+import { ImageIcon } from 'lucide-react'
 import { memo, useCallback, useMemo, useState } from 'react'
 
-interface MovieCardProps {
+interface Movie {
   id: string
+  title: string
+  year: number
+  poster?: string
+}
+
+interface MovieCardProps {
+  movie: Movie
   priority?: boolean // for above-fold images
 }
 
-export const MovieCard = memo(function MovieCard({ id, priority = false }: MovieCardProps) {
+export const MovieCard = memo(function MovieCard({ movie, priority = false }: MovieCardProps) {
   const [imageLoadError, setImageLoadError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
-
-  const {
-    data: imageData,
-    isLoading: imageDataLoading,
-    error: imageDataError,
-    refetch: refetchImages,
-  } = apiQuery.useQuery('get', '/movies/{id}/images', {
-    params: {
-      path: { id },
-    },
-    // Structured query key for better cache management
-    queryKey: ['movies', 'images', id],
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours - images don't change often
-    gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
-    // Use global retry settings from QueryClient
-    retry: undefined,
-    retryDelay: undefined,
-    // Don't refetch on window focus for images
-    refetchOnWindowFocus: false,
-  })
-
-  const {
-    data: movieData,
-    isLoading: movieDataLoading,
-    error: movieDataError,
-    refetch: refetchMovieInfo,
-  } = apiQuery.useQuery('get', '/movies/{id}/info', {
-    params: {
-      path: { id },
-    },
-    // Structured query key for better cache management
-    queryKey: ['movies', 'info', id],
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours - movie info doesn't change often
-    gcTime: 7 * 24 * 60 * 60 * 1000, // Keep in cache for 7 days
-    // Use global retry settings from QueryClient
-    retry: undefined,
-    retryDelay: undefined,
-    // Don't refetch on window focus for movie info
-    refetchOnWindowFocus: false,
-  })
 
   // Memoized handlers for better performance
   const handleImageError = useCallback(() => {
@@ -65,32 +29,16 @@ export const MovieCard = memo(function MovieCard({ id, priority = false }: Movie
     setImageLoading(false)
   }, [])
 
-  const handleRetryImages = useCallback(() => {
-    setImageLoadError(false)
-    setImageLoading(true)
-    refetchImages()
-  }, [refetchImages])
-
-  const handleRetryMovieInfo = useCallback(() => {
-    refetchMovieInfo()
-  }, [refetchMovieInfo])
-
-  // Memoized poster URL calculation for performance
+  // Memoized poster URL - use TMDB base URL for posters
   const posterUrl = useMemo(() => {
-    if (!imageData?.movieposter?.length) return null
-
-    // Sort by likes (popularity) and return the most liked poster
-    const sortedPosters = [...imageData.movieposter].sort(
-      (a, b) => parseInt(b.likes || '0') - parseInt(a.likes || '0')
-    )
-
-    return sortedPosters[0]?.url
-  }, [imageData?.movieposter])
+    if (!movie.poster) return null
+    return `https://image.tmdb.org/t/p/w500${movie.poster}`
+  }, [movie.poster])
 
   // Memoized fallback image generation
   const fallbackImage = useMemo(() => {
-    const title = imageData?.name || movieData?.title || 'Movie'
-    const year = movieData?.year || ''
+    const title = movie.title || 'Movie'
+    const year = movie.year || ''
     return `data:image/svg+xml;base64,${btoa(`
       <svg width="400" height="600" xmlns="http://www.w3.org/2000/svg">
         <rect width="400" height="600" fill="#1f2937"/>
@@ -102,112 +50,43 @@ export const MovieCard = memo(function MovieCard({ id, priority = false }: Movie
         </g>
       </svg>
     `)}`
-  }, [imageData?.name, movieData?.title, movieData?.year])
-
-  // Memoized movie data for performance
-  const movieInfo = useMemo(
-    () => ({
-      title: imageData?.name || movieData?.title || 'Unknown Movie',
-      year: movieData?.year,
-      rating: movieData?.rating,
-      genres: movieData?.genres?.slice(0, 2).join(', ') || '',
-    }),
-    [imageData?.name, movieData?.title, movieData?.year, movieData?.rating, movieData?.genres]
-  )
-
-  // Show loading skeleton while data is loading
-  if (imageDataLoading || movieDataLoading) {
-    return (
-      <Card className="group relative overflow-hidden border-0 bg-card shadow-lg">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
-          <Skeleton className="w-full h-full" />
-        </div>
-        <div className="p-4">
-          <Skeleton className="h-6 w-3/4 mx-auto mb-2" />
-          <Skeleton className="h-4 w-1/2 mx-auto" />
-        </div>
-      </Card>
-    )
-  }
-
-  // Show error state with retry option
-  if (imageDataError && movieDataError) {
-    return (
-      <Card className="group relative overflow-hidden border-0 bg-card shadow-lg">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-muted flex flex-col items-center justify-center p-4">
-          <AlertCircle className="w-12 h-12 text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground text-center mb-3">
-            Failed to load movie data
-          </p>
-          <button
-            onClick={() => {
-              refetchImages()
-              refetchMovieInfo()
-            }}
-            className="flex items-center gap-2 px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Retry
-          </button>
-        </div>
-      </Card>
-    )
-  }
-
-  // Use memoized values
-  const { title: movieTitle, year: movieYear, rating: movieRating, genres: movieGenres } = movieInfo
+  }, [movie.title, movie.year])
 
   return (
     <Card className="group relative overflow-hidden border-0 bg-card shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
         {/* Main poster image */}
         {posterUrl && !imageLoadError ? (
-          <>
-            {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                <Skeleton className="w-full h-full" />
-              </div>
-            )}
-            <img
-              src={posterUrl}
-              alt={`${movieTitle} poster`}
-              className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-110 ${
-                imageLoading ? 'opacity-0' : 'opacity-100'
-              }`}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1440px) 33vw, 25vw"
-              loading={priority ? 'eager' : 'lazy'}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-              decoding="async"
-              // Add fetchpriority for above-fold images
-              fetchPriority={priority ? 'high' : 'auto'}
-              // Add referrerpolicy for better privacy
-              referrerPolicy="no-referrer"
-            />
-          </>
+          <img
+            src={posterUrl}
+            alt={`${movie.title} poster`}
+            className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-110 ${
+              imageLoading ? 'opacity-0' : 'opacity-100'
+            }`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1440px) 33vw, 25vw"
+            loading={priority ? 'eager' : 'lazy'}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+            decoding="async"
+            fetchPriority={priority ? 'high' : 'auto'}
+            referrerPolicy="no-referrer"
+          />
         ) : (
           /* Fallback image */
           <div className="w-full h-full bg-muted flex flex-col items-center justify-center p-4 relative">
             {imageLoadError && posterUrl ? (
-              /* Show retry option for failed image loads */
+              /* Show message for failed image loads */
               <>
                 <ImageIcon className="w-12 h-12 text-muted-foreground mb-2" />
-                <p className="text-xs text-muted-foreground text-center mb-3">
-                  Image failed to load
+                <p className="text-xs text-muted-foreground text-center">
+                  Image not available
                 </p>
-                <button
-                  onClick={handleRetryImages}
-                  className="flex items-center gap-1 px-2 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  Retry
-                </button>
               </>
             ) : (
               /* Show fallback placeholder */
               <img
                 src={fallbackImage}
-                alt={`${movieTitle} placeholder`}
+                alt={`${movie.title} placeholder`}
                 className="w-full h-full object-cover"
                 loading={priority ? 'eager' : 'lazy'}
                 decoding="async"
@@ -218,49 +97,16 @@ export const MovieCard = memo(function MovieCard({ id, priority = false }: Movie
 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        {/* Rating badge */}
-        {movieRating && (
-          <div className="absolute top-3 right-3">
-            <Badge variant="secondary" className="bg-black/50 text-white border-0 backdrop-blur-sm">
-              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-              {movieRating.toFixed(1)}
-            </Badge>
-          </div>
-        )}
-
-        {/* Loading indicator for movie info */}
-        {movieDataLoading && (
-          <div className="absolute top-3 left-3">
-            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          </div>
-        )}
       </div>
 
       {/* Movie title and details */}
       <div className="p-4 group-hover:bg-black/5 transition-colors duration-300">
         <h3 className="font-bold text-lg text-center text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-1">
-          {movieTitle}
+          {movie.title}
         </h3>
         <p className="text-sm text-muted-foreground text-center">
-          {movieYear && movieGenres
-            ? `${movieYear} • ${movieGenres}`
-            : movieYear || movieGenres || 'Movie'}
+          {movie.year || 'Year unknown'}
         </p>
-
-        {/* Error indicator for movie info */}
-        {movieDataError && (
-          <div className="flex items-center justify-center mt-2">
-            <button
-              onClick={handleRetryMovieInfo}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              title="Retry loading movie info"
-            >
-              <AlertCircle className="w-3 h-3" />
-              <span>Retry info</span>
-            </button>
-          </div>
-        )}
       </div>
     </Card>
   )
