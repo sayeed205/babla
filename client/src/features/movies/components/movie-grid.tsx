@@ -91,9 +91,12 @@ export function MovieGrid({ movies, isLoading, error, searchTerm }: MovieGridPro
 
   return (
     <div className="grid gap-4 md:gap-6 justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-      {movies.map((movie) => (
+      {movies.map((movie, index) => (
         <div key={movie.id} className="w-full max-w-[160px] sm:max-w-none">
-          <MovieCard id={movie.id} />
+          <MovieCard 
+            id={movie.id} 
+            priority={index < 12} // Prioritize first 12 movies (above-the-fold)
+          />
         </div>
       ))}
     </div>

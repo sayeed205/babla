@@ -13,12 +13,6 @@ export default class extends BaseSchema {
       table.integer('tmdb').notNullable().unique().unsigned()
       table.jsonb('tg_metadata').notNullable()
       table.jsonb('metadata').notNullable()
-      table
-        .string('collection_id')
-        .nullable()
-        .references('id')
-        .inTable('collections')
-        .onDelete('SET NULL')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').notNullable()
