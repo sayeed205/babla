@@ -2,19 +2,19 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import {
-    Cast,
-    Download,
-    Loader2,
-    Maximize,
-    Minimize,
-    Pause,
-    PictureInPicture,
-    Play,
-    Settings,
-    SkipBack,
-    SkipForward,
-    Volume2,
-    VolumeX,
+  Cast,
+  Download,
+  Loader2,
+  Maximize,
+  Minimize,
+  Pause,
+  PictureInPicture,
+  Play,
+  Settings,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import LosslessAudioPlayer from './lossless-audio-player'
@@ -35,18 +35,18 @@ interface MediaPlayerProps {
   artwork?: string
 }
 
-export function MediaPlayer({ 
-  src, 
-  title, 
-  type, 
-  className, 
+export function MediaPlayer({
+  src,
+  title,
+  type,
+  className,
   autoPlay = false,
   onTimeUpdate,
   onEnded,
   artist,
   album,
   artwork,
-  poster
+  poster,
 }: MediaPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null!)
@@ -64,80 +64,113 @@ export function MediaPlayer({
   const [detectedMediaType, setDetectedMediaType] = useState<'video' | 'audio' | null>(null)
 
   // Enhanced media type detection logic with comprehensive routing
-  const detectMediaType = useCallback((url: string, providedType?: 'video' | 'audio'): 'video' | 'audio' => {
-    // If type is explicitly provided, use it (highest priority)
-    if (providedType) {
-      console.log(`Media type explicitly provided: ${providedType}`)
-      return providedType
-    }
+  const detectMediaType = useCallback(
+    (url: string, providedType?: 'video' | 'audio'): 'video' | 'audio' => {
+      // If type is explicitly provided, use it (highest priority)
+      if (providedType) {
+        console.log(`Media type explicitly provided: ${providedType}`)
+        return providedType
+      }
 
-    // Detect based on URL patterns and file extensions
-    const urlLower = url.toLowerCase()
-    
-    // Lossless audio file extensions (prioritized for LosslessAudioPlayer)
-    const losslessAudioExtensions = ['.flac', '.wav', '.alac', '.ape', '.wv']
-    
-    // Standard audio file extensions
-    const audioExtensions = ['.mp3', '.aac', '.m4a', '.ogg', '.wma', '.opus']
-    
-    // Audio URL patterns and API endpoints
-    const audioPatterns = [
-      '/audio/', 'audio=', 'type=audio', '/music/', '/songs/', '/tracks/',
-      'format=audio', 'content-type=audio', 'mime=audio'
-    ]
-    
-    // Video file extensions (for MSEVideoPlayer with HEVC support)
-    const videoExtensions = ['.mp4', '.mkv', '.avi', '.mov', '.wmv', '.webm', '.m4v', '.ts', '.m3u8']
-    
-    // Video URL patterns and streaming endpoints
-    const videoPatterns = [
-      '/video/', 'video=', 'type=video', '/stream', '/movies/', '/tvs/',
-      '/episodes/', '/seasons/', 'format=video', 'content-type=video', 'mime=video'
-    ]
+      // Detect based on URL patterns and file extensions
+      const urlLower = url.toLowerCase()
 
-    // Check for lossless audio first (highest priority for audio detection)
-    if (losslessAudioExtensions.some(ext => urlLower.includes(ext))) {
-      console.log('Detected lossless audio format, routing to LosslessAudioPlayer')
-      return 'audio'
-    }
+      // Lossless audio file extensions (prioritized for LosslessAudioPlayer)
+      const losslessAudioExtensions = ['.flac', '.wav', '.alac', '.ape', '.wv']
 
-    // Check for standard audio formats
-    if (audioExtensions.some(ext => urlLower.includes(ext)) || 
-        audioPatterns.some(pattern => urlLower.includes(pattern))) {
-      console.log('Detected audio format, routing to LosslessAudioPlayer')
-      return 'audio'
-    }
+      // Standard audio file extensions
+      const audioExtensions = ['.mp3', '.aac', '.m4a', '.ogg', '.wma', '.opus']
 
-    // Check for video formats (route to MSEVideoPlayer with HEVC support)
-    if (videoExtensions.some(ext => urlLower.includes(ext)) || 
-        videoPatterns.some(pattern => urlLower.includes(pattern))) {
-      console.log('Detected video format, routing to MSEVideoPlayer')
-      return 'video'
-    }
+      // Audio URL patterns and API endpoints
+      const audioPatterns = [
+        '/audio/',
+        'audio=',
+        'type=audio',
+        '/music/',
+        '/songs/',
+        '/tracks/',
+        'format=audio',
+        'content-type=audio',
+        'mime=audio',
+      ]
 
-    // Special handling for streaming endpoints without clear extensions
-    if (urlLower.includes('/stream') || urlLower.includes('/play')) {
-      // Check query parameters for hints
-      const urlParams = new URLSearchParams(url.split('?')[1] || '')
-      const formatParam = urlParams.get('format') || urlParams.get('type')
-      
-      if (formatParam) {
-        const format = formatParam.toLowerCase()
-        if (format.includes('audio')) {
-          console.log('Detected audio from URL parameters, routing to LosslessAudioPlayer')
-          return 'audio'
-        }
-        if (format.includes('video')) {
-          console.log('Detected video from URL parameters, routing to MSEVideoPlayer')
-          return 'video'
+      // Video file extensions (for MSEVideoPlayer with HEVC support)
+      const videoExtensions = [
+        '.mp4',
+        '.mkv',
+        '.avi',
+        '.mov',
+        '.wmv',
+        '.webm',
+        '.m4v',
+        '.ts',
+        '.m3u8',
+      ]
+
+      // Video URL patterns and streaming endpoints
+      const videoPatterns = [
+        '/video/',
+        'video=',
+        'type=video',
+        '/stream',
+        '/movies/',
+        '/tvs/',
+        '/episodes/',
+        '/seasons/',
+        'format=video',
+        'content-type=video',
+        'mime=video',
+      ]
+
+      // Check for lossless audio first (highest priority for audio detection)
+      if (losslessAudioExtensions.some((ext) => urlLower.includes(ext))) {
+        console.log('Detected lossless audio format, routing to LosslessAudioPlayer')
+        return 'audio'
+      }
+
+      // Check for standard audio formats
+      if (
+        audioExtensions.some((ext) => urlLower.includes(ext)) ||
+        audioPatterns.some((pattern) => urlLower.includes(pattern))
+      ) {
+        console.log('Detected audio format, routing to LosslessAudioPlayer')
+        return 'audio'
+      }
+
+      // Check for video formats (route to MSEVideoPlayer with HEVC support)
+      if (
+        videoExtensions.some((ext) => urlLower.includes(ext)) ||
+        videoPatterns.some((pattern) => urlLower.includes(pattern))
+      ) {
+        console.log('Detected video format, routing to MSEVideoPlayer')
+        return 'video'
+      }
+
+      // Special handling for streaming endpoints without clear extensions
+      if (urlLower.includes('/stream') || urlLower.includes('/play')) {
+        // Check query parameters for hints
+        const urlParams = new URLSearchParams(url.split('?')[1] || '')
+        const formatParam = urlParams.get('format') || urlParams.get('type')
+
+        if (formatParam) {
+          const format = formatParam.toLowerCase()
+          if (format.includes('audio')) {
+            console.log('Detected audio from URL parameters, routing to LosslessAudioPlayer')
+            return 'audio'
+          }
+          if (format.includes('video')) {
+            console.log('Detected video from URL parameters, routing to MSEVideoPlayer')
+            return 'video'
+          }
         }
       }
-    }
 
-    // Default to video for unknown streaming endpoints (most common case)
-    console.log('No specific media type detected, defaulting to video (MSEVideoPlayer)')
-    return 'video'
-  }, [])
+      // Default to video for unknown streaming endpoints (most common case)
+      console.log('No specific media type detected, defaulting to video (MSEVideoPlayer)')
+      return 'video'
+    },
+    []
+  )
 
   // Format time helper
   const formatTime = useCallback((time: number) => {
@@ -178,7 +211,7 @@ export function MediaPlayer({
     if (detectedMediaType === 'video') {
       return true
     }
-    
+
     // For audio, show custom controls if we want consistent UI across both player types
     // The LosslessAudioPlayer has its own controls, but we can overlay additional controls
     return false // Let LosslessAudioPlayer handle its own controls for now
@@ -220,15 +253,18 @@ export function MediaPlayer({
     [getCurrentMediaElement, duration]
   )
 
-  const handleVolumeChange = useCallback((value: number[]) => {
-    const mediaElement = getCurrentMediaElement()
-    if (!mediaElement) return
+  const handleVolumeChange = useCallback(
+    (value: number[]) => {
+      const mediaElement = getCurrentMediaElement()
+      if (!mediaElement) return
 
-    const newVolume = value[0] / 100
-    mediaElement.volume = newVolume
-    setVolume(newVolume)
-    setIsMuted(newVolume === 0)
-  }, [getCurrentMediaElement])
+      const newVolume = value[0] / 100
+      mediaElement.volume = newVolume
+      setVolume(newVolume)
+      setIsMuted(newVolume === 0)
+    },
+    [getCurrentMediaElement]
+  )
 
   const toggleMute = useCallback(() => {
     const mediaElement = getCurrentMediaElement()
@@ -292,34 +328,41 @@ export function MediaPlayer({
   // Handle media routing errors and fallbacks
   const handleMediaRoutingError = useCallback((error: string, attemptedType: 'video' | 'audio') => {
     console.error(`Media routing error for ${attemptedType}:`, error)
-    
+
     // If video player fails, don't try audio fallback (different use cases)
     // If audio player fails, don't try video fallback (different use cases)
     // Instead, show appropriate error message
-    const errorMessage = attemptedType === 'video' 
-      ? `Video playback failed: ${error}. Please check if the video format is supported.`
-      : `Audio playback failed: ${error}. Please check if the audio format is supported.`
-    
+    const errorMessage =
+      attemptedType === 'video'
+        ? `Video playback failed: ${error}. Please check if the video format is supported.`
+        : `Audio playback failed: ${error}. Please check if the audio format is supported.`
+
     setError(errorMessage)
     setIsLoading(false)
   }, [])
 
   // Event handlers for new player components
-  const handlePlayerTimeUpdate = useCallback((currentTime: number, duration: number) => {
-    setCurrentTime(currentTime)
-    setDuration(duration)
-    onTimeUpdate?.(currentTime, duration)
-  }, [onTimeUpdate])
+  const handlePlayerTimeUpdate = useCallback(
+    (currentTime: number, duration: number) => {
+      setCurrentTime(currentTime)
+      setDuration(duration)
+      onTimeUpdate?.(currentTime, duration)
+    },
+    [onTimeUpdate]
+  )
 
-  const handlePlayerError = useCallback((error: string) => {
-    // Route error handling based on detected media type
-    if (detectedMediaType) {
-      handleMediaRoutingError(error, detectedMediaType)
-    } else {
-      setError(error)
-      setIsLoading(false)
-    }
-  }, [detectedMediaType, handleMediaRoutingError])
+  const handlePlayerError = useCallback(
+    (error: string) => {
+      // Route error handling based on detected media type
+      if (detectedMediaType) {
+        handleMediaRoutingError(error, detectedMediaType)
+      } else {
+        setError(error)
+        setIsLoading(false)
+      }
+    },
+    [detectedMediaType, handleMediaRoutingError]
+  )
 
   const handlePlayerLoadedMetadata = useCallback(() => {
     setIsLoading(false)
@@ -345,11 +388,11 @@ export function MediaPlayer({
 
     // Sync play/pause state
     setIsPlaying(!mediaElement.paused)
-    
+
     // Sync volume and mute state
     setVolume(mediaElement.volume)
     setIsMuted(mediaElement.muted)
-    
+
     // Sync time and duration
     setCurrentTime(mediaElement.currentTime)
     setDuration(mediaElement.duration || 0)
@@ -398,8 +441,10 @@ export function MediaPlayer({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle shortcuts when the media player container is focused or active
-      if (!containerRef.current?.contains(document.activeElement) && 
-          !containerRef.current?.matches(':hover')) {
+      if (
+        !containerRef.current?.contains(document.activeElement) &&
+        !containerRef.current?.matches(':hover')
+      ) {
         return
       }
 
@@ -568,158 +613,158 @@ export function MediaPlayer({
             showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
           )}
         >
-        {/* Progress Bar */}
-        <div className="absolute bottom-16 left-4 right-4">
-          <div className="relative">
-            {/* Buffered Progress - Placeholder */}
-            <div className="absolute inset-0 bg-white/20 rounded-full h-1">
-              <div
-                className="bg-white/40 h-full rounded-full transition-all duration-300"
-                style={{ width: '0%' }}
+          {/* Progress Bar */}
+          <div className="absolute bottom-16 left-4 right-4">
+            <div className="relative">
+              {/* Buffered Progress - Placeholder */}
+              <div className="absolute inset-0 bg-white/20 rounded-full h-1">
+                <div
+                  className="bg-white/40 h-full rounded-full transition-all duration-300"
+                  style={{ width: '0%' }}
+                />
+              </div>
+              {/* Seek Slider */}
+              <Slider
+                value={[duration > 0 ? (currentTime / duration) * 100 : 0]}
+                onValueChange={handleSeek}
+                max={100}
+                step={0.1}
+                className="relative z-10"
               />
             </div>
-            {/* Seek Slider */}
-            <Slider
-              value={[duration > 0 ? (currentTime / duration) * 100 : 0]}
-              onValueChange={handleSeek}
-              max={100}
-              step={0.1}
-              className="relative z-10"
-            />
           </div>
-        </div>
 
-        {/* Control Buttons */}
-        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Play/Pause */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                togglePlay()
-              }}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            </Button>
-
-            {/* Skip Controls */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                skipBackward()
-              }}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <SkipBack className="w-4 h-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                skipForward()
-              }}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <SkipForward className="w-4 h-4" />
-            </Button>
-
-            {/* Volume */}
+          {/* Control Buttons */}
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
+              {/* Play/Pause */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation()
-                  toggleMute()
+                  togglePlay()
                 }}
                 className="text-white hover:bg-white/20 p-2"
               >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </Button>
-              <div className="w-20">
-                <Slider
-                  value={[isMuted ? 0 : volume * 100]}
-                  onValueChange={handleVolumeChange}
-                  max={100}
-                  step={1}
-                  className="cursor-pointer"
-                />
+
+              {/* Skip Controls */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  skipBackward()
+                }}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <SkipBack className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  skipForward()
+                }}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <SkipForward className="w-4 h-4" />
+              </Button>
+
+              {/* Volume */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleMute()
+                  }}
+                  className="text-white hover:bg-white/20 p-2"
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </Button>
+                <div className="w-20">
+                  <Slider
+                    value={[isMuted ? 0 : volume * 100]}
+                    onValueChange={handleVolumeChange}
+                    max={100}
+                    step={1}
+                    className="cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Time Display */}
+              <div className="text-white text-sm font-mono">
+                {formatTime(currentTime)} / {formatTime(duration)}
               </div>
             </div>
 
-            {/* Time Display */}
-            <div className="text-white text-sm font-mono">
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </div>
-          </div>
+            <div className="flex items-center gap-2">
+              {/* Picture in Picture (Video only) */}
+              {detectedMediaType === 'video' && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    togglePictureInPicture()
+                  }}
+                  className="text-white hover:bg-white/20 p-2"
+                >
+                  <PictureInPicture className="w-4 h-4" />
+                </Button>
+              )}
 
-          <div className="flex items-center gap-2">
-            {/* Picture in Picture (Video only) */}
-            {detectedMediaType === 'video' && (
+              {/* Settings */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+
+              {/* Cast */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <Cast className="w-4 h-4" />
+              </Button>
+
+              {/* Download */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <Download className="w-4 h-4" />
+              </Button>
+
+              {/* Fullscreen */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation()
-                  togglePictureInPicture()
+                  toggleFullscreen()
                 }}
                 className="text-white hover:bg-white/20 p-2"
               >
-                <PictureInPicture className="w-4 h-4" />
+                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
               </Button>
-            )}
-
-            {/* Settings */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => e.stopPropagation()}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
-
-            {/* Cast */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => e.stopPropagation()}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <Cast className="w-4 h-4" />
-            </Button>
-
-            {/* Download */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => e.stopPropagation()}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <Download className="w-4 h-4" />
-            </Button>
-
-            {/* Fullscreen */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation()
-                toggleFullscreen()
-              }}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
-            </Button>
+            </div>
           </div>
-        </div>
         </div>
       )}
     </div>

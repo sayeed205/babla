@@ -1,5 +1,10 @@
 import { useAuthStore } from '@/features/auth/stores/auth-store'
-import { AuthenticatedStreamingCore, type ChunkRequest, type StreamingConfig, type StreamingError } from '@/lib/authenticated-streaming-core'
+import {
+  AuthenticatedStreamingCore,
+  type ChunkRequest,
+  type StreamingConfig,
+  type StreamingError,
+} from '@/lib/authenticated-streaming-core'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export interface LosslessAudioPlayerProps {
@@ -97,10 +102,10 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
   // Detect audio format from URL with lossless format prioritization
   const detectAudioFormat = useCallback((url: string): AudioFormat | null => {
     const urlLower = url.toLowerCase()
-    
+
     // Sort formats by priority (lossless first)
     const sortedFormats = [...LOSSLESS_AUDIO_FORMATS].sort((a, b) => a.priority - b.priority)
-    
+
     for (const format of sortedFormats) {
       if (urlLower.includes(`.${format.extension}`)) {
         return {
@@ -126,7 +131,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
   // Check if browser supports the audio format
   const checkAudioSupport = useCallback((format: AudioFormat): boolean => {
     if (!audioRef.current) return false
-    
+
     try {
       const canPlay = audioRef.current.canPlayType(format.codec)
       return canPlay === 'probably' || canPlay === 'maybe'
@@ -137,61 +142,68 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
   }, [])
 
   // Handle authentication errors with consistent approach matching video player
-  const handleAuthError = useCallback((error: StreamingError) => {
-    let message: string
-    
-    switch (error.status) {
-      case 401:
-        message = 'Authentication required to play this audio content. Please log in and try again.'
-        break
-      case 403:
-        message = 'You do not have permission to access this audio content.'
-        break
-      default:
-        message = `Authentication error occurred while loading audio: ${error.message}`
-    }
-    
-    setState(prev => ({ ...prev, error: message, isLoading: false }))
-    onError?.(message)
-    
-    // Log authentication errors for debugging
-    console.error('Audio player authentication error:', {
-      status: error.status,
-      message: error.message,
-      type: error.type,
-      src,
-    })
-  }, [onError, src])
+  const handleAuthError = useCallback(
+    (error: StreamingError) => {
+      let message: string
+
+      switch (error.status) {
+        case 401:
+          message =
+            'Authentication required to play this audio content. Please log in and try again.'
+          break
+        case 403:
+          message = 'You do not have permission to access this audio content.'
+          break
+        default:
+          message = `Authentication error occurred while loading audio: ${error.message}`
+      }
+
+      setState((prev) => ({ ...prev, error: message, isLoading: false }))
+      onError?.(message)
+
+      // Log authentication errors for debugging
+      console.error('Audio player authentication error:', {
+        status: error.status,
+        message: error.message,
+        type: error.type,
+        src,
+      })
+    },
+    [onError, src]
+  )
 
   // Handle network errors with retry logic
-  const handleNetworkError = useCallback(async (error: StreamingError, operation: () => Promise<void>): Promise<void> => {
-    if (!streamingCoreRef.current) return
+  const handleNetworkError = useCallback(
+    async (error: StreamingError, operation: () => Promise<void>): Promise<void> => {
+      if (!streamingCoreRef.current) return
 
-    try {
-      await streamingCoreRef.current.retryWithBackoff(operation)
-    } catch (retryError) {
-      const message = `Network error: ${error.message}. Please check your connection and try again.`
-      setState(prev => ({ ...prev, error: message, isLoading: false }))
-      onError?.(message)
-    }
-  }, [onError])
+      try {
+        await streamingCoreRef.current.retryWithBackoff(operation)
+      } catch (retryError) {
+        const message = `Network error: ${error.message}. Please check your connection and try again.`
+        setState((prev) => ({ ...prev, error: message, isLoading: false }))
+        onError?.(message)
+      }
+    },
+    [onError]
+  )
 
   // Validate authentication state before loading
   const validateAuthentication = useCallback((): boolean => {
     if (!isAuthenticated) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Authentication required to play audio content', 
-        isLoading: false 
+      setState((prev) => ({
+        ...prev,
+        error: 'Authentication required to play audio content',
+        isLoading: false,
       }))
       return false
     }
 
     if (!token || !token.token) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Invalid authentication token. Please log in again.', 
-        isLoading: false 
+      setState((prev) => ({
+        ...prev,
+        error: 'Invalid authentication token. Please log in again.',
+        isLoading: false,
       }))
       return false
     }
@@ -200,10 +212,10 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
     if (token.expiresAt) {
       const expirationDate = new Date(token.expiresAt)
       if (expirationDate <= new Date()) {
-        setState(prev => ({ 
-          ...prev, 
-          error: 'Authentication token has expired. Please log in again.', 
-          isLoading: false 
+        setState((prev) => ({
+          ...prev,
+          error: 'Authentication token has expired. Please log in again.',
+          isLoading: false,
         }))
         return false
       }
@@ -223,7 +235,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       return
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }))
+    setState((prev) => ({ ...prev, isLoading: true, error: null }))
 
     try {
       // Detect audio format
@@ -237,19 +249,18 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         throw new Error(`Your browser does not support ${audioFormat.codec} audio format`)
       }
 
-      setState(prev => ({ ...prev, audioFormat }))
+      setState((prev) => ({ ...prev, audioFormat }))
 
       // Get file size for chunk calculation
       const fileSize = await streamingCoreRef.current.getFileSize(src, token!.token)
-      setState(prev => ({ ...prev, totalFileSize: fileSize }))
+      setState((prev) => ({ ...prev, totalFileSize: fileSize }))
 
       // For audio, we can use the standard HTML5 audio element with authentication
       // by setting up a blob URL with the authenticated content
       await loadAudioBlob()
-
     } catch (error) {
       console.error('Error loading audio:', error)
-      
+
       if (error instanceof Error && 'type' in error) {
         const streamingError = error as StreamingError
         if (streamingError.type === 'AUTHENTICATION') {
@@ -265,10 +276,19 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       }
 
       const message = error instanceof Error ? error.message : 'Failed to load audio'
-      setState(prev => ({ ...prev, error: message, isLoading: false }))
+      setState((prev) => ({ ...prev, error: message, isLoading: false }))
       onError?.(message)
     }
-  }, [src, token, isAuthenticated, detectAudioFormat, checkAudioSupport, handleAuthError, handleNetworkError, onError])
+  }, [
+    src,
+    token,
+    isAuthenticated,
+    detectAudioFormat,
+    checkAudioSupport,
+    handleAuthError,
+    handleNetworkError,
+    onError,
+  ])
 
   // Load audio as blob using AuthenticatedStreamingCore for consistent authentication
   const loadAudioBlob = useCallback(async () => {
@@ -287,7 +307,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
 
       while (currentPosition < state.totalFileSize) {
         const endPosition = Math.min(currentPosition + chunkSize - 1, state.totalFileSize - 1)
-        
+
         const chunkRequest: ChunkRequest = {
           start: currentPosition,
           end: endPosition,
@@ -304,12 +324,16 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
 
         try {
           // Use AuthenticatedStreamingCore with consistent Bearer token authentication
-          const chunkData = await streamingCoreRef.current.fetchChunk(src, chunkRequest, token.token)
+          const chunkData = await streamingCoreRef.current.fetchChunk(
+            src,
+            chunkRequest,
+            token.token
+          )
           chunks.push(chunkData)
           loadedChunks++
-          
-          setState(prev => ({ 
-            ...prev, 
+
+          setState((prev) => ({
+            ...prev,
             currentChunkPosition: currentPosition,
           }))
 
@@ -317,10 +341,9 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
           if (state.audioFormat?.isLossless) {
             console.log(`Loaded lossless audio chunk ${loadedChunks}/${totalChunks}`)
           }
-
         } catch (chunkError) {
           console.warn(`Failed to load audio chunk ${chunkKey}:`, chunkError)
-          
+
           // Handle authentication errors during chunk loading
           if (chunkError instanceof Error && 'type' in chunkError) {
             const streamingError = chunkError as StreamingError
@@ -329,7 +352,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
               return
             }
           }
-          
+
           // For audio, we'll continue loading other chunks even if one fails
           // but we'll track failed chunks for potential retry
         } finally {
@@ -344,23 +367,22 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         const mimeType = state.audioFormat?.codec || 'audio/mpeg'
         const audioBlob = new Blob(chunks, { type: mimeType })
         const blobUrl = URL.createObjectURL(audioBlob)
-        
+
         console.log(`Created audio blob: ${audioBlob.size} bytes, type: ${mimeType}`)
-        
+
         // Set the blob URL as the audio source
         audioRef.current.src = blobUrl
-        
-        setState(prev => ({ ...prev, isLoading: false, isInitialized: true }))
+
+        setState((prev) => ({ ...prev, isLoading: false, isInitialized: true }))
 
         // Clean up blob URL when component unmounts
         return () => URL.revokeObjectURL(blobUrl)
       } else {
         throw new Error('No audio chunks were successfully loaded')
       }
-
     } catch (error) {
       console.error('Error creating audio blob:', error)
-      
+
       // Handle different types of errors appropriately
       if (error instanceof Error && 'type' in error) {
         const streamingError = error as StreamingError
@@ -375,16 +397,24 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
           return
         }
       }
-      
+
       const message = error instanceof Error ? error.message : 'Failed to load audio content'
-      setState(prev => ({ 
-        ...prev, 
-        error: message, 
-        isLoading: false 
+      setState((prev) => ({
+        ...prev,
+        error: message,
+        isLoading: false,
       }))
       onError?.(message)
     }
-  }, [src, token, state.totalFileSize, state.audioFormat, handleAuthError, handleNetworkError, onError])
+  }, [
+    src,
+    token,
+    state.totalFileSize,
+    state.audioFormat,
+    handleAuthError,
+    handleNetworkError,
+    onError,
+  ])
 
   // Initialize audio loading when component mounts or src changes
   useEffect(() => {
@@ -404,13 +434,13 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
   // Reset state when authentication changes
   useEffect(() => {
     if (!isAuthenticated || !token) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: null,
         isLoading: false,
         isInitialized: false,
       }))
-      
+
       // Clear audio source if authentication is lost
       if (audioRef.current?.src.startsWith('blob:')) {
         URL.revokeObjectURL(audioRef.current.src)
@@ -428,27 +458,27 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
 
   const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
-      setState(prev => ({ 
-        ...prev, 
-        bufferedRanges: audioRef.current?.buffered || null 
+      setState((prev) => ({
+        ...prev,
+        bufferedRanges: audioRef.current?.buffered || null,
       }))
       onLoadedMetadata?.()
     }
   }, [onLoadedMetadata])
 
   const handleCanPlay = useCallback(() => {
-    setState(prev => ({ ...prev, isLoading: false }))
+    setState((prev) => ({ ...prev, isLoading: false }))
     onCanPlay?.()
   }, [onCanPlay])
 
   const handleWaiting = useCallback(() => {
-    setState(prev => ({ ...prev, isLoading: true }))
+    setState((prev) => ({ ...prev, isLoading: true }))
     onWaiting?.()
   }, [onWaiting])
 
   const handleError = useCallback(() => {
     const message = 'Audio playback error occurred'
-    setState(prev => ({ ...prev, error: message, isLoading: false }))
+    setState((prev) => ({ ...prev, error: message, isLoading: false }))
     onError?.(message)
   }, [onError])
 
@@ -459,9 +489,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         <div className="audio-loading-indicator">
           <div className="loading-spinner" />
           <p>Loading high-quality audio...</p>
-          {state.audioFormat?.isLossless && (
-            <p className="format-info">Lossless format detected</p>
-          )}
+          {state.audioFormat?.isLossless && <p className="format-info">Lossless format detected</p>}
         </div>
       </div>
     )
@@ -473,10 +501,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       <div className={`lossless-audio-player error ${className}`}>
         <div className="audio-error-message">
           <p>{state.error}</p>
-          <button 
-            onClick={() => loadAudioWithChunks()}
-            className="retry-button"
-          >
+          <button onClick={() => loadAudioWithChunks()} className="retry-button">
             Retry
           </button>
         </div>
@@ -499,16 +524,12 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         onError={handleError}
         preload="metadata"
       />
-      
+
       {/* Audio metadata display */}
       {(title || artist || album) && (
         <div className="audio-metadata">
           {artwork && (
-            <img 
-              src={artwork} 
-              alt={`${album || title} artwork`}
-              className="audio-artwork"
-            />
+            <img src={artwork} alt={`${album || title} artwork`} className="audio-artwork" />
           )}
           <div className="audio-info">
             {title && <h3 className="audio-title">{title}</h3>}
