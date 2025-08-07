@@ -7,14 +7,9 @@ import { useState } from 'react'
 
 export function PlaylistPanel() {
   const [isOpen, setIsOpen] = useState(false)
-  
-  const {
-    playlist,
-    currentMedia,
-    playFromPlaylist,
-    removeFromPlaylist,
-    clearPlaylist,
-  } = useMediaPlayerStore()
+
+  const { playlist, currentMedia, playFromPlaylist, removeFromPlaylist, clearPlaylist } =
+    useMediaPlayerStore()
 
   if (playlist.length === 0) {
     return null
@@ -73,8 +68,8 @@ export function PlaylistPanel() {
                 <div
                   key={item.id}
                   className={cn(
-                    "flex items-center gap-3 p-3 hover:bg-white/10 cursor-pointer border-b border-white/10 last:border-b-0",
-                    isCurrentItem && "bg-white/20"
+                    'flex items-center gap-3 p-3 hover:bg-white/10 cursor-pointer border-b border-white/10 last:border-b-0',
+                    isCurrentItem && 'bg-white/20'
                   )}
                   onClick={() => playFromPlaylist(index)}
                 >
@@ -97,10 +92,12 @@ export function PlaylistPanel() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      "text-sm font-medium truncate",
-                      isCurrentItem ? "text-white" : "text-white/80"
-                    )}>
+                    <p
+                      className={cn(
+                        'text-sm font-medium truncate',
+                        isCurrentItem ? 'text-white' : 'text-white/80'
+                      )}
+                    >
                       {item.title}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-white/60">
@@ -138,7 +135,13 @@ export function PlaylistPanel() {
               <p className="text-xs text-white/60">
                 Total: {playlist.length} item{playlist.length !== 1 ? 's' : ''}
                 {playlist.reduce((total, item) => total + (item.duration || 0), 0) > 0 && (
-                  <span> • {formatDuration(playlist.reduce((total, item) => total + (item.duration || 0), 0))}</span>
+                  <span>
+                    {' '}
+                    •{' '}
+                    {formatDuration(
+                      playlist.reduce((total, item) => total + (item.duration || 0), 0)
+                    )}
+                  </span>
                 )}
               </p>
             </div>

@@ -2,19 +2,19 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import {
-    Cast,
-    Download,
-    Loader2,
-    Maximize,
-    Minimize,
-    Pause,
-    PictureInPicture,
-    Play,
-    Settings,
-    SkipBack,
-    SkipForward,
-    Volume2,
-    VolumeX
+  Cast,
+  Download,
+  Loader2,
+  Maximize,
+  Minimize,
+  Pause,
+  PictureInPicture,
+  Play,
+  Settings,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -29,16 +29,11 @@ interface MediaPlayerProps {
   onEnded?: () => void
 }
 
-export function MediaPlayer({
-  src,
-  title,
-  type = 'video',
-  className
-}: MediaPlayerProps) {
+export function MediaPlayer({ src, title, type = 'video', className }: MediaPlayerProps) {
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const controlsTimeoutRef = useRef<NodeJS.Timeout|null>(null)
-  
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -54,7 +49,7 @@ export function MediaPlayer({
     const hours = Math.floor(time / 3600)
     const minutes = Math.floor((time % 3600) / 60)
     const seconds = Math.floor(time % 60)
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     }
@@ -68,7 +63,7 @@ export function MediaPlayer({
       setIsLoading(false)
       return
     }
-    
+
     // Reset state for new source
     setError(null)
     setIsLoading(false)
@@ -82,11 +77,14 @@ export function MediaPlayer({
     setIsPlaying(!isPlaying)
   }, [isPlaying])
 
-  const handleSeek = useCallback((value: number[]) => {
-    // Placeholder - new implementation will handle seeking
-    const newTime = (value[0] / 100) * duration
-    setCurrentTime(newTime)
-  }, [duration])
+  const handleSeek = useCallback(
+    (value: number[]) => {
+      // Placeholder - new implementation will handle seeking
+      const newTime = (value[0] / 100) * duration
+      setCurrentTime(newTime)
+    },
+    [duration]
+  )
 
   const handleVolumeChange = useCallback((value: number[]) => {
     // Placeholder - new implementation will handle volume
@@ -114,7 +112,7 @@ export function MediaPlayer({
 
   const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return
-    
+
     if (!isFullscreen) {
       if (containerRef.current.requestFullscreen) {
         containerRef.current.requestFullscreen()
@@ -148,7 +146,7 @@ export function MediaPlayer({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!mediaRef.current) return
-      
+
       switch (e.code) {
         case 'Space':
           e.preventDefault()
@@ -183,7 +181,15 @@ export function MediaPlayer({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [togglePlay, skipBackward, skipForward, handleVolumeChange, volume, toggleMute, toggleFullscreen])
+  }, [
+    togglePlay,
+    skipBackward,
+    skipForward,
+    handleVolumeChange,
+    volume,
+    toggleMute,
+    toggleFullscreen,
+  ])
 
   // Fullscreen change listener
   useEffect(() => {
@@ -221,11 +227,13 @@ export function MediaPlayer({
 
   if (error) {
     return (
-      <div className={cn(
-        "relative bg-black rounded-lg overflow-hidden flex items-center justify-center",
-        type === 'video' ? "aspect-video" : "h-32",
-        className
-      )}>
+      <div
+        className={cn(
+          'relative bg-black rounded-lg overflow-hidden flex items-center justify-center',
+          type === 'video' ? 'aspect-video' : 'h-32',
+          className
+        )}
+      >
         <div className="text-center text-white">
           <p className="text-lg font-medium mb-2">Failed to load media</p>
           <p className="text-sm text-white/60">Please try again later</p>
@@ -238,8 +246,8 @@ export function MediaPlayer({
     <div
       ref={containerRef}
       className={cn(
-        "relative bg-black rounded-lg overflow-hidden group",
-        type === 'video' ? "aspect-video" : "h-32",
+        'relative bg-black rounded-lg overflow-hidden group',
+        type === 'video' ? 'aspect-video' : 'h-32',
         className
       )}
       onClick={type === 'video' ? togglePlay : undefined}
@@ -256,7 +264,9 @@ export function MediaPlayer({
         <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white">
           <div className="text-center">
             <p className="text-lg font-medium mb-2">Audio Player</p>
-            <p className="text-sm text-white/60">New lossless audio implementation will be added here</p>
+            <p className="text-sm text-white/60">
+              New lossless audio implementation will be added here
+            </p>
           </div>
         </div>
       )}
@@ -283,8 +293,8 @@ export function MediaPlayer({
       {/* Controls */}
       <div
         className={cn(
-          "absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300",
-          showControls || !isPlaying ? "opacity-100" : "opacity-0"
+          'absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300',
+          showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
         )}
       >
         {/* Progress Bar */}
@@ -292,7 +302,7 @@ export function MediaPlayer({
           <div className="relative">
             {/* Buffered Progress - Placeholder */}
             <div className="absolute inset-0 bg-white/20 rounded-full h-1">
-              <div 
+              <div
                 className="bg-white/40 h-full rounded-full transition-all duration-300"
                 style={{ width: '0%' }}
               />

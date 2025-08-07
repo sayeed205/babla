@@ -3,27 +3,27 @@ import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import { useMediaPlayerStore } from '@/stores/media-player-store'
 import {
-    ChevronDown,
-    ChevronUp,
-    Maximize,
-    Minimize,
-    Pause,
-    Play,
-    Repeat,
-    Repeat1,
-    Shuffle,
-    SkipBack,
-    SkipForward,
-    Volume2,
-    VolumeX,
-    X
+  ChevronDown,
+  ChevronUp,
+  Maximize,
+  Minimize,
+  Pause,
+  Play,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  X,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
 
 export function GlobalMediaPlayer() {
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  
+
   const {
     currentMedia,
     isPlaying,
@@ -60,7 +60,7 @@ export function GlobalMediaPlayer() {
     const hours = Math.floor(time / 3600)
     const minutes = Math.floor((time % 3600) / 60)
     const seconds = Math.floor(time % 60)
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     }
@@ -100,7 +100,7 @@ export function GlobalMediaPlayer() {
   // Control functions
   const togglePlay = useCallback(() => {
     if (!mediaRef.current) return
-    
+
     if (isPlaying) {
       mediaRef.current.pause()
       pause()
@@ -110,19 +110,25 @@ export function GlobalMediaPlayer() {
     }
   }, [isPlaying, pause, resume])
 
-  const handleSeek = useCallback((value: number[]) => {
-    if (!mediaRef.current) return
-    const newTime = (value[0] / 100) * duration
-    mediaRef.current.currentTime = newTime
-    seekTo(newTime)
-  }, [duration, seekTo])
+  const handleSeek = useCallback(
+    (value: number[]) => {
+      if (!mediaRef.current) return
+      const newTime = (value[0] / 100) * duration
+      mediaRef.current.currentTime = newTime
+      seekTo(newTime)
+    },
+    [duration, seekTo]
+  )
 
-  const handleVolumeChange = useCallback((value: number[]) => {
-    if (!mediaRef.current) return
-    const newVolume = value[0] / 100
-    mediaRef.current.volume = newVolume
-    setVolume(newVolume)
-  }, [setVolume])
+  const handleVolumeChange = useCallback(
+    (value: number[]) => {
+      if (!mediaRef.current) return
+      const newVolume = value[0] / 100
+      mediaRef.current.volume = newVolume
+      setVolume(newVolume)
+    },
+    [setVolume]
+  )
 
   const handleToggleMute = useCallback(() => {
     if (!mediaRef.current) return
@@ -140,7 +146,7 @@ export function GlobalMediaPlayer() {
   // Sync media element with store state
   useEffect(() => {
     if (!mediaRef.current) return
-    
+
     if (isPlaying) {
       mediaRef.current.play().catch(console.error)
     } else {
@@ -161,7 +167,7 @@ export function GlobalMediaPlayer() {
   // Fullscreen handling
   useEffect(() => {
     if (!containerRef.current) return
-    
+
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!document.fullscreenElement
       if (isCurrentlyFullscreen !== isFullscreen) {
@@ -175,7 +181,7 @@ export function GlobalMediaPlayer() {
 
   const handleFullscreenToggle = useCallback(async () => {
     if (!containerRef.current) return
-    
+
     try {
       if (isFullscreen) {
         await document.exitFullscreen()
@@ -191,12 +197,12 @@ export function GlobalMediaPlayer() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isPlayerVisible || !currentMedia) return
-      
+
       // Only handle shortcuts if not typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return
       }
-      
+
       switch (e.code) {
         case 'Space':
           e.preventDefault()
@@ -253,7 +259,7 @@ export function GlobalMediaPlayer() {
     handleToggleMute,
     handleFullscreenToggle,
     playNext,
-    playPrevious
+    playPrevious,
   ])
 
   if (!isPlayerVisible || !currentMedia) {
@@ -267,12 +273,12 @@ export function GlobalMediaPlayer() {
     <div
       ref={containerRef}
       className={cn(
-        "fixed z-50 bg-black transition-all duration-300 ease-in-out",
-        isFullscreen 
-          ? "inset-0" 
-          : isMinimized 
-            ? "bottom-4 right-4 w-80 h-20 rounded-lg shadow-2xl"
-            : "bottom-4 right-4 w-96 h-64 rounded-lg shadow-2xl"
+        'fixed z-50 bg-black transition-all duration-300 ease-in-out',
+        isFullscreen
+          ? 'inset-0'
+          : isMinimized
+            ? 'bottom-4 right-4 w-80 h-20 rounded-lg shadow-2xl'
+            : 'bottom-4 right-4 w-96 h-64 rounded-lg shadow-2xl'
       )}
     >
       {/* Media Element */}
@@ -281,10 +287,7 @@ export function GlobalMediaPlayer() {
           ref={mediaRef as React.RefObject<HTMLVideoElement>}
           src={currentMedia.src}
           poster={posterUrl}
-          className={cn(
-            "w-full h-full object-contain",
-            isMinimized ? "hidden" : "block"
-          )}
+          className={cn('w-full h-full object-contain', isMinimized ? 'hidden' : 'block')}
           onLoadedMetadata={handleLoadedMetadata}
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
@@ -308,10 +311,12 @@ export function GlobalMediaPlayer() {
       {(!isVideo || isMinimized) && (
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-purple-900/20 flex items-center">
           {posterUrl && (
-            <div className={cn(
-              "flex-shrink-0 bg-gray-800 rounded overflow-hidden",
-              isMinimized ? "w-12 h-12 ml-2" : "w-16 h-16 ml-4"
-            )}>
+            <div
+              className={cn(
+                'flex-shrink-0 bg-gray-800 rounded overflow-hidden',
+                isMinimized ? 'w-12 h-12 ml-2' : 'w-16 h-16 ml-4'
+              )}
+            >
               <img
                 src={posterUrl}
                 alt={currentMedia.title}
@@ -319,27 +324,24 @@ export function GlobalMediaPlayer() {
               />
             </div>
           )}
-          <div className={cn("flex-1 min-w-0 text-white", isMinimized ? "mx-2" : "mx-4")}>
-            <p className={cn(
-              "font-medium truncate",
-              isMinimized ? "text-sm" : "text-base"
-            )}>
+          <div className={cn('flex-1 min-w-0 text-white', isMinimized ? 'mx-2' : 'mx-4')}>
+            <p className={cn('font-medium truncate', isMinimized ? 'text-sm' : 'text-base')}>
               {currentMedia.title}
             </p>
             {currentMedia.artist && !isMinimized && (
-              <p className="text-sm text-white/60 truncate">
-                {currentMedia.artist}
-              </p>
+              <p className="text-sm text-white/60 truncate">{currentMedia.artist}</p>
             )}
           </div>
         </div>
       )}
 
       {/* Controls Overlay */}
-      <div className={cn(
-        "absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent",
-        isMinimized ? "from-black/60" : ""
-      )}>
+      <div
+        className={cn(
+          'absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent',
+          isMinimized ? 'from-black/60' : ''
+        )}
+      >
         {/* Header Controls */}
         <div className="absolute top-2 right-2 flex items-center gap-1">
           <Button
@@ -440,8 +442,8 @@ export function GlobalMediaPlayer() {
                   size="sm"
                   onClick={handleRepeatClick}
                   className={cn(
-                    "text-white hover:bg-white/20 p-2",
-                    repeatMode !== 'none' && "bg-white/20"
+                    'text-white hover:bg-white/20 p-2',
+                    repeatMode !== 'none' && 'bg-white/20'
                   )}
                 >
                   {repeatMode === 'one' ? (
@@ -456,10 +458,7 @@ export function GlobalMediaPlayer() {
                   variant="ghost"
                   size="sm"
                   onClick={toggleShuffle}
-                  className={cn(
-                    "text-white hover:bg-white/20 p-2",
-                    shuffleMode && "bg-white/20"
-                  )}
+                  className={cn('text-white hover:bg-white/20 p-2', shuffleMode && 'bg-white/20')}
                 >
                   <Shuffle className="w-4 h-4" />
                 </Button>
@@ -472,7 +471,11 @@ export function GlobalMediaPlayer() {
                     onClick={handleFullscreenToggle}
                     className="text-white hover:bg-white/20 p-2"
                   >
-                    {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                    {isFullscreen ? (
+                      <Minimize className="w-4 h-4" />
+                    ) : (
+                      <Maximize className="w-4 h-4" />
+                    )}
                   </Button>
                 )}
               </div>

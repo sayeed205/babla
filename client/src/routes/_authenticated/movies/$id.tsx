@@ -32,7 +32,7 @@ function MovieDetailsPage() {
         <h1 className="text-lg font-semibold">Movie Details</h1>
       </Header>
       <Main>
-          <MovieDetails id={id} />
+        <MovieDetails id={id} />
       </Main>
     </>
   )

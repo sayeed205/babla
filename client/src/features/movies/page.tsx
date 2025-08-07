@@ -4,8 +4,8 @@ import { Main } from '@/components/layout/main.tsx'
 import { PaginationControls } from '@/components/pagination-controls'
 import { SearchInput } from '@/components/search-input'
 import {
-    getMoviesSearchParamsWithDefaults,
-    type MoviesSearchParams,
+  getMoviesSearchParamsWithDefaults,
+  type MoviesSearchParams,
 } from '@/features/movies/types/search-params'
 import { apiQuery } from '@/lib/api-client.ts'
 import { useNavigate, useSearch } from '@tanstack/react-router'
@@ -56,10 +56,7 @@ export default function MovieList() {
       },
     },
     // Structured query key for proper cache invalidation and management
-    queryKey: [
-      'movies',
-      'list',
-    ],
+    queryKey: ['movies', 'list'],
     staleTime: 0,
     gcTime: 0,
     placeholderData: (previousData: any) => previousData,

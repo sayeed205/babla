@@ -1,4 +1,16 @@
-import { AlertCircle, Calendar, ChevronLeft, ChevronRight, Clock, Heart, Play, Plus, RotateCcw, Share, Star } from 'lucide-react'
+import {
+  AlertCircle,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Heart,
+  Play,
+  Plus,
+  RotateCcw,
+  Share,
+  Star,
+} from 'lucide-react'
 import { memo, useCallback } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +26,7 @@ interface MovieDetailsProps {
 
 export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps) {
   const { playMedia } = useMediaPlayerStore()
-  
+
   // Fetch movie info using the correct endpoint
   const {
     data: movieData,
@@ -37,10 +49,10 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
 
   const handlePlay = useCallback(() => {
     if (!movieData) return
-    
+
     const mediaItem = createMovieMediaItem(id, {
       ...movieData,
-      id: movieData.id?.toString()
+      id: movieData.id?.toString(),
     })
     playMedia(mediaItem)
   }, [playMedia, movieData, id])
@@ -84,12 +96,12 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
   const releaseYear = movieData.release_date ? new Date(movieData.release_date).getFullYear() : null
 
   // Get backdrop image URL
-  const backdropUrl = movieData.backdrop_path 
+  const backdropUrl = movieData.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movieData.backdrop_path}`
     : null
 
   // Get poster image URL
-  const posterUrl = movieData.poster_path 
+  const posterUrl = movieData.poster_path
     ? `https://image.tmdb.org/t/p/original${movieData.poster_path}`
     : null
 
@@ -123,7 +135,7 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white drop-shadow-2xl leading-tight">
                     {movieData.title}
                   </h1>
-                  
+
                   {/* Tagline */}
                   {movieData.tagline && (
                     <p className="text-xl md:text-2xl text-white/90 font-light italic drop-shadow-lg max-w-3xl">
@@ -160,7 +172,11 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                 {movieData.genres && movieData.genres.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {movieData.genres.slice(0, 4).map((genre) => (
-                      <Badge key={genre.id} variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-colors">
+                      <Badge
+                        key={genre.id}
+                        variant="outline"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-colors"
+                      >
                         {genre.name}
                       </Badge>
                     ))}
@@ -176,33 +192,33 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4 pt-4">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105"
                     onClick={handlePlay}
                   >
                     <Play className="w-5 h-5 mr-2 fill-current" />
                     Play
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-white/30 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-full backdrop-blur-sm"
                   >
                     <Plus className="w-5 h-5 mr-2" />
                     My List
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-white/30 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-full backdrop-blur-sm"
                   >
                     <Heart className="w-5 h-5 mr-2" />
                     Like
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    size="lg"
+                    variant="outline"
                     className="border-white/30 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-full backdrop-blur-sm"
                   >
                     <Share className="w-5 h-5 mr-2" />
@@ -232,22 +248,29 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
       {/* Content Sections */}
       <div className="px-6 md:px-12 lg:px-16 pb-16 space-y-16">
         <div className="mx-auto">
-          
           {/* Cast Section */}
           {movieData.credits?.cast && movieData.credits.cast.length > 0 && (
             <section className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-white">Cast</h2>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2"
+                  >
                     <ChevronLeft className="w-5 h-5" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2"
+                  >
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
-              
+
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {movieData.credits.cast.slice(0, 12).map((person) => (
                   <div key={person.id} className="flex-shrink-0 w-32 group cursor-pointer">
@@ -288,50 +311,61 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-white">Crew</h2>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2"
+                  >
                     <ChevronLeft className="w-5 h-5" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/60 hover:text-white hover:bg-white/10 rounded-full p-2"
+                  >
                     <ChevronRight className="w-5 h-5" />
                   </Button>
                 </div>
               </div>
-              
+
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {movieData.credits.crew
-                  .filter((person, index, self) => 
-                    index === self.findIndex(p => p.id === person.id)
+                  .filter(
+                    (person, index, self) => index === self.findIndex((p) => p.id === person.id)
                   )
                   .slice(0, 12)
                   .map((person) => (
-                  <div key={`${person.id}-${person.job}`} className="flex-shrink-0 w-32 group cursor-pointer">
-                    <div className="relative mb-3">
-                      <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-700 ring-2 ring-white/10 group-hover:ring-white/30 transition-all duration-300">
-                        {person.profile_path ? (
-                          <img
-                            src={`https://image.tmdb.org/t/p/original${person.profile_path}`}
-                            alt={person.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-                            <span className="text-white/40 text-2xl font-bold">
-                              {person.name.charAt(0)}
-                            </span>
-                          </div>
-                        )}
+                    <div
+                      key={`${person.id}-${person.job}`}
+                      className="flex-shrink-0 w-32 group cursor-pointer"
+                    >
+                      <div className="relative mb-3">
+                        <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-700 ring-2 ring-white/10 group-hover:ring-white/30 transition-all duration-300">
+                          {person.profile_path ? (
+                            <img
+                              src={`https://image.tmdb.org/t/p/original${person.profile_path}`}
+                              alt={person.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center">
+                              <span className="text-white/40 text-2xl font-bold">
+                                {person.name.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-center space-y-1">
+                        <p className="text-white font-medium text-sm leading-tight line-clamp-2">
+                          {person.name}
+                        </p>
+                        <p className="text-white/60 text-xs leading-tight line-clamp-2">
+                          {person.job}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-center space-y-1">
-                      <p className="text-white font-medium text-sm leading-tight line-clamp-2">
-                        {person.name}
-                      </p>
-                      <p className="text-white/60 text-xs leading-tight line-clamp-2">
-                        {person.job}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </section>
           )}
@@ -363,7 +397,9 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                 {movieData.original_language && (
                   <div>
                     <span className="text-sm font-medium text-white/60">Original Language</span>
-                    <p className="text-white font-medium uppercase">{movieData.original_language}</p>
+                    <p className="text-white font-medium uppercase">
+                      {movieData.original_language}
+                    </p>
                   </div>
                 )}
               </div>
@@ -398,7 +434,11 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                 <h3 className="text-xl font-bold text-white">Languages</h3>
                 <div className="flex flex-wrap gap-2">
                   {movieData.spoken_languages.map((language) => (
-                    <Badge key={language.iso_639_1} variant="outline" className="bg-white/10 border-white/20 text-white">
+                    <Badge
+                      key={language.iso_639_1}
+                      variant="outline"
+                      className="bg-white/10 border-white/20 text-white"
+                    >
                       {language.english_name}
                     </Badge>
                   ))}
@@ -436,7 +476,7 @@ function MovieDetailsSkeleton() {
       {/* Hero Skeleton */}
       <div className="relative w-full h-screen overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 animate-pulse" />
-        
+
         <div className="relative z-10 flex flex-col justify-center h-full px-6 md:px-12 lg:px-16">
           <div className="mx-auto w-full">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -445,32 +485,32 @@ function MovieDetailsSkeleton() {
                   <Skeleton className="h-16 md:h-20 lg:h-24 w-3/4 bg-white/10" />
                   <Skeleton className="h-6 md:h-8 w-1/2 bg-white/10" />
                 </div>
-                
+
                 <div className="flex gap-4">
                   <Skeleton className="h-8 w-20 rounded-full bg-white/10" />
                   <Skeleton className="h-8 w-24 rounded-full bg-white/10" />
                   <Skeleton className="h-8 w-16 rounded-full bg-white/10" />
                 </div>
-                
+
                 <div className="flex gap-2">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <Skeleton key={i} className="h-6 w-16 rounded-full bg-white/10" />
                   ))}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-full bg-white/10" />
                   <Skeleton className="h-4 w-full bg-white/10" />
                   <Skeleton className="h-4 w-3/4 bg-white/10" />
                 </div>
-                
+
                 <div className="flex gap-4 pt-4">
                   <Skeleton className="h-12 w-24 rounded-full bg-white/10" />
                   <Skeleton className="h-12 w-28 rounded-full bg-white/10" />
                   <Skeleton className="h-12 w-20 rounded-full bg-white/10" />
                 </div>
               </div>
-              
+
               <div className="lg:col-span-4 flex justify-center lg:justify-end">
                 <Skeleton className="w-80 h-[480px] rounded-2xl bg-white/10" />
               </div>
@@ -495,7 +535,7 @@ function MovieDetailsSkeleton() {
               ))}
             </div>
           </div>
-          
+
           {/* Details Skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Array.from({ length: 3 }).map((_, i) => (

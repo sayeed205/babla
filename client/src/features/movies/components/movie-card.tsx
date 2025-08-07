@@ -35,7 +35,6 @@ export const MovieCard = memo(function MovieCard({ movie, priority = false }: Mo
     return `https://image.tmdb.org/t/p/original${movie.poster}`
   }, [movie.poster])
 
-
   // Memoized fallback image generation
   const fallbackImage = useMemo(() => {
     const title = movie.title || 'Movie'
