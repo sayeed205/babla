@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth/stores/auth-store'
-import { SignedUrlError, SignedUrlService } from '@/lib/signed-url-service'
+import { SignedUrlError, SignedUrlErrorType, SignedUrlService } from '@/lib/signed-url-service'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export interface SignedUrlVideoPlayerProps {
@@ -19,7 +19,7 @@ export interface SignedUrlVideoPlayerProps {
 interface SignedUrlVideoPlayerState {
   signedUrl: string | null
   isLoading: boolean
-  error: string | null
+  error: SignedUrlError | null
   urlExpiresAt: number | null
   refreshTimer: NodeJS.Timeout | null
   movieId: string | null
@@ -31,6 +31,13 @@ interface SignedUrlVideoPlayerState {
     paused: boolean
     wasPlaying: boolean
   }
+  errorHistory: Array<{
+    error: SignedUrlError
+    timestamp: number
+    context: string
+  }>
+  recoveryAttempts: number
+  lastRecoveryTime: number
 }
 
 export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
@@ -66,6 +73,9 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
       paused: true,
       wasPlaying: false,
     },
+    errorHistory: [],
+    recoveryAttempts: 0,
+    lastRecoveryTime: 0,
   })
 
   // Get auth state
@@ -117,23 +127,107 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
     return null
   }, [])
 
-  // Handle errors with proper classification
+  // Handle errors with comprehensive classification and recovery logic
   const handleError = useCallback(
-    (error: string | SignedUrlError) => {
-      const errorMessage = error instanceof SignedUrlError ? error.message : error
+    (error: string | SignedUrlError, context: string = 'unknown') => {
+      const signedUrlError =
+        error instanceof SignedUrlError
+          ? error
+          : new SignedUrlError(SignedUrlErrorType.UNKNOWN, error)
+
+      // Add to error history for debugging and pattern analysis
+      const errorEntry = {
+        error: signedUrlError,
+        timestamp: Date.now(),
+        context,
+      }
 
       setState((prev) => ({
         ...prev,
-        error: errorMessage,
+        error: signedUrlError,
         isLoading: false,
+        errorHistory: [...prev.errorHistory.slice(-4), errorEntry], // Keep last 5 errors
       }))
 
-      // Log error for debugging
-      console.error('SignedUrlVideoPlayer Error:', error)
+      // Log comprehensive error information
+      console.error('SignedUrlVideoPlayer Error:', {
+        type: signedUrlError.type,
+        severity: signedUrlError.severity,
+        message: signedUrlError.message,
+        userMessage: signedUrlError.userMessage,
+        isRetryable: signedUrlError.isRetryable,
+        context,
+        timestamp: signedUrlError.timestamp,
+        originalError: signedUrlError.originalError,
+      })
 
-      onError?.(errorMessage)
+      // Call the error callback with user-friendly message
+      onError?.(signedUrlError.userMessage)
+
+      // Attempt automatic recovery for certain error types
+      if (signedUrlError.isRetryable && state.movieId && context !== 'recovery') {
+        attemptErrorRecovery(signedUrlError, context)
+      }
     },
     [onError]
+  )
+
+  // Attempt automatic error recovery with exponential backoff
+  const attemptErrorRecovery = useCallback(
+    (error: SignedUrlError, context: string) => {
+      const now = Date.now()
+      const timeSinceLastRecovery = now - state.lastRecoveryTime
+      const maxRecoveryAttempts = 3
+      const minRecoveryInterval = 5000 // 5 seconds
+
+      // Prevent too frequent recovery attempts
+      if (timeSinceLastRecovery < minRecoveryInterval) {
+        console.log(`Recovery attempt too soon for context: ${context}, skipping`)
+        return
+      }
+
+      // Check if we've exceeded max recovery attempts
+      if (state.recoveryAttempts >= maxRecoveryAttempts) {
+        console.log(`Max recovery attempts exceeded for context: ${context}`)
+        return
+      }
+
+      const recoveryDelay = error.getRetryDelay(state.recoveryAttempts)
+
+      console.log(
+        `Attempting automatic recovery for ${error.type} error from ${context} in ${recoveryDelay}ms (attempt ${state.recoveryAttempts + 1}/${maxRecoveryAttempts})`
+      )
+
+      setState((prev) => ({
+        ...prev,
+        recoveryAttempts: prev.recoveryAttempts + 1,
+        lastRecoveryTime: now,
+      }))
+
+      setTimeout(() => {
+        if (!isMountedRef.current || !state.movieId) return
+
+        switch (error.type) {
+          case SignedUrlErrorType.NETWORK:
+          case SignedUrlErrorType.TIMEOUT:
+          case SignedUrlErrorType.PLAYBACK:
+            // Attempt URL refresh for network/playback issues
+            console.log(`Attempting URL refresh recovery for ${context}`)
+            handleUrlRefresh(state.movieId, false)
+            break
+
+          case SignedUrlErrorType.SERVER:
+            // For server errors, try reinitializing
+            console.log(`Attempting reinitialization recovery for ${context}`)
+            initializeSignedUrl()
+            break
+
+          default:
+            console.log(`No recovery strategy for error type: ${error.type} from ${context}`)
+        }
+      }, recoveryDelay)
+    },
+    [state.lastRecoveryTime, state.recoveryAttempts, state.movieId]
   )
 
   // Save current playback state before URL refresh
@@ -215,6 +309,7 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
           error: null,
           lastRefreshTime: Date.now(),
           refreshAttempts: 0, // Reset attempts on success
+          recoveryAttempts: 0, // Reset recovery attempts on success
         }))
 
         // Update video source seamlessly
@@ -242,7 +337,9 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
           }))
         }
 
-        console.log(`Successfully refreshed signed URL for movie ${movieId} (${isProactive ? 'proactive' : 'reactive'})`)
+        console.log(
+          `Successfully refreshed signed URL for movie ${movieId} (${isProactive ? 'proactive' : 'reactive'})`
+        )
       } catch (error) {
         if (!isMountedRef.current) return
 
@@ -255,7 +352,9 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
         if (state.refreshAttempts < maxRetries) {
           const retryDelay = baseDelay * Math.pow(2, state.refreshAttempts)
 
-          console.log(`Retrying URL refresh in ${retryDelay}ms (attempt ${state.refreshAttempts + 1}/${maxRetries})`)
+          console.log(
+            `Retrying URL refresh in ${retryDelay}ms (attempt ${state.refreshAttempts + 1}/${maxRetries})`
+          )
 
           setTimeout(() => {
             if (isMountedRef.current) {
@@ -265,9 +364,15 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
         } else {
           // Max retries exceeded, show error
           if (error instanceof SignedUrlError) {
-            handleError(error)
+            handleError(error, 'url_refresh_max_retries')
           } else {
-            handleError('Failed to refresh video URL after multiple attempts. Please reload the page.')
+            const maxRetriesError = new SignedUrlError(
+              SignedUrlErrorType.NETWORK,
+              'Failed to refresh video URL after multiple attempts',
+              error instanceof Error ? error : undefined,
+              'Unable to refresh video stream. Please reload the page.'
+            )
+            handleError(maxRetriesError, 'url_refresh_max_retries')
           }
         }
       } finally {
@@ -279,7 +384,15 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
         }
       }
     },
-    [videoRef, handleError, state.isRefreshing, state.refreshAttempts, state.playbackState, savePlaybackState, restorePlaybackState]
+    [
+      videoRef,
+      handleError,
+      state.isRefreshing,
+      state.refreshAttempts,
+      state.playbackState,
+      savePlaybackState,
+      restorePlaybackState,
+    ]
   )
 
   // Initialize signed URL
@@ -289,18 +402,36 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
     }
 
     if (!isAuthenticated) {
-      handleError('Authentication required to play video content')
+      const authError = new SignedUrlError(
+        SignedUrlErrorType.AUTHENTICATION,
+        'User not authenticated',
+        undefined,
+        'Please log in to watch video content.'
+      )
+      handleError(authError, 'initialization')
       return
     }
 
     const movieId = extractMovieId(src)
     if (!movieId) {
-      handleError('Invalid video source: could not extract movie ID')
+      const validationError = new SignedUrlError(
+        SignedUrlErrorType.VALIDATION,
+        'Could not extract movie ID from source',
+        undefined,
+        'Invalid video source. Please contact support if this persists.'
+      )
+      handleError(validationError, 'initialization')
       return
     }
 
     if (!signedUrlServiceRef.current) {
-      handleError('Video service not initialized')
+      const serviceError = new SignedUrlError(
+        SignedUrlErrorType.UNKNOWN,
+        'Video service not initialized',
+        undefined,
+        'Video player initialization failed. Please refresh the page.'
+      )
+      handleError(serviceError, 'initialization')
       return
     }
 
@@ -322,6 +453,7 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
         urlExpiresAt: response.expiresAt,
         isLoading: false,
         error: null,
+        recoveryAttempts: 0, // Reset recovery attempts on successful initialization
       }))
 
       // Set video source
@@ -344,9 +476,15 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
       console.error('Failed to get signed URL:', error)
 
       if (error instanceof SignedUrlError) {
-        handleError(error)
+        handleError(error, 'initialization')
       } else {
-        handleError('Failed to load video. Please try again.')
+        const initError = new SignedUrlError(
+          SignedUrlErrorType.UNKNOWN,
+          'Failed to initialize video player',
+          error instanceof Error ? error : undefined,
+          'Failed to load video. Please try again.'
+        )
+        handleError(initError, 'initialization')
       }
     }
   }, [src, isAuthenticated, authLoading, extractMovieId, videoRef, handleError, handleUrlRefresh])
@@ -459,9 +597,22 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
       }
 
       // If refresh is not appropriate or has failed, show error
-      handleError(errorMessage)
+      const playbackError = new SignedUrlError(
+        SignedUrlErrorType.PLAYBACK,
+        errorMessage,
+        undefined,
+        'Video playback error occurred. Please try again.'
+      )
+      handleError(playbackError, 'video_playback')
     },
-    [state.movieId, state.refreshAttempts, state.urlExpiresAt, state.isRefreshing, handleError, handleUrlRefresh]
+    [
+      state.movieId,
+      state.refreshAttempts,
+      state.urlExpiresAt,
+      state.isRefreshing,
+      handleError,
+      handleUrlRefresh,
+    ]
   )
 
   const handleVideoWaiting = useCallback(() => {
@@ -484,13 +635,86 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
   // Show refresh indicator when refreshing URL during playback
   const showRefreshIndicator = state.isRefreshing && state.signedUrl
 
-  // Render error state
+  // Render error state with enhanced user experience
   if (state.error) {
+    const canRetry = state.error.isRetryable && state.recoveryAttempts < 3
+    const isRecovering = state.recoveryAttempts > 0 && canRetry
+
     return (
       <div className={`flex items-center justify-center bg-black ${className || ''}`}>
-        <div className="text-red-400 text-center p-4">
-          <div className="mb-2">⚠️ Video Error</div>
-          <div className="text-sm">{state.error}</div>
+        <div className="text-center p-6 max-w-md">
+          {/* Error icon based on severity */}
+          <div className="mb-4 text-4xl">
+            {state.error.severity === 'critical'
+              ? '🚨'
+              : state.error.severity === 'high'
+                ? '⚠️'
+                : state.error.severity === 'medium'
+                  ? '⚡'
+                  : '💭'}
+          </div>
+
+          {/* Error title */}
+          <div className="text-white font-semibold mb-2">
+            {state.error.type === SignedUrlErrorType.AUTHENTICATION
+              ? 'Authentication Required'
+              : state.error.type === SignedUrlErrorType.NETWORK
+                ? 'Connection Issue'
+                : state.error.type === SignedUrlErrorType.SERVER
+                  ? 'Server Unavailable'
+                  : state.error.type === SignedUrlErrorType.PLAYBACK
+                    ? 'Playback Error'
+                    : state.error.type === SignedUrlErrorType.VALIDATION
+                      ? 'Invalid Content'
+                      : 'Video Error'}
+          </div>
+
+          {/* User-friendly error message */}
+          <div className="text-gray-300 text-sm mb-4">{state.error.userMessage}</div>
+
+          {/* Recovery status */}
+          {isRecovering && (
+            <div className="text-blue-400 text-xs mb-3">
+              Attempting to recover... (attempt {state.recoveryAttempts}/3)
+            </div>
+          )}
+
+          {/* Action buttons */}
+          <div className="flex gap-2 justify-center">
+            {canRetry && !isRecovering && (
+              <button
+                onClick={() => state.movieId && initializeSignedUrl()}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+              >
+                Try Again
+              </button>
+            )}
+
+            {state.error.type === SignedUrlErrorType.AUTHENTICATION && (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors"
+              >
+                Refresh Page
+              </button>
+            )}
+          </div>
+
+          {/* Technical details for debugging (only in development) */}
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-4 text-left">
+              <summary className="text-xs text-gray-500 cursor-pointer">Technical Details</summary>
+              <div className="text-xs text-gray-400 mt-2 font-mono">
+                <div>Type: {state.error.type}</div>
+                <div>Severity: {state.error.severity}</div>
+                <div>Retryable: {state.error.isRetryable ? 'Yes' : 'No'}</div>
+                <div>Timestamp: {new Date(state.error.timestamp).toLocaleString()}</div>
+                {state.error.originalError && (
+                  <div>Original: {state.error.originalError.message}</div>
+                )}
+              </div>
+            </details>
+          )}
         </div>
       </div>
     )
@@ -514,7 +738,7 @@ export const SignedUrlVideoPlayer: React.FC<SignedUrlVideoPlayerProps> = ({
       >
         Your browser does not support the video tag.
       </video>
-      
+
       {/* Show refresh indicator when refreshing URL during playback */}
       {showRefreshIndicator && (
         <div className="absolute top-4 right-4 bg-black bg-opacity-75 text-white px-3 py-1 rounded text-sm">

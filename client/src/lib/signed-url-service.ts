@@ -29,20 +29,116 @@ export enum SignedUrlErrorType {
   NETWORK = 'network',
   SERVER = 'server',
   TIMEOUT = 'timeout',
+  PLAYBACK = 'playback',
+  VALIDATION = 'validation',
+  RATE_LIMIT = 'rate_limit',
   UNKNOWN = 'unknown',
 }
 
 /**
- * Custom error class for signed URL operations
+ * Error severity levels for different error types
+ */
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+/**
+ * Custom error class for signed URL operations with enhanced classification
  */
 export class SignedUrlError extends Error {
+  public readonly timestamp: number
+  public readonly severity: ErrorSeverity
+  public readonly isRetryable: boolean
+  public readonly userMessage: string
+
   constructor(
     public type: SignedUrlErrorType,
     message: string,
-    public originalError?: Error
+    public originalError?: Error,
+    userMessage?: string
   ) {
     super(message)
     this.name = 'SignedUrlError'
+    this.timestamp = Date.now()
+    this.userMessage = userMessage || this.generateUserMessage()
+    this.severity = this.determineSeverity()
+    this.isRetryable = this.determineRetryability()
+  }
+
+  /**
+   * Generate user-friendly error message based on error type
+   */
+  private generateUserMessage(): string {
+    switch (this.type) {
+      case SignedUrlErrorType.AUTHENTICATION:
+        return 'Please log in again to continue watching.'
+      case SignedUrlErrorType.NETWORK:
+        return 'Connection issue detected. Please check your internet connection.'
+      case SignedUrlErrorType.SERVER:
+        return 'Server is temporarily unavailable. Please try again in a few moments.'
+      case SignedUrlErrorType.TIMEOUT:
+        return 'Request timed out. Please try again.'
+      case SignedUrlErrorType.PLAYBACK:
+        return 'Video playback error. Attempting to recover...'
+      case SignedUrlErrorType.VALIDATION:
+        return 'Invalid video source. Please contact support if this persists.'
+      case SignedUrlErrorType.RATE_LIMIT:
+        return 'Too many requests. Please wait a moment before trying again.'
+      default:
+        return 'An unexpected error occurred. Please try refreshing the page.'
+    }
+  }
+
+  /**
+   * Determine error severity based on type
+   */
+  private determineSeverity(): ErrorSeverity {
+    switch (this.type) {
+      case SignedUrlErrorType.AUTHENTICATION:
+        return ErrorSeverity.HIGH
+      case SignedUrlErrorType.VALIDATION:
+        return ErrorSeverity.HIGH
+      case SignedUrlErrorType.SERVER:
+        return ErrorSeverity.MEDIUM
+      case SignedUrlErrorType.NETWORK:
+      case SignedUrlErrorType.TIMEOUT:
+      case SignedUrlErrorType.PLAYBACK:
+        return ErrorSeverity.MEDIUM
+      case SignedUrlErrorType.RATE_LIMIT:
+        return ErrorSeverity.LOW
+      default:
+        return ErrorSeverity.MEDIUM
+    }
+  }
+
+  /**
+   * Determine if error is retryable based on type
+   */
+  private determineRetryability(): boolean {
+    switch (this.type) {
+      case SignedUrlErrorType.AUTHENTICATION:
+      case SignedUrlErrorType.VALIDATION:
+        return false
+      case SignedUrlErrorType.NETWORK:
+      case SignedUrlErrorType.SERVER:
+      case SignedUrlErrorType.TIMEOUT:
+      case SignedUrlErrorType.PLAYBACK:
+      case SignedUrlErrorType.RATE_LIMIT:
+        return true
+      default:
+        return false
+    }
+  }
+
+  /**
+   * Get recommended retry delay in milliseconds
+   */
+  getRetryDelay(attempt: number): number {
+    const baseDelay = this.type === SignedUrlErrorType.RATE_LIMIT ? 5000 : 1000
+    return baseDelay * Math.pow(2, attempt)
   }
 }
 
@@ -175,11 +271,17 @@ export class SignedUrlService {
   }
 
   /**
-   * Internal method to fetch signed URL with retry logic
+   * Internal method to fetch signed URL with enhanced retry logic and exponential backoff
    * Requirements: 4.2, 4.3
    */
   private async fetchWithRetry(movieId: string, attempt: number): Promise<SignedUrlResponse> {
+    const startTime = Date.now()
+
     try {
+      console.log(
+        `Fetching signed URL for movie ${movieId} (attempt ${attempt + 1}/${this.config.maxRetries + 1})`
+      )
+
       const response = await apiClient.GET('/movies/{id}/stream-url', {
         params: {
           path: { id: movieId },
@@ -191,78 +293,241 @@ export class SignedUrlService {
       }
 
       if (!response.data) {
-        throw new SignedUrlError(SignedUrlErrorType.SERVER, 'No data received from server')
+        throw new SignedUrlError(
+          SignedUrlErrorType.SERVER,
+          'No data received from server',
+          undefined,
+          'Server response was empty. Please try again.'
+        )
       }
+
+      // Validate response data
+      if (!response.data.streamUrl || !response.data.expiresAt) {
+        throw new SignedUrlError(
+          SignedUrlErrorType.VALIDATION,
+          'Invalid response data structure',
+          undefined,
+          'Invalid server response. Please contact support.'
+        )
+      }
+
+      const duration = Date.now() - startTime
+      console.log(`Successfully fetched signed URL for movie ${movieId} in ${duration}ms`)
 
       return response.data
     } catch (error) {
+      const duration = Date.now() - startTime
+      const signedUrlError =
+        error instanceof SignedUrlError ? error : this.createErrorFromUnknown(error)
+
+      console.error(
+        `Failed to fetch signed URL for movie ${movieId} (attempt ${attempt + 1}) after ${duration}ms:`,
+        signedUrlError
+      )
+
       // If we've exhausted retries, throw the error
       if (attempt >= this.config.maxRetries) {
-        throw error instanceof SignedUrlError ? error : this.createErrorFromUnknown(error)
+        console.error(`Max retries (${this.config.maxRetries}) exceeded for movie ${movieId}`)
+        throw signedUrlError
       }
 
-      // For certain error types, don't retry
-      if (error instanceof SignedUrlError && error.type === SignedUrlErrorType.AUTHENTICATION) {
-        throw error
+      // Check if error is retryable
+      if (!signedUrlError.isRetryable) {
+        console.log(`Error is not retryable for movie ${movieId}:`, signedUrlError.type)
+        throw signedUrlError
       }
 
-      // Wait before retrying with exponential backoff
-      const delay = this.config.retryDelay * Math.pow(2, attempt)
+      // Calculate delay with jitter to prevent thundering herd
+      const baseDelay = signedUrlError.getRetryDelay(attempt)
+      const jitter = Math.random() * 0.1 * baseDelay // Add up to 10% jitter
+      const delay = Math.floor(baseDelay + jitter)
+
+      console.log(
+        `Retrying in ${delay}ms for movie ${movieId} (attempt ${attempt + 2}/${this.config.maxRetries + 1})`
+      )
+
       await this.sleep(delay)
-
       return this.fetchWithRetry(movieId, attempt + 1)
     }
   }
 
   /**
-   * Create a SignedUrlError from API response error
+   * Create a SignedUrlError from API response error with comprehensive classification
    * Requirements: 4.2, 4.4
    */
   private createErrorFromResponse(error: any): SignedUrlError {
-    // Check for authentication errors
-    if (error.status === 401 || error.status === 403) {
+    const status = error.status
+    const message = error.message || error.statusText || 'Unknown error'
+
+    // Authentication errors (401, 403)
+    if (status === 401) {
       return new SignedUrlError(
         SignedUrlErrorType.AUTHENTICATION,
-        'Authentication failed. Please log in again.',
-        error
+        'Authentication token expired or invalid',
+        error,
+        'Your session has expired. Please log in again.'
       )
     }
 
-    // Check for server errors
-    if (error.status >= 500) {
+    if (status === 403) {
+      return new SignedUrlError(
+        SignedUrlErrorType.AUTHENTICATION,
+        'Access forbidden for this resource',
+        error,
+        'You do not have permission to access this video.'
+      )
+    }
+
+    // Client errors (400-499)
+    if (status === 400) {
+      return new SignedUrlError(
+        SignedUrlErrorType.VALIDATION,
+        'Invalid request parameters',
+        error,
+        'Invalid video request. Please try refreshing the page.'
+      )
+    }
+
+    if (status === 404) {
+      return new SignedUrlError(
+        SignedUrlErrorType.VALIDATION,
+        'Video not found',
+        error,
+        'This video is no longer available.'
+      )
+    }
+
+    if (status === 429) {
+      return new SignedUrlError(
+        SignedUrlErrorType.RATE_LIMIT,
+        'Rate limit exceeded',
+        error,
+        'Too many requests. Please wait a moment before trying again.'
+      )
+    }
+
+    // Server errors (500-599)
+    if (status >= 500 && status < 600) {
+      const serverMessage =
+        status === 503
+          ? 'Service temporarily unavailable. Please try again in a few minutes.'
+          : 'Server error occurred. Our team has been notified.'
+
       return new SignedUrlError(
         SignedUrlErrorType.SERVER,
-        'Server error occurred. Please try again later.',
-        error
+        `Server error: ${status} ${message}`,
+        error,
+        serverMessage
       )
     }
 
-    // Check for network errors
-    if (!error.status) {
+    // Network errors (no status code)
+    if (!status || status === 0) {
+      // Check for specific network error types
+      if (error.name === 'TimeoutError' || message.includes('timeout')) {
+        return new SignedUrlError(
+          SignedUrlErrorType.TIMEOUT,
+          'Request timeout',
+          error,
+          'Request timed out. Please check your connection and try again.'
+        )
+      }
+
+      if (
+        error.name === 'NetworkError' ||
+        message.includes('network') ||
+        message.includes('fetch')
+      ) {
+        return new SignedUrlError(
+          SignedUrlErrorType.NETWORK,
+          'Network connection failed',
+          error,
+          'Unable to connect to the server. Please check your internet connection.'
+        )
+      }
+
       return new SignedUrlError(
         SignedUrlErrorType.NETWORK,
-        'Network error occurred. Please check your connection.',
-        error
+        'Network error occurred',
+        error,
+        'Connection problem detected. Please check your internet connection.'
+      )
+    }
+
+    // Unknown client errors
+    if (status >= 400 && status < 500) {
+      return new SignedUrlError(
+        SignedUrlErrorType.VALIDATION,
+        `Client error: ${status} ${message}`,
+        error,
+        'Request failed. Please try refreshing the page.'
       )
     }
 
     // Default to unknown error
     return new SignedUrlError(
       SignedUrlErrorType.UNKNOWN,
-      `Request failed with status ${error.status}`,
-      error
+      `Unexpected error: ${status} ${message}`,
+      error,
+      'An unexpected error occurred. Please try refreshing the page.'
     )
   }
 
   /**
-   * Create a SignedUrlError from unknown error
+   * Create a SignedUrlError from unknown error with enhanced classification
    */
   private createErrorFromUnknown(error: unknown): SignedUrlError {
     if (error instanceof Error) {
-      return new SignedUrlError(SignedUrlErrorType.UNKNOWN, error.message, error)
+      // Try to classify based on error name and message
+      const errorName = error.name.toLowerCase()
+      const errorMessage = error.message.toLowerCase()
+
+      if (errorName.includes('timeout') || errorMessage.includes('timeout')) {
+        return new SignedUrlError(
+          SignedUrlErrorType.TIMEOUT,
+          `Timeout error: ${error.message}`,
+          error,
+          'Request timed out. Please try again.'
+        )
+      }
+
+      if (
+        errorName.includes('network') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('connection')
+      ) {
+        return new SignedUrlError(
+          SignedUrlErrorType.NETWORK,
+          `Network error: ${error.message}`,
+          error,
+          'Network connection failed. Please check your internet connection.'
+        )
+      }
+
+      if (errorMessage.includes('abort')) {
+        return new SignedUrlError(
+          SignedUrlErrorType.NETWORK,
+          `Request aborted: ${error.message}`,
+          error,
+          'Request was cancelled. Please try again.'
+        )
+      }
+
+      return new SignedUrlError(
+        SignedUrlErrorType.UNKNOWN,
+        `Unknown error: ${error.message}`,
+        error,
+        'An unexpected error occurred. Please try refreshing the page.'
+      )
     }
 
-    return new SignedUrlError(SignedUrlErrorType.UNKNOWN, 'An unknown error occurred')
+    return new SignedUrlError(
+      SignedUrlErrorType.UNKNOWN,
+      'An unknown error occurred',
+      undefined,
+      'An unexpected error occurred. Please try refreshing the page.'
+    )
   }
 
   /**
