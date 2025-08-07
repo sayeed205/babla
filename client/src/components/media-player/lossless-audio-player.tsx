@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/features/auth/stores/auth-store'
 import {
-  AuthenticatedStreamingCore,
-  type ChunkRequest,
-  type StreamingConfig,
-  type StreamingError,
+    AuthenticatedStreamingCore,
+    type ChunkRequest,
+    type StreamingConfig,
+    type StreamingError,
 } from '@/lib/authenticated-streaming-core'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -41,7 +41,7 @@ interface AudioPlayerState {
   isInitialized: boolean
 }
 
-// Audio-specific streaming configuration with smaller chunk sizes optimized for lossless audio
+// Audio-specific streaming configuration with memory optimization
 const AUDIO_STREAMING_CONFIG: StreamingConfig = {
   chunkSize: 512 * 1024, // 512KB default for audio - smaller chunks for better memory management
   maxRetries: 3,
@@ -49,6 +49,9 @@ const AUDIO_STREAMING_CONFIG: StreamingConfig = {
   bufferAhead: 60, // Longer buffer for audio to prevent interruptions
   bufferBehind: 15, // Shorter behind buffer for audio
 }
+
+// Audio memory management constants
+const MAX_AUDIO_MEMORY = 50 * 1024 * 1024 // 50MB max for audio
 
 // Supported lossless audio formats with prioritization - lossless formats prioritized
 const LOSSLESS_AUDIO_FORMATS = [
@@ -79,9 +82,11 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null)
   const streamingCoreRef = useRef<AuthenticatedStreamingCore | null>(null)
   const loadingChunksRef = useRef<Set<string>>(new Set())
+  const audioBlobRef = useRef<Blob | null>(null)
+  const blobUrlRef = useRef<string | null>(null)
 
   // Auth store
-  const { token, isAuthenticated } = useAuthStore()
+  const { token, isAuthenticated, isLoading: authLoading } = useAuthStore()
 
   // Component state
   const [state, setState] = useState<AudioPlayerState>({
@@ -190,6 +195,16 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
 
   // Validate authentication state before loading
   const validateAuthentication = useCallback((): boolean => {
+    // Wait for authentication to complete if still loading
+    if (authLoading) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Loading authentication...',
+        isLoading: true,
+      }))
+      return false
+    }
+
     if (!isAuthenticated) {
       setState((prev) => ({
         ...prev,
@@ -222,7 +237,7 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
     }
 
     return true
-  }, [isAuthenticated, token])
+  }, [authLoading, isAuthenticated, token])
 
   // Load audio with chunked streaming using AuthenticatedStreamingCore
   const loadAudioWithChunks = useCallback(async () => {
@@ -301,9 +316,6 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       const chunkSize = AUDIO_STREAMING_CONFIG.chunkSize
       let currentPosition = 0
       let loadedChunks = 0
-      const totalChunks = Math.ceil(state.totalFileSize / chunkSize)
-
-      console.log(`Loading audio in ${totalChunks} chunks of ${chunkSize / 1024}KB each`)
 
       while (currentPosition < state.totalFileSize) {
         const endPosition = Math.min(currentPosition + chunkSize - 1, state.totalFileSize - 1)
@@ -336,11 +348,6 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
             ...prev,
             currentChunkPosition: currentPosition,
           }))
-
-          // Log progress for lossless audio loading
-          if (state.audioFormat?.isLossless) {
-            console.log(`Loaded lossless audio chunk ${loadedChunks}/${totalChunks}`)
-          }
         } catch (chunkError) {
           console.warn(`Failed to load audio chunk ${chunkKey}:`, chunkError)
 
@@ -362,21 +369,38 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         currentPosition = endPosition + 1
       }
 
-      // Create blob from all chunks with proper MIME type
+      // Create blob from all chunks with proper MIME type and memory management
       if (chunks.length > 0) {
         const mimeType = state.audioFormat?.codec || 'audio/mpeg'
         const audioBlob = new Blob(chunks, { type: mimeType })
+        
+        // Check memory usage
+        const blobSize = audioBlob.size
+        if (blobSize > MAX_AUDIO_MEMORY) {
+          console.warn(`Audio blob size (${(blobSize / 1024 / 1024).toFixed(1)}MB) exceeds memory limit`)
+        }
+
         const blobUrl = URL.createObjectURL(audioBlob)
 
-        console.log(`Created audio blob: ${audioBlob.size} bytes, type: ${mimeType}`)
+        // Store references for cleanup
+        audioBlobRef.current = audioBlob
+        blobUrlRef.current = blobUrl
 
         // Set the blob URL as the audio source
         audioRef.current.src = blobUrl
 
         setState((prev) => ({ ...prev, isLoading: false, isInitialized: true }))
 
+        console.info(`Audio loaded: ${(blobSize / 1024 / 1024).toFixed(1)}MB, ${state.audioFormat?.isLossless ? 'lossless' : 'lossy'} format`)
+
         // Clean up blob URL when component unmounts
-        return () => URL.revokeObjectURL(blobUrl)
+        return () => {
+          if (blobUrlRef.current) {
+            URL.revokeObjectURL(blobUrlRef.current)
+            blobUrlRef.current = null
+          }
+          audioBlobRef.current = null
+        }
       } else {
         throw new Error('No audio chunks were successfully loaded')
       }
@@ -422,18 +446,36 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       loadAudioWithChunks()
     }
 
-    // Cleanup function
+    // Enhanced cleanup function with memory management
     return () => {
-      if (audioRef.current?.src.startsWith('blob:')) {
-        URL.revokeObjectURL(audioRef.current.src)
+      try {
+        // Clean up blob URL
+        if (blobUrlRef.current) {
+          URL.revokeObjectURL(blobUrlRef.current)
+          blobUrlRef.current = null
+        }
+
+        // Clear audio source
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current.src = ''
+          audioRef.current.load()
+        }
+
+        // Clear references
+        audioBlobRef.current = null
+        loadingChunksRef.current.clear()
+
+        console.info('Lossless audio player cleanup completed')
+      } catch (error) {
+        console.warn('Error during audio player cleanup:', error)
       }
-      loadingChunksRef.current.clear()
     }
   }, [src, loadAudioWithChunks])
 
   // Reset state when authentication changes
   useEffect(() => {
-    if (!isAuthenticated || !token) {
+    if (!authLoading && (!isAuthenticated || !token)) {
       setState((prev) => ({
         ...prev,
         error: null,
@@ -442,12 +484,27 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       }))
 
       // Clear audio source if authentication is lost
-      if (audioRef.current?.src.startsWith('blob:')) {
-        URL.revokeObjectURL(audioRef.current.src)
-        audioRef.current.src = ''
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current)
+        blobUrlRef.current = null
       }
+      
+      if (audioRef.current) {
+        audioRef.current.src = ''
+        audioRef.current.load()
+      }
+      
+      audioBlobRef.current = null
     }
-  }, [isAuthenticated, token])
+  }, [authLoading, isAuthenticated, token])
+
+  // Retry loading when authentication becomes available
+  useEffect(() => {
+    if (src && !authLoading && isAuthenticated && token?.token && state.error?.includes('Authentication')) {
+      console.info('Authentication now available, retrying audio loading...')
+      loadAudioWithChunks()
+    }
+  }, [src, authLoading, isAuthenticated, token, state.error, loadAudioWithChunks])
 
   // Audio event handlers
   const handleTimeUpdate = useCallback(() => {

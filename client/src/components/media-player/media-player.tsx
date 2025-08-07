@@ -67,7 +67,6 @@ export function MediaPlayer({
     (url: string, providedType?: 'video' | 'audio'): 'video' | 'audio' => {
       // If type is explicitly provided, use it (highest priority)
       if (providedType) {
-        console.log(`Media type explicitly provided: ${providedType}`)
         return providedType
       }
 
@@ -123,7 +122,6 @@ export function MediaPlayer({
 
       // Check for lossless audio first (highest priority for audio detection)
       if (losslessAudioExtensions.some((ext) => urlLower.includes(ext))) {
-        console.log('Detected lossless audio format, routing to LosslessAudioPlayer')
         return 'audio'
       }
 
@@ -132,7 +130,6 @@ export function MediaPlayer({
         audioExtensions.some((ext) => urlLower.includes(ext)) ||
         audioPatterns.some((pattern) => urlLower.includes(pattern))
       ) {
-        console.log('Detected audio format, routing to LosslessAudioPlayer')
         return 'audio'
       }
 
@@ -141,7 +138,6 @@ export function MediaPlayer({
         videoExtensions.some((ext) => urlLower.includes(ext)) ||
         videoPatterns.some((pattern) => urlLower.includes(pattern))
       ) {
-        console.log('Detected video format, routing to MSEVideoPlayer')
         return 'video'
       }
 
@@ -154,18 +150,15 @@ export function MediaPlayer({
         if (formatParam) {
           const format = formatParam.toLowerCase()
           if (format.includes('audio')) {
-            console.log('Detected audio from URL parameters, routing to LosslessAudioPlayer')
             return 'audio'
           }
           if (format.includes('video')) {
-            console.log('Detected video from URL parameters, routing to MSEVideoPlayer')
             return 'video'
           }
         }
       }
 
       // Default to video for unknown streaming endpoints (most common case)
-      console.log('No specific media type detected, defaulting to video (MSEVideoPlayer)')
       return 'video'
     },
     []
