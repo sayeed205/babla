@@ -64,13 +64,19 @@ router
           .as('show')
           .where('id', router.matchers.slug())
         router
-          .get('/:id/stream', [MoviesController, 'stream'])
-          .as('stream')
+          .get('/:id/stream-url', [MoviesController, 'getStreamUrl'])
+          .as('streamUrl')
           .where('id', router.matchers.slug())
       })
       .as('movies')
       .prefix('movies')
       .use([middleware.auth()])
+
+    // Stream endpoint - no auth required since it uses signed URLs for security
+    router
+      .get('movies/:id/stream', [MoviesController, 'stream'])
+      .as('movies.stream')
+      .where('id', router.matchers.slug())
 
     /*
     |--------------------------------------------------------------------------

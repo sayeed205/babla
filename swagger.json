@@ -6567,7 +6567,28 @@
             "in": "path",
             "description": "",
             "required": true,
-            "example": "mission-impossible-1996",
+            "example": "sudani-from-nigeria-2018",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expires",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": 1754552483,
+            "schema": {
+              "type": "integer",
+              "format": "uint64"
+            }
+          },
+          {
+            "name": "signature",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "2fcac33f0da2527b8898a01e39dad03e8ace4ebca25a4533fd7ddfc05f55279e",
             "schema": {
               "type": "string"
             }
@@ -6581,6 +6602,71 @@
                 "schema": {
                   "type": "object",
                   "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/movies/{id}/stream-url": {
+      "get": {
+        "summary": "Get Stream URL",
+        "deprecated": false,
+        "description": "",
+        "tags": ["Movies"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "streamUrl": {
+                      "type": "string"
+                    },
+                    "expiresAt": {
+                      "type": "integer"
+                    },
+                    "expiresIn": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["streamUrl", "expiresAt", "expiresIn"]
+                },
+                "example": {
+                  "streamUrl": "/api/movies/sudani-from-nigeria-2018/stream?expires=1754552483&signature=2fcac33f0da2527b8898a01e39dad03e8ace4ebca25a4533fd7ddfc05f55279e",
+                  "expiresAt": 1754552483,
+                  "expiresIn": 3600
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedAccess"
                 }
               }
             },

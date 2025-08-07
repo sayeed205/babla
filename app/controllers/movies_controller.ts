@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
 
 import Movie from '#models/movie'
 import { moviePaginateValidator } from '#validators/movie_validator'
@@ -8,6 +9,9 @@ import cache from '@adonisjs/cache/services/main'
 import bindMovie from '#decorators/bind_movie'
 
 export default class MoviesController {
+  private readonly SIGNING_SECRET = process.env.STREAM_SIGNING_SECRET || 'your-secret-key'
+  private readonly URL_EXPIRY = 3600 // 1 hour in seconds
+
   async index({ request }: HttpContext) {
     const {
       page = 1,
@@ -58,9 +62,50 @@ export default class MoviesController {
     })
   }
 
-  async stream({ request, response, params }: HttpContext) {
-    const movie = await Movie.find(params.id)
-    if (!movie) return response.notFound({ message: 'Movie not found' })
+  @bindMovie()
+  async getStreamUrl({}: HttpContext, movie: Movie) {
+    // Create expiration timestamp
+    const expiresAt = Math.floor(Date.now() / 1000) + this.URL_EXPIRY
+
+    // Create signature payload
+    const payload = {
+      movieId: movie.id,
+      expiresAt,
+    }
+
+    // Generate signature
+    const signature = this.generateSignature(payload)
+
+    // Create the signed streaming URL
+    const streamUrl = router.makeUrl(
+      'api.movies.stream',
+      { id: movie.id },
+      {
+        qs: {
+          expires: expiresAt,
+          signature,
+        },
+      }
+    )
+
+    return {
+      streamUrl,
+      expiresAt,
+      expiresIn: this.URL_EXPIRY,
+    }
+  }
+
+  @bindMovie()
+  async stream({ request, response }: HttpContext, movie: Movie) {
+    // Verify signed URL
+    const expires = request.input('expires')
+    const signature = request.input('signature')
+
+    if (!this.verifySignature(movie.id, expires, signature)) {
+      return response.unauthorized({
+        message: 'Invalid or expired streaming URL',
+      })
+    }
 
     const { size, mimeType } = movie.metadata
     const range = request.header('range')
@@ -108,5 +153,41 @@ export default class MoviesController {
     })
 
     return response.stream(tgStream)
+  }
+
+  /**
+   * Generate HMAC signature for URL signing
+   */
+  private generateSignature(payload: { movieId: string; expiresAt: number }): string {
+    const data = `${payload.movieId}-${payload.expiresAt}`
+    return crypto.createHmac('sha256', this.SIGNING_SECRET).update(data).digest('hex')
+  }
+
+  /**
+   * Verify the signature and expiration of a signed URL
+   */
+  private verifySignature(movieId: string, expires: string, signature: string): boolean {
+    if (!expires || !signature) {
+      return false
+    }
+
+    const expiresAt = Number.parseInt(expires, 10)
+
+    // Check if URL has expired
+    if (Number.isNaN(expiresAt) || expiresAt < Math.floor(Date.now() / 1000)) {
+      return false
+    }
+
+    // Generate expected signature
+    const expectedSignature = this.generateSignature({
+      movieId,
+      expiresAt,
+    })
+
+    // Use constant-time comparison to prevent timing attacks
+    return crypto.timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    )
   }
 }

@@ -6408,10 +6408,15 @@ export interface paths {
     /** Movie Stream by ID */
     get: {
       parameters: {
-        query?: never
+        query?: {
+          /** @example 1754552483 */
+          expires?: number
+          /** @example 2fcac33f0da2527b8898a01e39dad03e8ace4ebca25a4533fd7ddfc05f55279e */
+          signature?: string
+        }
         header?: never
         path: {
-          /** @example mission-impossible-1996 */
+          /** @example sudani-from-nigeria-2018 */
           id: string
         }
         cookie?: never
@@ -6424,6 +6429,60 @@ export interface paths {
           }
           content: {
             'application/json': Record<string, never>
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/movies/{id}/stream-url': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get Stream URL */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            /** @example {
+             *       "streamUrl": "/api/movies/sudani-from-nigeria-2018/stream?expires=1754552483&signature=2fcac33f0da2527b8898a01e39dad03e8ace4ebca25a4533fd7ddfc05f55279e",
+             *       "expiresAt": 1754552483,
+             *       "expiresIn": 3600
+             *     } */
+            'application/json': {
+              streamUrl: string
+              expiresAt: number
+              expiresIn: number
+            }
+          }
+        }
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            'application/json': components['schemas']['UnauthorizedAccess']
           }
         }
       }
