@@ -94,8 +94,13 @@ export class SignedUrlService {
     const refreshTime = this.calculateRefreshTime(expiresAt, this.config.refreshBufferTime)
     const delay = Math.max(0, refreshTime - Date.now())
 
+    console.log(
+      `Scheduling proactive URL refresh for movie ${movieId} in ${Math.round(delay / 1000)} seconds`
+    )
+
     const timer = setTimeout(async () => {
       try {
+        console.log(`Executing proactive URL refresh for movie ${movieId}`)
         const response = await this.refreshSignedUrl(movieId)
         callback(response)
 
@@ -145,6 +150,28 @@ export class SignedUrlService {
   shouldRefresh(expiresAt: number): boolean {
     const refreshTime = this.calculateRefreshTime(expiresAt, this.config.refreshBufferTime)
     return Date.now() >= refreshTime
+  }
+
+  /**
+   * Check if a URL has expired
+   */
+  isExpired(expiresAt: number): boolean {
+    return Date.now() >= expiresAt * 1000
+  }
+
+  /**
+   * Get time remaining until URL expires (in seconds)
+   */
+  getTimeUntilExpiry(expiresAt: number): number {
+    return Math.max(0, expiresAt - Math.floor(Date.now() / 1000))
+  }
+
+  /**
+   * Get time remaining until proactive refresh (in seconds)
+   */
+  getTimeUntilRefresh(expiresAt: number): number {
+    const refreshTime = this.calculateRefreshTime(expiresAt, this.config.refreshBufferTime)
+    return Math.max(0, Math.floor((refreshTime - Date.now()) / 1000))
   }
 
   /**
