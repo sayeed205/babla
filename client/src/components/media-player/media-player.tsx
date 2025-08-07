@@ -2,23 +2,22 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import {
-  Cast,
-  Download,
-  Loader2,
-  Maximize,
-  Minimize,
-  Pause,
-  PictureInPicture,
-  Play,
-  Settings,
-  SkipBack,
-  SkipForward,
-  Volume2,
-  VolumeX,
+    Cast,
+    Download,
+    Loader2,
+    Maximize,
+    Minimize,
+    Pause,
+    PictureInPicture,
+    Play,
+    Settings,
+    SkipBack,
+    SkipForward,
+    Volume2,
+    VolumeX,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import LosslessAudioPlayer from './lossless-audio-player'
-import { MSEVideoPlayer } from './mse-video-player'
+import { LosslessAudioPlayer, MSEVideoPlayer } from './index'
 
 interface MediaPlayerProps {
   src: string

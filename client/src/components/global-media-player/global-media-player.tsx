@@ -19,8 +19,7 @@ import {
     X,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import LosslessAudioPlayer from '../media-player/lossless-audio-player'
-import { MSEVideoPlayer } from '../media-player/mse-video-player'
+import { LosslessAudioPlayer, MSEVideoPlayer } from '../media-player'
 
 export function GlobalMediaPlayer() {
     const videoRef = useRef<HTMLVideoElement>(null!)
