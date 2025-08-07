@@ -3,20 +3,20 @@ import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import { useMediaPlayerStore } from '@/stores/media-player-store'
 import {
-    ChevronDown,
-    ChevronUp,
-    Maximize,
-    Minimize,
-    Pause,
-    Play,
-    Repeat,
-    Repeat1,
-    Shuffle,
-    SkipBack,
-    SkipForward,
-    Volume2,
-    VolumeX,
-    X,
+  ChevronDown,
+  ChevronUp,
+  Maximize,
+  Minimize,
+  Pause,
+  Play,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  X,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LosslessAudioPlayer, MSEVideoPlayer } from '../media-player'
@@ -147,14 +147,13 @@ export function GlobalMediaPlayer() {
               console.warn('Error removing SourceBuffer:', error)
             }
           }
-          
+
           currentMediaSourceRef.current.endOfStream()
         }
 
         // Remove event listeners to prevent memory leaks
         currentMediaSourceRef.current.removeEventListener('sourceopen', () => {})
         currentMediaSourceRef.current.removeEventListener('error', () => {})
-
       } catch (error) {
         console.warn('Error ending MediaSource:', error)
       }
@@ -186,15 +185,15 @@ export function GlobalMediaPlayer() {
     audioElements?.forEach((audio) => {
       try {
         audio.pause()
-        
+
         // Clean up blob URLs to free memory
         if (audio.src.startsWith('blob:')) {
           URL.revokeObjectURL(audio.src)
         }
-        
+
         audio.src = ''
         audio.load()
-        
+
         // Remove event listeners to prevent memory leaks
         audio.removeEventListener('timeupdate', () => {})
         audio.removeEventListener('loadedmetadata', () => {})
@@ -458,18 +457,18 @@ export function GlobalMediaPlayer() {
 
     const bufferMonitorInterval = setInterval(() => {
       cleanupOldBuffers()
-      
+
       // Memory usage monitoring (Chrome-specific)
       if (typeof performance !== 'undefined' && 'memory' in performance) {
         const memoryInfo = (performance as any).memory
         if (memoryInfo && memoryInfo.usedJSHeapSize && memoryInfo.jsHeapSizeLimit) {
           const usedMB = (memoryInfo.usedJSHeapSize / 1024 / 1024).toFixed(1)
           const limitMB = (memoryInfo.jsHeapSizeLimit / 1024 / 1024).toFixed(1)
-          
+
           // Log memory usage if it's getting high
           if (memoryInfo.usedJSHeapSize > memoryInfo.jsHeapSizeLimit * 0.8) {
             console.warn(`High memory usage detected: ${usedMB}MB / ${limitMB}MB`)
-            
+
             // Force cleanup if memory is critically high
             if (memoryInfo.usedJSHeapSize > memoryInfo.jsHeapSizeLimit * 0.9) {
               console.warn('Critical memory usage, forcing cleanup')

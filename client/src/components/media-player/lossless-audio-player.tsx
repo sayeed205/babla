@@ -1,9 +1,9 @@
 import { useAuthStore } from '@/features/auth/stores/auth-store'
 import {
-    AuthenticatedStreamingCore,
-    type ChunkRequest,
-    type StreamingConfig,
-    type StreamingError,
+  AuthenticatedStreamingCore,
+  type ChunkRequest,
+  type StreamingConfig,
+  type StreamingError,
 } from '@/lib/authenticated-streaming-core'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -373,11 +373,13 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
       if (chunks.length > 0) {
         const mimeType = state.audioFormat?.codec || 'audio/mpeg'
         const audioBlob = new Blob(chunks, { type: mimeType })
-        
+
         // Check memory usage
         const blobSize = audioBlob.size
         if (blobSize > MAX_AUDIO_MEMORY) {
-          console.warn(`Audio blob size (${(blobSize / 1024 / 1024).toFixed(1)}MB) exceeds memory limit`)
+          console.warn(
+            `Audio blob size (${(blobSize / 1024 / 1024).toFixed(1)}MB) exceeds memory limit`
+          )
         }
 
         const blobUrl = URL.createObjectURL(audioBlob)
@@ -391,7 +393,9 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
 
         setState((prev) => ({ ...prev, isLoading: false, isInitialized: true }))
 
-        console.info(`Audio loaded: ${(blobSize / 1024 / 1024).toFixed(1)}MB, ${state.audioFormat?.isLossless ? 'lossless' : 'lossy'} format`)
+        console.info(
+          `Audio loaded: ${(blobSize / 1024 / 1024).toFixed(1)}MB, ${state.audioFormat?.isLossless ? 'lossless' : 'lossy'} format`
+        )
 
         // Clean up blob URL when component unmounts
         return () => {
@@ -488,19 +492,25 @@ export const LosslessAudioPlayer: React.FC<LosslessAudioPlayerProps> = ({
         URL.revokeObjectURL(blobUrlRef.current)
         blobUrlRef.current = null
       }
-      
+
       if (audioRef.current) {
         audioRef.current.src = ''
         audioRef.current.load()
       }
-      
+
       audioBlobRef.current = null
     }
   }, [authLoading, isAuthenticated, token])
 
   // Retry loading when authentication becomes available
   useEffect(() => {
-    if (src && !authLoading && isAuthenticated && token?.token && state.error?.includes('Authentication')) {
+    if (
+      src &&
+      !authLoading &&
+      isAuthenticated &&
+      token?.token &&
+      state.error?.includes('Authentication')
+    ) {
       console.info('Authentication now available, retrying audio loading...')
       loadAudioWithChunks()
     }
