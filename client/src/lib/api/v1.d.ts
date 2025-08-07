@@ -385,14 +385,17 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/movies/{id}/info': {
+  '/movies/{id}': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /** Movie Info by ID */
+    /**
+     * Movie by ID
+     * @description Get movie details by ID
+     */
     get: {
       parameters: {
         query?: never

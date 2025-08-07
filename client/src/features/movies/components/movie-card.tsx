@@ -32,8 +32,9 @@ export const MovieCard = memo(function MovieCard({ movie, priority = false }: Mo
   // Memoized poster URL - use TMDB base URL for posters
   const posterUrl = useMemo(() => {
     if (!movie.poster) return null
-    return `https://image.tmdb.org/t/p/w500${movie.poster}`
+    return `https://image.tmdb.org/t/p/original${movie.poster}`
   }, [movie.poster])
+
 
   // Memoized fallback image generation
   const fallbackImage = useMemo(() => {

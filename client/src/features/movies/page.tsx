@@ -4,8 +4,8 @@ import { Main } from '@/components/layout/main.tsx'
 import { PaginationControls } from '@/components/pagination-controls'
 import { SearchInput } from '@/components/search-input'
 import {
-  getMoviesSearchParamsWithDefaults,
-  type MoviesSearchParams,
+    getMoviesSearchParamsWithDefaults,
+    type MoviesSearchParams,
 } from '@/features/movies/types/search-params'
 import { apiQuery } from '@/lib/api-client.ts'
 import { useNavigate, useSearch } from '@tanstack/react-router'
@@ -14,7 +14,7 @@ import { FilterBar } from './components/filter-bar'
 import { MovieGrid } from './components/movie-grid'
 
 export default function MovieList() {
-  const searchParams = useSearch({ from: '/_authenticated/movies' })
+  const searchParams = useSearch({ from: '/_authenticated/movies/' })
   const navigate = useNavigate()
 
   // Memoize search params with defaults to prevent unnecessary re-renders
@@ -59,13 +59,6 @@ export default function MovieList() {
     queryKey: [
       'movies',
       'list',
-      {
-        page,
-        limit,
-        sort,
-        order,
-        ...(search && { search }),
-      },
     ],
     staleTime: 0,
     gcTime: 0,

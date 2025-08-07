@@ -32,9 +32,7 @@ function MovieDetailsPage() {
         <h1 className="text-lg font-semibold">Movie Details</h1>
       </Header>
       <Main>
-        <div className="max-w-7xl mx-auto px-4 py-6">
           <MovieDetails id={id} />
-        </div>
       </Main>
     </>
   )

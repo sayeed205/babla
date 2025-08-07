@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedMoviesRouteImport } from './routes/_authenticated/movies'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
-import { Route as AuthenticatedMoviesIdRouteImport } from './routes/_authenticated/movies.$id'
+import { Route as AuthenticatedMoviesIndexRouteImport } from './routes/_authenticated/movies/index'
+import { Route as AuthenticatedMoviesIdRouteImport } from './routes/_authenticated/movies/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -30,35 +30,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedMoviesRoute = AuthenticatedMoviesRouteImport.update({
-  id: '/movies',
-  path: '/movies',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMoviesIndexRoute = AuthenticatedMoviesIndexRouteImport.update({
+  id: '/movies/',
+  path: '/movies/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMoviesIdRoute = AuthenticatedMoviesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedMoviesRoute,
+  id: '/movies/$id',
+  path: '/movies/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/movies': typeof AuthenticatedMoviesRouteWithChildren
   '/movies/$id': typeof AuthenticatedMoviesIdRoute
+  '/movies': typeof AuthenticatedMoviesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/movies': typeof AuthenticatedMoviesRouteWithChildren
   '/movies/$id': typeof AuthenticatedMoviesIdRoute
+  '/movies': typeof AuthenticatedMoviesIndexRoute
 }
 export interface FileRoutesById {
   '__root__': typeof rootRouteImport
@@ -66,22 +66,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
-  '/_authenticated/movies': typeof AuthenticatedMoviesRouteWithChildren
   '/_authenticated/movies/$id': typeof AuthenticatedMoviesIdRoute
+  '/_authenticated/movies/': typeof AuthenticatedMoviesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/home' | '/movies' | '/movies/$id'
+  fullPaths: '/' | '/login' | '/home' | '/movies/$id' | '/movies'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/home' | '/movies' | '/movies/$id'
+  to: '/' | '/login' | '/home' | '/movies/$id' | '/movies'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/home'
-    | '/_authenticated/movies'
     | '/_authenticated/movies/$id'
+    | '/_authenticated/movies/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,13 +113,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/movies': {
-      id: '/_authenticated/movies'
-      path: '/movies'
-      fullPath: '/movies'
-      preLoaderRoute: typeof AuthenticatedMoviesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -127,36 +120,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/movies/': {
+      id: '/_authenticated/movies/'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof AuthenticatedMoviesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/movies/$id': {
       id: '/_authenticated/movies/$id'
-      path: '/$id'
+      path: '/movies/$id'
       fullPath: '/movies/$id'
       preLoaderRoute: typeof AuthenticatedMoviesIdRouteImport
-      parentRoute: typeof AuthenticatedMoviesRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedMoviesRouteChildren {
-  AuthenticatedMoviesIdRoute: typeof AuthenticatedMoviesIdRoute
-}
-
-const AuthenticatedMoviesRouteChildren: AuthenticatedMoviesRouteChildren = {
-  AuthenticatedMoviesIdRoute: AuthenticatedMoviesIdRoute,
-}
-
-const AuthenticatedMoviesRouteWithChildren = AuthenticatedMoviesRoute._addFileChildren(
-  AuthenticatedMoviesRouteChildren
-)
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
-  AuthenticatedMoviesRoute: typeof AuthenticatedMoviesRouteWithChildren
+  AuthenticatedMoviesIdRoute: typeof AuthenticatedMoviesIdRoute
+  AuthenticatedMoviesIndexRoute: typeof AuthenticatedMoviesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
-  AuthenticatedMoviesRoute: AuthenticatedMoviesRouteWithChildren,
+  AuthenticatedMoviesIdRoute: AuthenticatedMoviesIdRoute,
+  AuthenticatedMoviesIndexRoute: AuthenticatedMoviesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren = AuthenticatedRouteRoute._addFileChildren(
