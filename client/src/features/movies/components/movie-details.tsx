@@ -17,16 +17,12 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { apiQuery } from '@/lib/api-client'
-import { createMovieMediaItem } from '@/lib/media-utils'
-import { useMediaPlayerStore } from '@/stores/media-player-store'
 
 interface MovieDetailsProps {
   id: string
 }
 
 export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps) {
-  const { playMedia } = useMediaPlayerStore()
-
   // Fetch movie info using the correct endpoint
   const {
     data: movieData,
@@ -46,16 +42,6 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
   const handleRetry = useCallback(() => {
     refetch()
   }, [refetch])
-
-  const handlePlay = useCallback(() => {
-    if (!movieData) return
-
-    const mediaItem = createMovieMediaItem(id, {
-      ...movieData,
-      id: movieData.id?.toString(),
-    })
-    playMedia(mediaItem)
-  }, [playMedia, movieData, id])
 
   // Loading state
   if (isLoading) {
@@ -195,7 +181,7 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                   <Button
                     size="lg"
                     className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105"
-                    onClick={handlePlay}
+                    disabled
                   >
                     <Play className="w-5 h-5 mr-2 fill-current" />
                     Play

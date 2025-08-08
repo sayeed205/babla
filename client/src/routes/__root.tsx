@@ -3,7 +3,6 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
-import { GlobalMediaPlayer } from '@/components/global-media-player/global-media-player.tsx'
 import AuthGuard from '@/components/layout/auth-guard.tsx'
 import { NavigationProgress } from '@/components/navigation-progress.tsx'
 import { Toaster } from '@/components/ui/sonner.tsx'
@@ -22,7 +21,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <AuthGuard>
         <Outlet />
       </AuthGuard>
-      <GlobalMediaPlayer />
       <Toaster duration={5000} />
       {import.meta.env.DEV && (
         <>
