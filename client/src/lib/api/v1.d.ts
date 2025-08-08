@@ -6466,13 +6466,19 @@ export interface paths {
           }
           content: {
             /** @example {
-             *       "streamUrl": "/api/movies/sudani-from-nigeria-2018/stream?expires=1754552483&signature=2fcac33f0da2527b8898a01e39dad03e8ace4ebca25a4533fd7ddfc05f55279e",
-             *       "expiresAt": 1754552483,
+             *       "streamUrl": "/api/movies/sudani-from-nigeria-2018/stream?expires=1754638719&signature=ec1ee087b1e0b0e1b7bd65c6c92766c16868022c626a40b572b0f3b7cd6ce851",
+             *       "expiresAt": 1754638719,
+             *       "size": 4012473511,
+             *       "filename": "Sudani from Nigeria (2018) [tmdbid-504314] - [WEB-HEVC][AAC .mp4",
+             *       "mimeType": "video/mp4",
              *       "expiresIn": 3600
              *     } */
             'application/json': {
               streamUrl: string
               expiresAt: number
+              size: number
+              filename: string
+              mimeType: string
               expiresIn: number
             }
           }

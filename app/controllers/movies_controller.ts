@@ -1,12 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import crypto from 'node:crypto'
 
+import bindMovie from '#decorators/bind_movie'
 import Movie from '#models/movie'
 import { moviePaginateValidator } from '#validators/movie_validator'
+import cache from '@adonisjs/cache/services/main'
 import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
-import cache from '@adonisjs/cache/services/main'
-import bindMovie from '#decorators/bind_movie'
 
 export default class MoviesController {
   private readonly SIGNING_SECRET = process.env.STREAM_SIGNING_SECRET || 'your-secret-key'
@@ -91,6 +91,7 @@ export default class MoviesController {
     return {
       streamUrl,
       expiresAt,
+      ...movie.metadata,
       expiresIn: this.URL_EXPIRY,
     }
   }
