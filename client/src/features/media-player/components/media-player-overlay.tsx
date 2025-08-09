@@ -7,7 +7,8 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp, Maximize2, Minimize2, X } from 'lucide-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useAccessibility } from '../hooks'
 import { useMediaPlayer } from '../providers'
 import { useErrorState } from '../stores/media-player-store'
 import { AudioPlayer } from './audio-player'
@@ -28,11 +29,26 @@ interface OverlayPosition {
 export function MediaPlayerOverlay() {
   const { playerState, stop } = useMediaPlayer()
   const errorState = useErrorState()
+  const overlayRef = useRef<HTMLDivElement>(null!)
   const [overlaySize, setOverlaySize] = useState<OverlaySize>('normal')
   const [position, setPosition] = useState<OverlayPosition>({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isVisible, setIsVisible] = useState(false)
+
+  // Accessibility features
+  const {
+    getAriaAttributes,
+    announceStateChange,
+    getAccessibilityClasses,
+    storeFocus,
+    restorePreviousFocus,
+    createSkipLink,
+  } = useAccessibility(overlayRef, {
+    trapFocus: overlaySize === 'maximized',
+    restoreFocus: true,
+    skipLinks: true,
+  })
 
   // Show/hide overlay based on media state
   useEffect(() => {
@@ -47,24 +63,34 @@ export function MediaPlayerOverlay() {
 
   // Handle overlay close
   const handleClose = useCallback(() => {
+    announceStateChange('Media player closed')
+    restorePreviousFocus()
     stop()
     setOverlaySize('normal')
-  }, [stop])
+  }, [stop, announceStateChange, restorePreviousFocus])
 
   // Handle minimize/maximize
   const handleToggleSize = useCallback(() => {
+    let newSize: OverlaySize
     if (overlaySize === 'minimized') {
-      setOverlaySize('normal')
+      newSize = 'normal'
+      announceStateChange('Media player restored')
     } else if (overlaySize === 'normal') {
-      setOverlaySize('maximized')
+      newSize = 'maximized'
+      announceStateChange('Media player maximized')
+      storeFocus()
     } else {
-      setOverlaySize('normal')
+      newSize = 'normal'
+      announceStateChange('Media player restored')
+      restorePreviousFocus()
     }
-  }, [overlaySize])
+    setOverlaySize(newSize)
+  }, [overlaySize, announceStateChange, storeFocus, restorePreviousFocus])
 
   const handleMinimize = useCallback(() => {
     setOverlaySize('minimized')
-  }, [])
+    announceStateChange('Media player minimized')
+  }, [announceStateChange])
 
   // Drag functionality for minimized state
   const handleMouseDown = useCallback(
@@ -230,135 +256,162 @@ export function MediaPlayerOverlay() {
   const overlayStyles = getOverlayStyles()
 
   return (
-    <div
-      className={cn(
-        'bg-black rounded-lg shadow-2xl border border-gray-800 overflow-hidden transition-all duration-300 ease-in-out',
-        {
-          'cursor-move': overlaySize === 'minimized',
-          'animate-in slide-in-from-bottom-4 fade-in-0': isVisible,
-          'animate-out slide-out-to-bottom-4 fade-out-0': !isVisible,
-        }
+    <>
+      {/* Skip link for accessibility */}
+      {overlaySize === 'maximized' && (
+        <a
+          {...createSkipLink('media-player-controls', 'Skip to media player controls')}
+          className="skip-link"
+        />
       )}
-      style={overlayStyles}
-      onMouseDown={handleMouseDown}
-    >
-      {/* Header with controls */}
+
       <div
+        ref={overlayRef}
         className={cn(
-          'flex items-center justify-between bg-gray-900/90 backdrop-blur-sm px-3 py-2 border-b border-gray-700',
+          'media-player-overlay bg-black rounded-lg shadow-2xl border border-gray-800 overflow-hidden transition-all duration-300 ease-in-out',
+          getAccessibilityClasses(),
           {
             'cursor-move': overlaySize === 'minimized',
-            'hidden': overlaySize === 'maximized' && playerState.isFullscreen,
+            'animate-in slide-in-from-bottom-4 fade-in-0': isVisible,
+            'animate-out slide-out-to-bottom-4 fade-out-0': !isVisible,
           }
         )}
+        style={overlayStyles}
+        onMouseDown={handleMouseDown}
+        {...getAriaAttributes('player')}
+        role="dialog"
+        aria-modal={overlaySize === 'maximized'}
+        aria-label={`Media player: ${playerState.currentMedia?.title || 'No media'}`}
       >
-        <div className="flex items-center space-x-2 min-w-0 flex-1">
-          <div className="min-w-0 flex-1">
-            <h3 className="text-white text-sm font-medium truncate">
-              {playerState.currentMedia.title}
-            </h3>
-            {playerState.currentMedia.type === 'tv' && (
-              <p className="text-gray-400 text-xs truncate">
-                {(playerState.currentMedia as any).seriesTitle &&
-                  `${(playerState.currentMedia as any).seriesTitle} • `}
-                S{(playerState.currentMedia as any).seasonNumber}E
-                {(playerState.currentMedia as any).episodeNumber}
-              </p>
-            )}
-            {playerState.currentMedia.type === 'music' && (
-              <p className="text-gray-400 text-xs truncate">
-                {(playerState.currentMedia as any).artist}
-              </p>
-            )}
+        {/* Header with controls */}
+        <div
+          id="media-player-controls"
+          className={cn(
+            'flex items-center justify-between bg-gray-900/90 backdrop-blur-sm px-3 py-2 border-b border-gray-700',
+            {
+              'cursor-move': overlaySize === 'minimized',
+              'hidden': overlaySize === 'maximized' && playerState.isFullscreen,
+            }
+          )}
+          {...getAriaAttributes('controls')}
+        >
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-white text-sm font-medium truncate">
+                {playerState.currentMedia.title}
+              </h3>
+              {playerState.currentMedia.type === 'tv' && (
+                <p className="text-gray-400 text-xs truncate">
+                  {(playerState.currentMedia as any).seriesTitle &&
+                    `${(playerState.currentMedia as any).seriesTitle} • `}
+                  S{(playerState.currentMedia as any).seasonNumber}E
+                  {(playerState.currentMedia as any).episodeNumber}
+                </p>
+              )}
+              {playerState.currentMedia.type === 'music' && (
+                <p className="text-gray-400 text-xs truncate">
+                  {(playerState.currentMedia as any).artist}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-1">
-          {/* Minimize/Restore button */}
-          {overlaySize !== 'minimized' && (
+          <div className="flex items-center space-x-1">
+            {/* Minimize/Restore button */}
+            {overlaySize !== 'minimized' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 media-player-button"
+                onClick={handleMinimize}
+                aria-label="Minimize media player"
+                title="Minimize"
+              >
+                <Minimize2 className="h-3 w-3" />
+              </Button>
+            )}
+
+            {/* Maximize/Restore button */}
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700"
-              onClick={handleMinimize}
-              title="Minimize"
+              className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700 media-player-button"
+              onClick={handleToggleSize}
+              aria-label={
+                overlaySize === 'maximized'
+                  ? 'Restore media player'
+                  : overlaySize === 'minimized'
+                    ? 'Restore media player'
+                    : 'Maximize media player'
+              }
+              title={
+                overlaySize === 'maximized'
+                  ? 'Restore'
+                  : overlaySize === 'minimized'
+                    ? 'Restore'
+                    : 'Maximize'
+              }
             >
-              <Minimize2 className="h-3 w-3" />
+              {overlaySize === 'maximized' ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : overlaySize === 'minimized' ? (
+                <ChevronUp className="h-3 w-3" />
+              ) : (
+                <Maximize2 className="h-3 w-3" />
+              )}
             </Button>
+
+            {/* Close button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-gray-400 hover:text-white hover:bg-red-600 media-player-button"
+              onClick={handleClose}
+              aria-label="Close media player"
+              title="Close"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Player content */}
+        <div
+          className={cn('relative bg-black', {
+            'h-[calc(100%-40px)]': overlaySize !== 'maximized' || !playerState.isFullscreen,
+            'h-full': overlaySize === 'maximized' && playerState.isFullscreen,
+          })}
+        >
+          {renderPlayer()}
+
+          {/* Loading overlay */}
+          {playerState.isLoading && !errorState.hasError && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <p className="text-white text-sm">Loading...</p>
+              </div>
+            </div>
           )}
 
-          {/* Maximize/Restore button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700"
-            onClick={handleToggleSize}
-            title={
-              overlaySize === 'maximized'
-                ? 'Restore'
-                : overlaySize === 'minimized'
-                  ? 'Restore'
-                  : 'Maximize'
-            }
-          >
-            {overlaySize === 'maximized' ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : overlaySize === 'minimized' ? (
-              <ChevronUp className="h-3 w-3" />
-            ) : (
-              <Maximize2 className="h-3 w-3" />
-            )}
-          </Button>
-
-          {/* Close button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 text-gray-400 hover:text-white hover:bg-red-600"
-            onClick={handleClose}
-            title="Close"
-          >
-            <X className="h-3 w-3" />
-          </Button>
+          {/* Recovery overlay */}
+          {errorState.isRecovering && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <p className="text-white text-sm">Recovering...</p>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Player content */}
-      <div
-        className={cn('relative bg-black', {
-          'h-[calc(100%-40px)]': overlaySize !== 'maximized' || !playerState.isFullscreen,
-          'h-full': overlaySize === 'maximized' && playerState.isFullscreen,
-        })}
-      >
-        {renderPlayer()}
-
-        {/* Loading overlay */}
-        {playerState.isLoading && !errorState.hasError && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="flex flex-col items-center space-y-2">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              <p className="text-white text-sm">Loading...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Recovery overlay */}
-        {errorState.isRecovering && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="flex flex-col items-center space-y-2">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-              <p className="text-white text-sm">Recovering...</p>
-            </div>
+        {/* Resize handle for minimized state */}
+        {overlaySize === 'minimized' && (
+          <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 hover:opacity-100">
+            <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-gray-500"></div>
           </div>
         )}
       </div>
-
-      {/* Resize handle for minimized state */}
-      {overlaySize === 'minimized' && (
-        <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 hover:opacity-100">
-          <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-gray-500"></div>
-        </div>
-      )}
-    </div>
+    </>
   )
 }

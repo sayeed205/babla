@@ -3,7 +3,9 @@
  * Provides media player state and actions throughout the application
  */
 
-import React, { createContext, useContext, useEffect, useRef } from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { KeyboardShortcutsHelp } from '../components'
+import { useKeyboardShortcuts } from '../hooks'
 import type { MediaPlayerStore } from '../stores/media-player-store'
 import { useMediaPlayerStore } from '../stores/media-player-store'
 
@@ -31,6 +33,9 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
   // Ref to track if provider is mounted
   const isMountedRef = useRef(true)
 
+  // State for keyboard shortcuts help
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
+
   // Provider initialization
   useEffect(() => {
     // Any initialization logic can go here
@@ -50,99 +55,25 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
     }
   }, [store])
 
-  // Handle global keyboard shortcuts
+  // Use enhanced keyboard shortcuts hook
+  const { shortcuts } = useKeyboardShortcuts({
+    enabled: store.config.keyboard,
+    announceShortcuts: true,
+    preventDefaultOnInputs: true,
+  })
+
+  // Override the help shortcut to show our modal
   useEffect(() => {
-    if (!store.config.keyboard) {
-      return
-    }
-
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Only handle shortcuts if no input is focused
-      const activeElement = document.activeElement
-      const isInputFocused =
-        activeElement &&
-        (activeElement.tagName === 'INPUT' ||
-          activeElement.tagName === 'TEXTAREA' ||
-          activeElement.getAttribute('contenteditable') === 'true')
-
-      if (isInputFocused) {
-        return
-      }
-
-      // Handle keyboard shortcuts
-      switch (event.code) {
-        case 'Space':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            if (store.playerState.isPlaying) {
-              store.pause()
-            } else {
-              store.resume()
-            }
-          }
-          break
-
-        case 'ArrowLeft':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            const newTime = Math.max(0, store.playerState.currentTime - 10)
-            store.seek(newTime)
-          }
-          break
-
-        case 'ArrowRight':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            const newTime = Math.min(store.playerState.duration, store.playerState.currentTime + 10)
-            store.seek(newTime)
-          }
-          break
-
-        case 'ArrowUp':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            const newVolume = Math.min(1, store.playerState.volume + 0.1)
-            store.setVolume(newVolume)
-          }
-          break
-
-        case 'ArrowDown':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            const newVolume = Math.max(0, store.playerState.volume - 0.1)
-            store.setVolume(newVolume)
-          }
-          break
-
-        case 'KeyM':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            store.toggleMute()
-          }
-          break
-
-        case 'KeyF':
-          event.preventDefault()
-          if (store.playerState.currentMedia) {
-            store.toggleFullscreen()
-          }
-          break
-
-        case 'Escape':
-          event.preventDefault()
-          if (store.playerState.isFullscreen) {
-            store.setIsFullscreen(false)
-          }
-          break
+      if (event.key === '?' && event.shiftKey && store.config.keyboard) {
+        event.preventDefault()
+        setShowKeyboardHelp(true)
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [store, store.config.keyboard])
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [store.config.keyboard])
 
   // Handle fullscreen changes
   useEffect(() => {
@@ -163,7 +94,18 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
   // Context value - pass through the entire store
   const contextValue: MediaPlayerContextValue = store
 
-  return <MediaPlayerContext.Provider value={contextValue}>{children}</MediaPlayerContext.Provider>
+  return (
+    <MediaPlayerContext.Provider value={contextValue}>
+      {children}
+
+      {/* Keyboard shortcuts help modal */}
+      <KeyboardShortcutsHelp
+        isOpen={showKeyboardHelp}
+        onClose={() => setShowKeyboardHelp(false)}
+        shortcuts={shortcuts}
+      />
+    </MediaPlayerContext.Provider>
+  )
 }
 
 /**

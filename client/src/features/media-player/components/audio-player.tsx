@@ -6,6 +6,7 @@
 import { MediaPlayer, MediaProvider, type MediaPlayerInstance } from '@vidstack/react'
 import { DefaultAudioLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import { useEffect, useRef, useState } from 'react'
+import { useAccessibility } from '../hooks'
 import { streamingService } from '../services'
 import { useMediaPlayerStore } from '../stores'
 import type { MediaPlayerErrorType, MediaSource, MusicMediaItem } from '../types'
@@ -20,10 +21,14 @@ interface AudioPlayerProps {
 
 export function AudioPlayer({ media, className }: AudioPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
+  const containerRef = useRef<HTMLDivElement>(null!)
   const [mediaSource, setMediaSource] = useState<MediaSource | null>(null)
   const [localError, setLocalError] = useState<MediaPlayerErrorType | null>(null)
   const retryManager = useRef(createStreamingRetryManager())
   const { handleAuthError } = useAuthErrorHandler()
+
+  // Accessibility features
+  const { getAriaAttributes, getAccessibilityClasses } = useAccessibility(containerRef)
 
   // Store actions and state
   const {
@@ -306,7 +311,9 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
 
   return (
     <div
-      className={`bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-lg overflow-hidden ${className}`}
+      ref={containerRef}
+      className={`media-player-container bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-lg overflow-hidden ${getAccessibilityClasses()} ${className}`}
+      {...getAriaAttributes('player')}
     >
       {/* Album Art and Metadata Section */}
       <div className="flex flex-col md:flex-row p-6 gap-6">

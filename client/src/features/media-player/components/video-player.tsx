@@ -6,6 +6,7 @@
 import { MediaPlayer, MediaProvider, Poster, type MediaPlayerInstance } from '@vidstack/react'
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import { useEffect, useRef, useState } from 'react'
+import { useAccessibility } from '../hooks'
 import { streamingService } from '../services'
 import { useMediaPlayerStore } from '../stores'
 import type { MediaItem, MediaPlayerErrorType, MediaSource } from '../types'
@@ -20,10 +21,14 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({ media, className }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
+  const containerRef = useRef<HTMLDivElement>(null!)
   const [mediaSource, setMediaSource] = useState<MediaSource | null>(null)
   const [localError, setLocalError] = useState<MediaPlayerErrorType | null>(null)
   const retryManager = useRef(createStreamingRetryManager())
   const { handleAuthError } = useAuthErrorHandler()
+
+  // Accessibility features
+  const { getAriaAttributes, getAccessibilityClasses } = useAccessibility(containerRef)
 
   // Store actions and state
   const {
@@ -284,34 +289,40 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
   }
 
   return (
-    <MediaPlayer
-      ref={playerRef}
-      className={className}
-      title={media.title}
-      src={mediaSource.url}
-      crossOrigin
-      playsInline
-      autoPlay={config.autoplay}
-      loop={config.loop}
-      volume={config.volume}
-      muted={playerState.isMuted}
-      playbackRate={playerState.playbackRate}
+    <div
+      ref={containerRef}
+      className={`media-player-container ${getAccessibilityClasses()}`}
+      {...getAriaAttributes('player')}
     >
-      <MediaProvider>
-        {media.thumbnail && (
-          <Poster className="vds-poster" src={media.thumbnail} alt={`${media.title} poster`} />
-        )}
-      </MediaProvider>
+      <MediaPlayer
+        ref={playerRef}
+        className={className}
+        title={media.title}
+        src={mediaSource.url}
+        crossOrigin
+        playsInline
+        autoPlay={config.autoplay}
+        loop={config.loop}
+        volume={config.volume}
+        muted={playerState.isMuted}
+        playbackRate={playerState.playbackRate}
+      >
+        <MediaProvider>
+          {media.thumbnail && (
+            <Poster className="vds-poster" src={media.thumbnail} alt={`${media.title} poster`} />
+          )}
+        </MediaProvider>
 
-      <DefaultVideoLayout
-        icons={defaultLayoutIcons}
-        thumbnails={media.thumbnail}
-        slots={
-          {
-            // Custom slots can be added here for additional controls
+        <DefaultVideoLayout
+          icons={defaultLayoutIcons}
+          thumbnails={media.thumbnail}
+          slots={
+            {
+              // Custom slots can be added here for additional controls
+            }
           }
-        }
-      />
-    </MediaPlayer>
+        />
+      </MediaPlayer>
+    </div>
   )
 }

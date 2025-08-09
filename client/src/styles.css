@@ -2,6 +2,7 @@
 @import '@vidstack/react/player/styles/base.css';
 @import '@vidstack/react/player/styles/default/theme.css';
 @import '@vidstack/react/player/styles/default/layouts/video.css';
+@import './features/media-player/styles/accessibility.css';
 
 @plugin "tailwindcss-animate";
 
