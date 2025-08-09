@@ -1,0 +1,322 @@
+/**
+ * MediaPlayerOverlay Component
+ * Global overlay component that appears when media is playing
+ * Provides minimize/maximize functionality and responsive design
+ */
+
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { ChevronDown, ChevronUp, Maximize2, Minimize2, X } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useMediaPlayer } from '../providers'
+import { AudioPlayer } from './audio-player'
+import { VideoPlayer } from './video-player'
+
+// Overlay size states
+type OverlaySize = 'minimized' | 'normal' | 'maximized'
+
+// Overlay position for minimized state
+interface OverlayPosition {
+  x: number
+  y: number
+}
+
+export function MediaPlayerOverlay() {
+  const { playerState, stop } = useMediaPlayer()
+  const [overlaySize, setOverlaySize] = useState<OverlaySize>('normal')
+  const [position, setPosition] = useState<OverlayPosition>({ x: 20, y: 20 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [isVisible, setIsVisible] = useState(false)
+
+  // Show/hide overlay based on media state
+  useEffect(() => {
+    if (playerState.currentMedia) {
+      setIsVisible(true)
+    } else {
+      // Delay hiding to allow for smooth animations
+      const timer = setTimeout(() => setIsVisible(false), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [playerState.currentMedia])
+
+  // Handle overlay close
+  const handleClose = useCallback(() => {
+    stop()
+    setOverlaySize('normal')
+  }, [stop])
+
+  // Handle minimize/maximize
+  const handleToggleSize = useCallback(() => {
+    if (overlaySize === 'minimized') {
+      setOverlaySize('normal')
+    } else if (overlaySize === 'normal') {
+      setOverlaySize('maximized')
+    } else {
+      setOverlaySize('normal')
+    }
+  }, [overlaySize])
+
+  const handleMinimize = useCallback(() => {
+    setOverlaySize('minimized')
+  }, [])
+
+  const handleMaximize = useCallback(() => {
+    setOverlaySize('maximized')
+  }, [])
+
+  // Drag functionality for minimized state
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (overlaySize !== 'minimized') return
+
+      setIsDragging(true)
+      const rect = e.currentTarget.getBoundingClientRect()
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      })
+    },
+    [overlaySize]
+  )
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging || overlaySize !== 'minimized') return
+
+      const newX = e.clientX - dragOffset.x
+      const newY = e.clientY - dragOffset.y
+
+      // Keep within viewport bounds
+      const maxX = window.innerWidth - 320 // Approximate minimized width
+      const maxY = window.innerHeight - 180 // Approximate minimized height
+
+      setPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+      })
+    },
+    [isDragging, overlaySize, dragOffset]
+  )
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  // Global mouse event listeners for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp])
+
+  // Handle escape key to close overlay
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && playerState.currentMedia && !playerState.isFullscreen) {
+        handleClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleClose, playerState.currentMedia, playerState.isFullscreen])
+
+  // Don't render if no media or not visible
+  if (!isVisible || !playerState.currentMedia) {
+    return null
+  }
+
+  // Render appropriate player component based on media type
+  const renderPlayer = () => {
+    if (!playerState.currentMedia) return null
+
+    switch (playerState.currentMedia.type) {
+      case 'movie':
+      case 'tv':
+        return <VideoPlayer media={playerState.currentMedia} className="w-full h-full" />
+      case 'music':
+        return <AudioPlayer media={playerState.currentMedia} className="w-full h-full" />
+      default:
+        return (
+          <div className="flex items-center justify-center w-full h-full bg-black text-white">
+            <p>Unsupported media type</p>
+          </div>
+        )
+    }
+  }
+
+  // Overlay styles based on size state
+  const getOverlayStyles = () => {
+    switch (overlaySize) {
+      case 'minimized':
+        return {
+          position: 'fixed' as const,
+          left: position.x,
+          top: position.y,
+          width: '320px',
+          height: '180px',
+          zIndex: 1000,
+        }
+      case 'maximized':
+        return {
+          position: 'fixed' as const,
+          inset: 0,
+          zIndex: 1000,
+        }
+      default: // normal
+        return {
+          position: 'fixed' as const,
+          bottom: '20px',
+          right: '20px',
+          width: '480px',
+          height: '270px',
+          zIndex: 1000,
+        }
+    }
+  }
+
+  const overlayStyles = getOverlayStyles()
+
+  return (
+    <div
+      className={cn(
+        'bg-black rounded-lg shadow-2xl border border-gray-800 overflow-hidden transition-all duration-300 ease-in-out',
+        {
+          'cursor-move': overlaySize === 'minimized',
+          'animate-in slide-in-from-bottom-4 fade-in-0': isVisible,
+          'animate-out slide-out-to-bottom-4 fade-out-0': !isVisible,
+        }
+      )}
+      style={overlayStyles}
+      onMouseDown={handleMouseDown}
+    >
+      {/* Header with controls */}
+      <div
+        className={cn(
+          'flex items-center justify-between bg-gray-900/90 backdrop-blur-sm px-3 py-2 border-b border-gray-700',
+          {
+            'cursor-move': overlaySize === 'minimized',
+            'hidden': overlaySize === 'maximized' && playerState.isFullscreen,
+          }
+        )}
+      >
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-white text-sm font-medium truncate">
+              {playerState.currentMedia.title}
+            </h3>
+            {playerState.currentMedia.type === 'tv' && (
+              <p className="text-gray-400 text-xs truncate">
+                {(playerState.currentMedia as any).seriesTitle &&
+                  `${(playerState.currentMedia as any).seriesTitle} • `}
+                S{(playerState.currentMedia as any).seasonNumber}E
+                {(playerState.currentMedia as any).episodeNumber}
+              </p>
+            )}
+            {playerState.currentMedia.type === 'music' && (
+              <p className="text-gray-400 text-xs truncate">
+                {(playerState.currentMedia as any).artist}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-1">
+          {/* Minimize/Restore button */}
+          {overlaySize !== 'minimized' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700"
+              onClick={handleMinimize}
+              title="Minimize"
+            >
+              <Minimize2 className="h-3 w-3" />
+            </Button>
+          )}
+
+          {/* Maximize/Restore button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-gray-400 hover:text-white hover:bg-gray-700"
+            onClick={handleToggleSize}
+            title={
+              overlaySize === 'maximized'
+                ? 'Restore'
+                : overlaySize === 'minimized'
+                  ? 'Restore'
+                  : 'Maximize'
+            }
+          >
+            {overlaySize === 'maximized' ? (
+              <ChevronDown className="h-3 w-3" />
+            ) : overlaySize === 'minimized' ? (
+              <ChevronUp className="h-3 w-3" />
+            ) : (
+              <Maximize2 className="h-3 w-3" />
+            )}
+          </Button>
+
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-gray-400 hover:text-white hover:bg-red-600"
+            onClick={handleClose}
+            title="Close"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Player content */}
+      <div
+        className={cn('relative bg-black', {
+          'h-[calc(100%-40px)]': overlaySize !== 'maximized' || !playerState.isFullscreen,
+          'h-full': overlaySize === 'maximized' && playerState.isFullscreen,
+        })}
+      >
+        {renderPlayer()}
+
+        {/* Loading overlay */}
+        {playerState.isLoading && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <p className="text-white text-sm">Loading...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error overlay */}
+        {playerState.error && (
+          <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
+            <div className="text-center text-white p-4">
+              <h4 className="font-semibold mb-2">Playback Error</h4>
+              <p className="text-sm text-gray-300 mb-4">{playerState.error}</p>
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Resize handle for minimized state */}
+      {overlaySize === 'minimized' && (
+        <div className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize opacity-50 hover:opacity-100">
+          <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-gray-500"></div>
+        </div>
+      )}
+    </div>
+  )
+}
