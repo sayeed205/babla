@@ -46,3 +46,14 @@ export interface UrlRefreshStatus {
   nextRefresh: number
   retryCount: number
 }
+
+// Streaming error codes
+export type StreamingErrorCode =
+  | 'URL_FETCH_FAILED'
+  | 'URL_REFRESH_FAILED'
+  | 'REFRESH_IN_PROGRESS'
+  | 'AUTH_FAILED'
+  | 'API_ERROR'
+  | 'UNSUPPORTED_MEDIA_TYPE'
+  | 'NETWORK_ERROR'
+  | 'TIMEOUT_ERROR'

@@ -9,6 +9,12 @@ export * from './types'
 // Stores
 export * from './stores'
 
+// Services
+export * from './services'
+
+// Hooks
+export * from './hooks'
+
 // Utilities - explicitly export to avoid conflicts
 export {
   createMediaItem,
