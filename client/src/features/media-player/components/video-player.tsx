@@ -3,16 +3,8 @@
  * Vidstack-based video player with full controls and streaming integration
  */
 
-import {
-    MediaPlayer,
-    MediaProvider,
-    Poster,
-    type MediaPlayerInstance,
-} from '@vidstack/react'
-import {
-    DefaultVideoLayout,
-    defaultLayoutIcons,
-} from '@vidstack/react/player/layouts/default'
+import { MediaPlayer, MediaProvider, Poster, type MediaPlayerInstance } from '@vidstack/react'
+import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default'
 import { useEffect, useRef, useState } from 'react'
 import { streamingService } from '../services'
 import { useMediaPlayerStore } from '../stores'
@@ -58,7 +50,7 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
         setStoreError(null)
 
         const source = await streamingService.getStreamingUrl(media.id, media.type)
-        
+
         if (!isCancelled) {
           setMediaSource(source)
         }
@@ -211,20 +203,18 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
     >
       <MediaProvider>
         {media.thumbnail && (
-          <Poster
-            className="vds-poster"
-            src={media.thumbnail}
-            alt={`${media.title} poster`}
-          />
+          <Poster className="vds-poster" src={media.thumbnail} alt={`${media.title} poster`} />
         )}
       </MediaProvider>
 
       <DefaultVideoLayout
         icons={defaultLayoutIcons}
         thumbnails={media.thumbnail}
-        slots={{
-          // Custom slots can be added here for additional controls
-        }}
+        slots={
+          {
+            // Custom slots can be added here for additional controls
+          }
+        }
       />
     </MediaPlayer>
   )
