@@ -9,7 +9,11 @@ import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp, Maximize2, Minimize2, X } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useMediaPlayer } from '../providers'
+import { useErrorState } from '../stores/media-player-store'
 import { AudioPlayer } from './audio-player'
+import { ErrorDisplay } from './error-display'
+import { MediaPlayerErrorBoundary } from './media-player-error-boundary'
+import { UnsupportedMediaFallback } from './unsupported-media-fallback'
 import { VideoPlayer } from './video-player'
 
 // Overlay size states
@@ -23,6 +27,7 @@ interface OverlayPosition {
 
 export function MediaPlayerOverlay() {
   const { playerState, stop } = useMediaPlayer()
+  const errorState = useErrorState()
   const [overlaySize, setOverlaySize] = useState<OverlaySize>('normal')
   const [position, setPosition] = useState<OverlayPosition>({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
@@ -59,10 +64,6 @@ export function MediaPlayerOverlay() {
 
   const handleMinimize = useCallback(() => {
     setOverlaySize('minimized')
-  }, [])
-
-  const handleMaximize = useCallback(() => {
-    setOverlaySize('maximized')
   }, [])
 
   // Drag functionality for minimized state
@@ -137,16 +138,60 @@ export function MediaPlayerOverlay() {
   const renderPlayer = () => {
     if (!playerState.currentMedia) return null
 
+    // Show error display if there's an error
+    if (errorState.hasError) {
+      return (
+        <div className="flex items-center justify-center w-full h-full p-4">
+          <ErrorDisplay errorState={errorState} compact={overlaySize === 'minimized'} />
+        </div>
+      )
+    }
+
+    // Check for unsupported media types
+    const supportedTypes = ['movie', 'tv', 'music']
+    if (!supportedTypes.includes(playerState.currentMedia.type)) {
+      return (
+        <div className="flex items-center justify-center w-full h-full p-4">
+          <UnsupportedMediaFallback media={playerState.currentMedia} onClose={handleClose} />
+        </div>
+      )
+    }
+
+    // Render appropriate player component
     switch (playerState.currentMedia.type) {
       case 'movie':
       case 'tv':
-        return <VideoPlayer media={playerState.currentMedia} className="w-full h-full" />
+        return (
+          <MediaPlayerErrorBoundary
+            onError={(error, errorInfo) => {
+              console.error('Video player error:', error, errorInfo)
+            }}
+            onRetry={() => {
+              // Retry logic could be implemented here
+              window.location.reload()
+            }}
+          >
+            <VideoPlayer media={playerState.currentMedia} className="w-full h-full" />
+          </MediaPlayerErrorBoundary>
+        )
       case 'music':
-        return <AudioPlayer media={playerState.currentMedia} className="w-full h-full" />
+        return (
+          <MediaPlayerErrorBoundary
+            onError={(error, errorInfo) => {
+              console.error('Audio player error:', error, errorInfo)
+            }}
+            onRetry={() => {
+              // Retry logic could be implemented here
+              window.location.reload()
+            }}
+          >
+            <AudioPlayer media={playerState.currentMedia} className="w-full h-full" />
+          </MediaPlayerErrorBoundary>
+        )
       default:
         return (
-          <div className="flex items-center justify-center w-full h-full bg-black text-white">
-            <p>Unsupported media type</p>
+          <div className="flex items-center justify-center w-full h-full p-4">
+            <UnsupportedMediaFallback media={playerState.currentMedia} onClose={handleClose} />
           </div>
         )
     }
@@ -288,7 +333,7 @@ export function MediaPlayerOverlay() {
         {renderPlayer()}
 
         {/* Loading overlay */}
-        {playerState.isLoading && (
+        {playerState.isLoading && !errorState.hasError && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div className="flex flex-col items-center space-y-2">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -297,15 +342,12 @@ export function MediaPlayerOverlay() {
           </div>
         )}
 
-        {/* Error overlay */}
-        {playerState.error && (
-          <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-            <div className="text-center text-white p-4">
-              <h4 className="font-semibold mb-2">Playback Error</h4>
-              <p className="text-sm text-gray-300 mb-4">{playerState.error}</p>
-              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-                Retry
-              </Button>
+        {/* Recovery overlay */}
+        {errorState.isRecovering && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <p className="text-white text-sm">Recovering...</p>
             </div>
           </div>
         )}

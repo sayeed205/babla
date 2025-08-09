@@ -5,7 +5,15 @@
 
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import type { MediaItem, PlayerConfig, PlayerState } from '../types'
+import type {
+  ErrorRecoveryStrategy,
+  ErrorState,
+  MediaItem,
+  MediaPlayerErrorType,
+  NetworkError,
+  PlayerConfig,
+  PlayerState,
+} from '../types'
 
 // Store interface definition
 export interface MediaPlayerStore {
@@ -14,6 +22,7 @@ export interface MediaPlayerStore {
   config: PlayerConfig
   queue: MediaItem[]
   currentIndex: number
+  errorState: ErrorState
 
   // Playback actions
   playMedia: (media: MediaItem) => void
@@ -50,9 +59,11 @@ export interface MediaPlayerStore {
   setIsFullscreen: (isFullscreen: boolean) => void
   setIsPictureInPicture: (isPictureInPicture: boolean) => void
 
-  // Error handling
-  setError: (error: string | null) => void
+  // Enhanced error handling
+  setError: (error: MediaPlayerErrorType | string | null) => void
   clearError: () => void
+  retryLastAction: () => Promise<void>
+  handleRecovery: (strategy: ErrorRecoveryStrategy) => Promise<void>
 }
 
 // Default player state
@@ -82,6 +93,15 @@ const defaultPlayerConfig: PlayerConfig = {
   tooltips: true,
 }
 
+// Default error state
+const defaultErrorState: ErrorState = {
+  hasError: false,
+  error: null,
+  recoveryStrategy: null,
+  isRecovering: false,
+  retryCount: 0,
+}
+
 // Create the store
 export const useMediaPlayerStore = create<MediaPlayerStore>()(
   devtools(
@@ -91,6 +111,7 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
       config: defaultPlayerConfig,
       queue: [],
       currentIndex: -1,
+      errorState: defaultErrorState,
 
       // Playback actions
       playMedia: (media: MediaItem) => {
@@ -457,13 +478,67 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
         }))
       },
 
-      // Error handling
-      setError: (error: string | null) => {
+      // Enhanced error handling
+      setError: (error: MediaPlayerErrorType | string | null) => {
+        if (!error) {
+          set((state) => ({
+            playerState: {
+              ...state.playerState,
+              error: null,
+            },
+            errorState: defaultErrorState,
+          }))
+          return
+        }
+
+        // Handle string errors (legacy support)
+        if (typeof error === 'string') {
+          set((state) => ({
+            playerState: {
+              ...state.playerState,
+              error,
+              isLoading: false,
+            },
+            errorState: {
+              hasError: true,
+              error: {
+                id: `error-${Date.now()}`,
+                category: 'network',
+                severity: 'medium',
+                message: error,
+                timestamp: Date.now(),
+                recoverable: true,
+                retryable: true,
+              } as NetworkError,
+              recoveryStrategy: {
+                canRecover: true,
+                recoveryAction: 'retry',
+                maxRetries: 3,
+                retryDelay: 2000,
+                userMessage: 'Something went wrong. Would you like to try again?',
+                actionLabel: 'Retry',
+              },
+              isRecovering: false,
+              retryCount: 0,
+            },
+          }))
+          return
+        }
+
+        // Handle structured errors
+        const recoveryStrategy = getRecoveryStrategy(error)
         set((state) => ({
           playerState: {
             ...state.playerState,
+            error: error.message,
+            isLoading: false,
+          },
+          errorState: {
+            hasError: true,
             error,
-            isLoading: error ? false : state.playerState.isLoading,
+            recoveryStrategy,
+            isRecovering: false,
+            retryCount: 0,
           },
         }))
       },
@@ -474,7 +549,90 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
             ...state.playerState,
             error: null,
           },
+          errorState: defaultErrorState,
         }))
+      },
+
+      retryLastAction: async () => {
+        const { errorState, playerState } = get()
+
+        if (!errorState.hasError || !errorState.recoveryStrategy?.canRecover) {
+          return
+        }
+
+        const maxRetries = errorState.recoveryStrategy.maxRetries || 3
+        if (errorState.retryCount >= maxRetries) {
+          return
+        }
+
+        set((state) => ({
+          errorState: {
+            ...state.errorState,
+            isRecovering: true,
+            retryCount: state.errorState.retryCount + 1,
+          },
+        }))
+
+        try {
+          // Add retry delay
+          if (errorState.recoveryStrategy?.retryDelay) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, errorState.recoveryStrategy!.retryDelay)
+            )
+          }
+
+          // Clear error and retry the last action
+          get().clearError()
+
+          // If there was a current media, try to play it again
+          if (playerState.currentMedia) {
+            get().playMedia(playerState.currentMedia)
+          }
+        } catch (retryError) {
+          // If retry fails, set a new error
+          get().setError(typeof retryError === 'string' ? retryError : 'Retry failed')
+        }
+      },
+
+      handleRecovery: async (strategy: ErrorRecoveryStrategy) => {
+        const { errorState } = get()
+
+        if (!errorState.hasError) {
+          return
+        }
+
+        set((state) => ({
+          errorState: {
+            ...state.errorState,
+            isRecovering: true,
+          },
+        }))
+
+        try {
+          switch (strategy.recoveryAction) {
+            case 'retry':
+              await get().retryLastAction()
+              break
+            case 'refresh_url':
+              // This would be handled by the streaming service
+              get().clearError()
+              break
+            case 'fallback':
+              // Implement fallback logic (e.g., lower quality)
+              get().clearError()
+              break
+            case 'user_action':
+              // Clear error and wait for user action
+              get().clearError()
+              break
+            case 'none':
+            default:
+              get().clearError()
+              break
+          }
+        } catch (recoveryError) {
+          get().setError(typeof recoveryError === 'string' ? recoveryError : 'Recovery failed')
+        }
       },
     }),
     {
@@ -482,6 +640,78 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
     }
   )
 )
+
+/**
+ * Get recovery strategy for different error types
+ */
+function getRecoveryStrategy(error: MediaPlayerErrorType): ErrorRecoveryStrategy {
+  switch (error.category) {
+    case 'network':
+      return {
+        canRecover: true,
+        recoveryAction: 'retry',
+        maxRetries: 3,
+        retryDelay: 2000,
+        userMessage: 'Network connection failed. Check your internet connection and try again.',
+        actionLabel: 'Retry',
+      }
+
+    case 'authentication':
+      const authError = error as any
+      return {
+        canRecover: authError.requiresLogin,
+        recoveryAction: 'user_action',
+        userMessage: authError.requiresLogin
+          ? 'Please log in to continue watching.'
+          : 'Authentication failed. Please refresh the page and try again.',
+        actionLabel: authError.requiresLogin ? 'Log In' : 'Refresh',
+      }
+
+    case 'media_format':
+      return {
+        canRecover: true,
+        recoveryAction: 'fallback',
+        userMessage: 'This media format is not supported. Trying alternative format...',
+        actionLabel: 'Try Alternative',
+      }
+
+    case 'signed_url':
+      return {
+        canRecover: true,
+        recoveryAction: 'refresh_url',
+        maxRetries: 2,
+        retryDelay: 1000,
+        userMessage: 'Media link expired. Refreshing...',
+        actionLabel: 'Refresh',
+      }
+
+    case 'player_library':
+      return {
+        canRecover: true,
+        recoveryAction: 'fallback',
+        userMessage: 'Player error occurred. Trying fallback player...',
+        actionLabel: 'Use Fallback',
+      }
+
+    case 'permission':
+      return {
+        canRecover: false,
+        recoveryAction: 'none',
+        userMessage: 'You do not have permission to access this content.',
+        actionLabel: 'OK',
+      }
+
+    default:
+      return {
+        canRecover: true,
+        recoveryAction: 'retry',
+        maxRetries: 2,
+        retryDelay: 2000,
+        userMessage: 'An unexpected error occurred. Would you like to try again?',
+        actionLabel: 'Retry',
+      }
+  }
+}
 
 // Selector hooks for common state access patterns
 export const usePlayerState = () => useMediaPlayerStore((state) => state.playerState)
@@ -492,3 +722,4 @@ export const useCurrentMedia = () => useMediaPlayerStore((state) => state.player
 export const useIsPlaying = () => useMediaPlayerStore((state) => state.playerState.isPlaying)
 export const useIsLoading = () => useMediaPlayerStore((state) => state.playerState.isLoading)
 export const usePlayerError = () => useMediaPlayerStore((state) => state.playerState.error)
+export const useErrorState = () => useMediaPlayerStore((state) => state.errorState)

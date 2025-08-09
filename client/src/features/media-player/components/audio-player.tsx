@@ -8,7 +8,8 @@ import { DefaultAudioLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import { useEffect, useRef, useState } from 'react'
 import { streamingService } from '../services'
 import { useMediaPlayerStore } from '../stores'
-import type { MediaSource, MusicMediaItem } from '../types'
+import type { MediaPlayerErrorType, MediaSource, MusicMediaItem } from '../types'
+import { createStreamingRetryManager, isAuthenticationError, useAuthErrorHandler } from '../utils'
 
 // Vidstack CSS is imported globally in styles.css
 
@@ -20,7 +21,9 @@ interface AudioPlayerProps {
 export function AudioPlayer({ media, className }: AudioPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
   const [mediaSource, setMediaSource] = useState<MediaSource | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<MediaPlayerErrorType | null>(null)
+  const retryManager = useRef(createStreamingRetryManager())
+  const { handleAuthError } = useAuthErrorHandler()
 
   // Store actions and state
   const {
@@ -32,7 +35,6 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
     setVolume,
     setIsLoading,
     setError: setStoreError,
-    setPlaybackRate,
   } = useMediaPlayerStore()
 
   // Load media source when media changes
@@ -44,20 +46,26 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
 
       try {
         setIsLoading(true)
-        setError(null)
+        setLocalError(null)
         setStoreError(null)
 
-        const source = await streamingService.getStreamingUrl(media.id, media.type)
+        // Use retry manager for loading media source
+        const result = await retryManager.current.executeWithRetry('STREAM_URL_FETCH', () =>
+          streamingService.getStreamingUrl(media.id, media.type)
+        )
 
         if (!isCancelled) {
-          setMediaSource(source)
+          if (result.success && result.result) {
+            setMediaSource(result.result)
+            setIsLoading(false)
+          } else if (result.error) {
+            await handleMediaError(result.error)
+          }
         }
       } catch (err) {
         if (!isCancelled) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to load audio'
-          setError(errorMessage)
-          setStoreError(errorMessage)
-          setIsLoading(false)
+          const error = err as MediaPlayerErrorType
+          await handleMediaError(error)
         }
       }
     }
@@ -70,6 +78,22 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
       streamingService.cleanupSession(media.id, media.type)
     }
   }, [media, setIsLoading, setStoreError])
+
+  // Handle media errors with appropriate recovery strategies
+  const handleMediaError = async (error: MediaPlayerErrorType) => {
+    setLocalError(error)
+    setStoreError(error)
+    setIsLoading(false)
+
+    // Handle authentication errors specially
+    if (isAuthenticationError(error)) {
+      await handleAuthError(error, {
+        mediaId: media.id,
+        mediaType: media.type,
+        operation: 'audio-playback',
+      })
+    }
+  }
 
   // Sync player state with store when external actions occur
   useEffect(() => {
@@ -118,11 +142,81 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
     const handleSeeked = () => setIsLoading(false)
     const handleLoadStart = () => setIsLoading(true)
     const handleLoadedData = () => setIsLoading(false)
-    const handleError = () => {
-      const errorMessage = 'Audio playback error'
-      setError(errorMessage)
-      setStoreError(errorMessage)
-      setIsLoading(false)
+    const handleError = (event: Event) => {
+      const target = event.target as HTMLAudioElement
+      const mediaError = target.error
+
+      let error: MediaPlayerErrorType
+
+      if (mediaError) {
+        switch (mediaError.code) {
+          case MediaError.MEDIA_ERR_NETWORK:
+            error = {
+              id: `network-error-${Date.now()}`,
+              category: 'network',
+              severity: 'medium',
+              message: 'Network error occurred during audio playback',
+              details: 'Check your internet connection and try again',
+              timestamp: Date.now(),
+              recoverable: true,
+              retryable: true,
+            }
+            break
+          case MediaError.MEDIA_ERR_DECODE:
+            error = {
+              id: `decode-error-${Date.now()}`,
+              category: 'media_format',
+              severity: 'high',
+              message: 'Audio format is not supported or corrupted',
+              details: 'This audio format cannot be played in your browser',
+              timestamp: Date.now(),
+              recoverable: false,
+              retryable: false,
+              supportedFormats: ['MP3', 'OGG', 'WAV', 'AAC'],
+            } as any
+            break
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            error = {
+              id: `format-error-${Date.now()}`,
+              category: 'media_format',
+              severity: 'high',
+              message: 'Audio source is not supported',
+              details: 'The audio format or codec is not supported by your browser',
+              timestamp: Date.now(),
+              recoverable: false,
+              retryable: false,
+              supportedFormats: ['MP3', 'OGG', 'WAV', 'AAC'],
+            } as any
+            break
+          case MediaError.MEDIA_ERR_ABORTED:
+          default:
+            error = {
+              id: `playback-error-${Date.now()}`,
+              category: 'player_library',
+              severity: 'medium',
+              message: 'Audio playback was interrupted',
+              details: 'The audio playback was aborted due to an error',
+              timestamp: Date.now(),
+              recoverable: true,
+              retryable: true,
+              libraryName: 'Vidstack',
+              libraryVersion: '1.0.0',
+            }
+            break
+        }
+      } else {
+        error = {
+          id: `unknown-error-${Date.now()}`,
+          category: 'network',
+          severity: 'medium',
+          message: 'An unknown audio playback error occurred',
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: true,
+        }
+      }
+
+      handleMediaError(error)
     }
     const handleEnded = () => setIsPlaying(false)
 
@@ -153,10 +247,18 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
       player.removeEventListener('error', handleError)
       player.removeEventListener('ended', handleEnded)
     }
-  }, [setIsPlaying, setCurrentTime, setDuration, setVolume, setIsLoading, setError, setStoreError])
+  }, [
+    setIsPlaying,
+    setCurrentTime,
+    setDuration,
+    setVolume,
+    setIsLoading,
+    setStoreError,
+    handleMediaError,
+  ])
 
-  // Show error state
-  if (error && !mediaSource) {
+  // Show error state - errors are now handled by the overlay component
+  if (localError && !mediaSource) {
     return (
       <div
         className={`flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 rounded-lg ${className}`}
@@ -177,14 +279,10 @@ export function AudioPlayer({ media, className }: AudioPlayerProps) {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold mb-2">Audio Playback Error</h3>
-          <p className="text-sm text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
-          >
-            Retry
-          </button>
+          <h3 className="text-lg font-semibold mb-2">Audio Player Error</h3>
+          <p className="text-sm text-gray-300 mb-4">
+            The audio player encountered an error and will be handled by the error system.
+          </p>
         </div>
       </div>
     )

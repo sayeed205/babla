@@ -4,6 +4,13 @@
  */
 
 import { apiClient } from '@/lib/api-client'
+import type {
+  AuthenticationError,
+  MediaFormatError,
+  MediaPlayerErrorType,
+  NetworkError,
+  SignedUrlError,
+} from '../types'
 import type { MediaType } from '../types/media-player-types'
 import type {
   MediaSource,
@@ -52,7 +59,7 @@ export class StreamingService {
 
       return source
     } catch (error) {
-      throw new StreamingError(
+      throw this.createStructuredError(
         `Failed to get streaming URL for ${mediaType} ${mediaId}`,
         'URL_FETCH_FAILED',
         error
@@ -69,7 +76,18 @@ export class StreamingService {
 
     // Prevent concurrent refresh attempts
     if (refreshStatus?.isRefreshing) {
-      throw new StreamingError('URL refresh already in progress', 'REFRESH_IN_PROGRESS')
+      const error: SignedUrlError = {
+        id: `refresh-in-progress-${Date.now()}`,
+        category: 'signed_url',
+        severity: 'medium',
+        message: 'URL refresh already in progress',
+        timestamp: Date.now(),
+        recoverable: true,
+        retryable: false,
+        urlExpired: false,
+        refreshAttempted: true,
+      }
+      throw error
     }
 
     this.setRefreshStatus(sessionKey, { isRefreshing: true })
@@ -98,7 +116,7 @@ export class StreamingService {
         retryCount: (refreshStatus?.retryCount || 0) + 1,
       })
 
-      throw new StreamingError(
+      throw this.createStructuredError(
         `Failed to refresh streaming URL for ${mediaType} ${mediaId}`,
         'URL_REFRESH_FAILED',
         error
@@ -151,10 +169,17 @@ export class StreamingService {
   private async fetchSignedUrl(mediaId: string, mediaType: MediaType): Promise<MediaSource> {
     // Currently only movies are supported, but this can be extended
     if (mediaType !== 'movie') {
-      throw new StreamingError(
-        `Media type ${mediaType} is not yet supported`,
-        'UNSUPPORTED_MEDIA_TYPE'
-      )
+      const error: MediaFormatError = {
+        id: `unsupported-media-${Date.now()}`,
+        category: 'media_format',
+        severity: 'high',
+        message: `Media type ${mediaType} is not yet supported`,
+        timestamp: Date.now(),
+        recoverable: false,
+        retryable: false,
+        supportedFormats: ['movie'],
+      }
+      throw error
     }
 
     const response = await apiClient.GET('/movies/{id}/stream-url', {
@@ -163,10 +188,32 @@ export class StreamingService {
 
     if (response.error) {
       if (response.response.status === 401) {
-        throw new StreamingError('Authentication failed', 'AUTH_FAILED', response.error)
+        const authError: AuthenticationError = {
+          id: `auth-failed-${Date.now()}`,
+          category: 'authentication',
+          severity: 'high',
+          message: 'Authentication failed',
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: false,
+          requiresLogin: true,
+          tokenExpired: true,
+        }
+        throw authError
       }
 
-      throw new StreamingError('Failed to fetch signed URL', 'API_ERROR', response.error)
+      const networkError: NetworkError = {
+        id: `api-error-${Date.now()}`,
+        category: 'network',
+        severity: 'medium',
+        message: 'Failed to fetch signed URL',
+        timestamp: Date.now(),
+        recoverable: true,
+        retryable: true,
+        statusCode: response.response.status,
+        endpoint: `/movies/${mediaId}/stream-url`,
+      }
+      throw networkError
     }
 
     const data = response.data as StreamUrlResponse
@@ -276,6 +323,88 @@ export class StreamingService {
       sessionKey,
       session,
     }))
+  }
+
+  /**
+   * Create structured error from generic error
+   */
+  private createStructuredError(
+    message: string,
+    code: StreamingErrorCode,
+    cause?: unknown
+  ): MediaPlayerErrorType {
+    // If the cause is already a structured error, return it
+    if (cause && typeof cause === 'object' && 'category' in cause) {
+      return cause as MediaPlayerErrorType
+    }
+
+    // Create appropriate structured error based on the code
+    switch (code) {
+      case 'URL_FETCH_FAILED':
+      case 'URL_REFRESH_FAILED':
+        return {
+          id: `network-error-${Date.now()}`,
+          category: 'network',
+          severity: 'medium',
+          message,
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: true,
+        } as NetworkError
+
+      case 'AUTH_FAILED':
+        const authError: AuthenticationError = {
+          id: `auth-error-${Date.now()}`,
+          category: 'authentication',
+          severity: 'high',
+          message,
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: false,
+          requiresLogin: true,
+          tokenExpired: true,
+        }
+        return authError
+
+      case 'UNSUPPORTED_MEDIA_TYPE':
+        const formatError: MediaFormatError = {
+          id: `format-error-${Date.now()}`,
+          category: 'media_format',
+          severity: 'high',
+          message,
+          timestamp: Date.now(),
+          recoverable: false,
+          retryable: false,
+          supportedFormats: ['movie'],
+        }
+        return formatError
+
+      case 'REFRESH_IN_PROGRESS':
+        const urlError: SignedUrlError = {
+          id: `url-error-${Date.now()}`,
+          category: 'signed_url',
+          severity: 'low',
+          message,
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: false,
+          urlExpired: false,
+          refreshAttempted: true,
+        }
+        return urlError
+
+      default:
+        // Generic error - use network category as fallback
+        return {
+          id: `generic-error-${Date.now()}`,
+          category: 'network',
+          severity: 'medium',
+          message,
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: true,
+        } as NetworkError
+    }
   }
 }
 

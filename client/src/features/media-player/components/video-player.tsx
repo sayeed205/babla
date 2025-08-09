@@ -8,7 +8,8 @@ import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/l
 import { useEffect, useRef, useState } from 'react'
 import { streamingService } from '../services'
 import { useMediaPlayerStore } from '../stores'
-import type { MediaItem, MediaSource } from '../types'
+import type { MediaItem, MediaPlayerErrorType, MediaSource } from '../types'
+import { createStreamingRetryManager, isAuthenticationError, useAuthErrorHandler } from '../utils'
 
 // Vidstack CSS is imported globally in styles.css
 
@@ -20,7 +21,9 @@ interface VideoPlayerProps {
 export function VideoPlayer({ media, className }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null)
   const [mediaSource, setMediaSource] = useState<MediaSource | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<MediaPlayerErrorType | null>(null)
+  const retryManager = useRef(createStreamingRetryManager())
+  const { handleAuthError } = useAuthErrorHandler()
 
   // Store actions and state
   const {
@@ -32,9 +35,6 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
     setVolume,
     setIsLoading,
     setError: setStoreError,
-    setIsFullscreen,
-    setIsPictureInPicture,
-    setPlaybackRate,
   } = useMediaPlayerStore()
 
   // Load media source when media changes
@@ -46,20 +46,26 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
 
       try {
         setIsLoading(true)
-        setError(null)
+        setLocalError(null)
         setStoreError(null)
 
-        const source = await streamingService.getStreamingUrl(media.id, media.type)
+        // Use retry manager for loading media source
+        const result = await retryManager.current.executeWithRetry('STREAM_URL_FETCH', () =>
+          streamingService.getStreamingUrl(media.id, media.type)
+        )
 
         if (!isCancelled) {
-          setMediaSource(source)
+          if (result.success && result.result) {
+            setMediaSource(result.result)
+            setIsLoading(false)
+          } else if (result.error) {
+            await handleMediaError(result.error)
+          }
         }
       } catch (err) {
         if (!isCancelled) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to load media'
-          setError(errorMessage)
-          setStoreError(errorMessage)
-          setIsLoading(false)
+          const error = err as MediaPlayerErrorType
+          await handleMediaError(error)
         }
       }
     }
@@ -72,6 +78,22 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
       streamingService.cleanupSession(media.id, media.type)
     }
   }, [media, setIsLoading, setStoreError])
+
+  // Handle media errors with appropriate recovery strategies
+  const handleMediaError = async (error: MediaPlayerErrorType) => {
+    setLocalError(error)
+    setStoreError(error)
+    setIsLoading(false)
+
+    // Handle authentication errors specially
+    if (isAuthenticationError(error)) {
+      await handleAuthError(error, {
+        mediaId: media.id,
+        mediaType: media.type,
+        operation: 'video-playback',
+      })
+    }
+  }
 
   // Sync player state with store when external actions occur
   useEffect(() => {
@@ -120,11 +142,81 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
     const handleSeeked = () => setIsLoading(false)
     const handleLoadStart = () => setIsLoading(true)
     const handleLoadedData = () => setIsLoading(false)
-    const handleError = () => {
-      const errorMessage = 'Video playback error'
-      setError(errorMessage)
-      setStoreError(errorMessage)
-      setIsLoading(false)
+    const handleError = (event: Event) => {
+      const target = event.target as HTMLVideoElement
+      const mediaError = target.error
+
+      let error: MediaPlayerErrorType
+
+      if (mediaError) {
+        switch (mediaError.code) {
+          case MediaError.MEDIA_ERR_NETWORK:
+            error = {
+              id: `network-error-${Date.now()}`,
+              category: 'network',
+              severity: 'medium',
+              message: 'Network error occurred during video playback',
+              details: 'Check your internet connection and try again',
+              timestamp: Date.now(),
+              recoverable: true,
+              retryable: true,
+            }
+            break
+          case MediaError.MEDIA_ERR_DECODE:
+            error = {
+              id: `decode-error-${Date.now()}`,
+              category: 'media_format',
+              severity: 'high',
+              message: 'Video format is not supported or corrupted',
+              details: 'This video format cannot be played in your browser',
+              timestamp: Date.now(),
+              recoverable: false,
+              retryable: false,
+              supportedFormats: ['MP4', 'WebM', 'OGV'],
+            } as any
+            break
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            error = {
+              id: `format-error-${Date.now()}`,
+              category: 'media_format',
+              severity: 'high',
+              message: 'Video source is not supported',
+              details: 'The video format or codec is not supported by your browser',
+              timestamp: Date.now(),
+              recoverable: false,
+              retryable: false,
+              supportedFormats: ['MP4', 'WebM', 'OGV'],
+            } as any
+            break
+          case MediaError.MEDIA_ERR_ABORTED:
+          default:
+            error = {
+              id: `playback-error-${Date.now()}`,
+              category: 'player_library',
+              severity: 'medium',
+              message: 'Video playback was interrupted',
+              details: 'The video playback was aborted due to an error',
+              timestamp: Date.now(),
+              recoverable: true,
+              retryable: true,
+              libraryName: 'Vidstack',
+              libraryVersion: '1.0.0',
+            }
+            break
+        }
+      } else {
+        error = {
+          id: `unknown-error-${Date.now()}`,
+          category: 'network',
+          severity: 'medium',
+          message: 'An unknown video playback error occurred',
+          timestamp: Date.now(),
+          recoverable: true,
+          retryable: true,
+        }
+      }
+
+      handleMediaError(error)
     }
     const handleEnded = () => setIsPlaying(false)
 
@@ -155,21 +247,25 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
       player.removeEventListener('error', handleError)
       player.removeEventListener('ended', handleEnded)
     }
-  }, [setIsPlaying, setCurrentTime, setDuration, setVolume, setIsLoading, setError, setStoreError])
+  }, [
+    setIsPlaying,
+    setCurrentTime,
+    setDuration,
+    setVolume,
+    setIsLoading,
+    setStoreError,
+    handleMediaError,
+  ])
 
-  // Show error state
-  if (error && !mediaSource) {
+  // Show error state - errors are now handled by the overlay component
+  if (localError && !mediaSource) {
     return (
       <div className={`flex items-center justify-center bg-black text-white p-8 ${className}`}>
         <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">Playback Error</h3>
-          <p className="text-sm text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm"
-          >
-            Retry
-          </button>
+          <h3 className="text-lg font-semibold mb-2">Video Player Error</h3>
+          <p className="text-sm text-gray-300 mb-4">
+            The video player encountered an error and will be handled by the error system.
+          </p>
         </div>
       </div>
     )
