@@ -15,6 +15,9 @@ export * from './services'
 // Hooks
 export * from './hooks'
 
+// Providers
+export * from './providers'
+
 // Utilities - explicitly export to avoid conflicts
 export {
   createMediaItem,
