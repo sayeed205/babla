@@ -3,9 +3,7 @@
  * Provides media player state and actions throughout the application
  */
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { KeyboardShortcutsHelp } from '../components'
-import { useKeyboardShortcuts } from '../hooks'
+import React, { createContext, useContext, useEffect, useRef } from 'react'
 import type { MediaPlayerStore } from '../stores/media-player-store'
 import { useMediaPlayerStore } from '../stores/media-player-store'
 
@@ -33,9 +31,6 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
   // Ref to track if provider is mounted
   const isMountedRef = useRef(true)
 
-  // State for keyboard shortcuts help
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
-
   // Provider initialization
   useEffect(() => {
     // Any initialization logic can go here
@@ -44,36 +39,8 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
     return () => {
       // Cleanup on unmount
       isMountedRef.current = false
-
-      // Stop any playing media and clear state
-      if (store.playerState.isPlaying) {
-        store.stop()
-      }
-
-      // Clear any errors
-      store.clearError()
     }
-  }, [store])
-
-  // Use enhanced keyboard shortcuts hook
-  const { shortcuts } = useKeyboardShortcuts({
-    enabled: store.config.keyboard,
-    announceShortcuts: true,
-    preventDefaultOnInputs: true,
-  })
-
-  // Override the help shortcut to show our modal
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === '?' && event.shiftKey && store.config.keyboard) {
-        event.preventDefault()
-        setShowKeyboardHelp(true)
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [store.config.keyboard])
+  }, [])
 
   // Handle fullscreen changes
   useEffect(() => {
@@ -89,23 +56,12 @@ export function MediaPlayerProvider({ children }: MediaPlayerProviderProps) {
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
     }
-  }, [store])
+  }, [])
 
   // Context value - pass through the entire store
   const contextValue: MediaPlayerContextValue = store
 
-  return (
-    <MediaPlayerContext.Provider value={contextValue}>
-      {children}
-
-      {/* Keyboard shortcuts help modal */}
-      <KeyboardShortcutsHelp
-        isOpen={showKeyboardHelp}
-        onClose={() => setShowKeyboardHelp(false)}
-        shortcuts={shortcuts}
-      />
-    </MediaPlayerContext.Provider>
-  )
+  return <MediaPlayerContext.Provider value={contextValue}>{children}</MediaPlayerContext.Provider>
 }
 
 /**

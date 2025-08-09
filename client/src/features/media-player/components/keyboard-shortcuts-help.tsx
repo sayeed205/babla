@@ -15,18 +15,21 @@ import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useAccessibility } from '../hooks/use-accessibility'
-import type { KeyboardShortcut } from '../hooks/use-keyboard-shortcuts'
+import { type KeyboardShortcut } from '../hooks/use-keyboard-shortcuts'
 
 interface KeyboardShortcutsHelpProps {
   isOpen: boolean
   onClose: () => void
-  shortcuts: KeyboardShortcut[]
+  shortcuts?: KeyboardShortcut[] // Make optional
 }
 
 export function KeyboardShortcutsHelp({ isOpen, onClose, shortcuts }: KeyboardShortcutsHelpProps) {
   const dialogRef = useRef<HTMLDivElement>(null!)
   const { manageFocus, storeFocus, restorePreviousFocus, getAccessibilityClasses } =
     useAccessibility(dialogRef, { trapFocus: true, restoreFocus: true })
+
+  // Use provided shortcuts or empty array
+  const shortcutsToShow = shortcuts || []
 
   // Store focus when dialog opens
   useEffect(() => {
@@ -48,7 +51,7 @@ export function KeyboardShortcutsHelp({ isOpen, onClose, shortcuts }: KeyboardSh
   }, [isOpen, manageFocus])
 
   // Group shortcuts by category
-  const groupedShortcuts = shortcuts.reduce(
+  const groupedShortcuts = shortcutsToShow.reduce(
     (acc, shortcut) => {
       if (!acc[shortcut.category]) {
         acc[shortcut.category] = []
