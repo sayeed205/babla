@@ -115,12 +115,14 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
 
       // Playback actions
       playMedia: (media: MediaItem) => {
+        console.log('playMedia called with:', media)
         set((state) => {
           // Check if media is already in queue
           const existingIndex = state.queue.findIndex((item) => item.id === media.id)
 
           if (existingIndex !== -1) {
             // Media is in queue, just switch to it
+            console.log('Media already in queue, switching to index:', existingIndex)
             return {
               currentIndex: existingIndex,
               playerState: {
@@ -135,6 +137,7 @@ export const useMediaPlayerStore = create<MediaPlayerStore>()(
           } else {
             // Add media to queue and play it
             const newQueue = [...state.queue, media]
+            console.log('Adding media to queue, new queue:', newQueue)
             return {
               queue: newQueue,
               currentIndex: newQueue.length - 1,

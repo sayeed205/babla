@@ -11,11 +11,12 @@ import {
   Share,
   Star,
 } from 'lucide-react'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { createMovieMediaItemFromDetails, useMediaPlayer } from '@/features/media-player'
 import { apiQuery } from '@/lib/api-client'
 
 interface MovieDetailsProps {
@@ -23,6 +24,11 @@ interface MovieDetailsProps {
 }
 
 export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps) {
+  // Media player integration
+  const mediaPlayer = useMediaPlayer()
+  const [isPlaybackLoading, setIsPlaybackLoading] = useState(false)
+  const [playbackError, setPlaybackError] = useState<string | null>(null)
+
   // Fetch movie info using the correct endpoint
   const {
     data: movieData,
@@ -42,6 +48,43 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
   const handleRetry = useCallback(() => {
     refetch()
   }, [refetch])
+
+  // Handle movie playback
+  const handlePlayMovie = useCallback(async () => {
+    if (!movieData) return
+
+    try {
+      setIsPlaybackLoading(true)
+      setPlaybackError(null)
+
+      console.log('Starting movie playback for:', id)
+      console.log('Movie data:', movieData)
+
+      // Create media item from movie data, using the route ID instead of TMDB ID
+      const movieMediaItem = createMovieMediaItemFromDetails(movieData)
+      // Override the ID with the correct database ID from the route
+      movieMediaItem.id = id
+
+      console.log('Created media item:', movieMediaItem)
+
+      // Start playback using media player
+      mediaPlayer.playMedia(movieMediaItem)
+      console.log('Called playMedia')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start playback'
+      setPlaybackError(errorMessage)
+      console.error('Movie playback error:', error)
+    } finally {
+      setIsPlaybackLoading(false)
+    }
+  }, [movieData, mediaPlayer, id])
+
+  // Clear playback error when movie data changes
+  useCallback(() => {
+    if (playbackError) {
+      setPlaybackError(null)
+    }
+  }, [movieData, playbackError])
 
   // Loading state
   if (isLoading) {
@@ -180,11 +223,12 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                 <div className="flex flex-wrap gap-4 pt-4">
                   <Button
                     size="lg"
-                    className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105"
-                    disabled
+                    className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    onClick={handlePlayMovie}
+                    disabled={isPlaybackLoading || !movieData}
                   >
                     <Play className="w-5 h-5 mr-2 fill-current" />
-                    Play
+                    {isPlaybackLoading ? 'Loading...' : 'Play'}
                   </Button>
                   <Button
                     size="lg"
@@ -211,6 +255,25 @@ export const MovieDetails = memo(function MovieDetails({ id }: MovieDetailsProps
                     Share
                   </Button>
                 </div>
+
+                {/* Playback Error Display */}
+                {playbackError && (
+                  <div className="flex items-center gap-3 p-4 bg-red-500/20 border border-red-500/30 rounded-lg backdrop-blur-sm">
+                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-red-100 font-medium">Playback Error</p>
+                      <p className="text-red-200/80 text-sm">{playbackError}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-400/30 text-red-100 hover:bg-red-500/20"
+                      onClick={() => setPlaybackError(null)}
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Right side - Poster */}

@@ -107,7 +107,10 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
 
     // Sync play/pause state
     if (playerState.isPlaying && player.paused) {
-      player.play()
+      player.play().catch((error) => {
+        console.error('Failed to start playback:', error)
+        setIsPlaying(false)
+      })
     } else if (!playerState.isPlaying && !player.paused) {
       player.pause()
     }
@@ -147,6 +150,16 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
     const handleSeeked = () => setIsLoading(false)
     const handleLoadStart = () => setIsLoading(true)
     const handleLoadedData = () => setIsLoading(false)
+    const handleCanPlay = () => {
+      setIsLoading(false)
+      // Now that media is ready, we can start playback if requested
+      if (playerState.isPlaying && player.paused) {
+        player.play().catch((error) => {
+          console.error('Failed to start playback:', error)
+          setIsPlaying(false)
+        })
+      }
+    }
     const handleError = (event: Event) => {
       const target = event.target as HTMLVideoElement
       const mediaError = target.error
@@ -235,6 +248,7 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
     player.addEventListener('seeked', handleSeeked)
     player.addEventListener('loadstart', handleLoadStart)
     player.addEventListener('loadeddata', handleLoadedData)
+    player.addEventListener('can-play', handleCanPlay)
     player.addEventListener('error', handleError)
     player.addEventListener('ended', handleEnded)
 
@@ -249,6 +263,7 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
       player.removeEventListener('seeked', handleSeeked)
       player.removeEventListener('loadstart', handleLoadStart)
       player.removeEventListener('loadeddata', handleLoadedData)
+      player.removeEventListener('can-play', handleCanPlay)
       player.removeEventListener('error', handleError)
       player.removeEventListener('ended', handleEnded)
     }
@@ -298,10 +313,13 @@ export function VideoPlayer({ media, className }: VideoPlayerProps) {
         ref={playerRef}
         className={className}
         title={media.title}
-        src={mediaSource.url}
+        src={{
+          src: mediaSource.url,
+          type: 'video/mp4',
+        }}
         crossOrigin
         playsInline
-        autoPlay={config.autoplay}
+        autoPlay={false} // Disable autoplay to prevent premature play attempts
         loop={config.loop}
         volume={config.volume}
         muted={playerState.isMuted}

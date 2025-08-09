@@ -52,9 +52,12 @@ export function MediaPlayerOverlay() {
 
   // Show/hide overlay based on media state
   useEffect(() => {
+    console.log('MediaPlayerOverlay: playerState.currentMedia changed:', playerState.currentMedia)
     if (playerState.currentMedia) {
+      console.log('MediaPlayerOverlay: Setting visible to true')
       setIsVisible(true)
     } else {
+      console.log('MediaPlayerOverlay: Setting visible to false after delay')
       // Delay hiding to allow for smooth animations
       const timer = setTimeout(() => setIsVisible(false), 300)
       return () => clearTimeout(timer)
